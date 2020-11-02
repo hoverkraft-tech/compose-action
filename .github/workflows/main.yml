@@ -1,0 +1,10 @@
+on: [push]
+
+jobs:
+  test-compose-action:
+    runs-on: ubuntu-latest
+    name: test compose action
+    steps:
+      - uses: isbang/compose-action@v0.1
+        with:
+          compose-file: './docker/docker-compose.yml'

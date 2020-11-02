@@ -1,0 +1,11 @@
+name: 'Docker Compose Action'
+description: 'Run your docker-compose file'
+inputs:
+  compose-file:  # id of input
+    description: 'relative path to compose file'
+    required: false
+    default: './docker-compose.yml'
+runs:
+  using: 'node12'
+  main: 'main.js'
+  post: 'post.js'
