@@ -10,6 +10,11 @@ This action runs your docker-compose file and clean up before action finished.
 
 ## Example usage
 
-uses: isbang/compose-action@v0.1
-with:
-  compose-file: './docker-compose.yml'
+```yaml
+steps:
+  # need checkout before using compose-action
+  - uses: actions/checkout@v2
+  - uses: isbang/compose-action@v0.1
+    with:
+      compose-file: './docker/docker-compose.yml'
+```
