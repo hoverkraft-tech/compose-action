@@ -6,7 +6,8 @@ try {
   const composeFile = core.getInput('compose-file');
 
   if (!fs.existsSync(composeFile)) {
-    core.setFailed(`${composeFile} not exists`);
+    console.log(`${composeFile} not exists`);
+    return
   }
 
   compose.down({ config: composeFile, log: true })
