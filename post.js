@@ -6,10 +6,9 @@ try {
   const composeFile = core.getInput('compose-file');
   const downOptionsString = core.getInput('down-options');
 
+  let options = { config: composeFile, log: true};
   if (downOptionsString.length > 0)
-    let options = { config: composeFile, log: true, commandOptions: downOptionsString.split(" ") };
-  else
-    let options = { config: composeFile, log: true};
+    options['commandOptions'] = downOptionsString.split(" ");
 
   if (!fs.existsSync(composeFile)) {
     console.log(`${composeFile} not exists`);
