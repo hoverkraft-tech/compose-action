@@ -4,7 +4,7 @@ const fs = require('fs');
 
 try {
   const composeFile = core.getInput('compose-file');
-  const downOptions = core.getInput('down-options');
+  const downOptions = core.getInput('down-options').split(" ");
 
   if (!fs.existsSync(composeFile)) {
     console.log(`${composeFile} not exists`);
