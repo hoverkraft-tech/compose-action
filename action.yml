@@ -5,6 +5,10 @@ inputs:
     description: 'relative path to compose file'
     required: false
     default: './docker-compose.yml'
+  down-options:  # id of input
+    description: 'additional options to pass to `docker-compose down` command'
+    required: false
+    default: ''
 runs:
   using: 'node12'
   main: 'main.js'
