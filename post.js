@@ -4,14 +4,19 @@ const fs = require('fs');
 
 try {
   const composeFile = core.getInput('compose-file');
-  const downOptions = core.getInput('down-options').split(" ");
+  const downOptionsString = core.getInput('down-options');
+
+  if (downOptionsString.length > 0)
+    let options = { config: composeFile, log: true, commandOptions: downOptionsString.split(" ") };
+  else
+    let options = { config: composeFile, log: true};
 
   if (!fs.existsSync(composeFile)) {
     console.log(`${composeFile} not exists`);
     return
   }
 
-  compose.down({ config: composeFile, log: true, commandOptions: downOptions })
+  compose.down(options)
     .then(
       () => { console.log('compose removed')},
       err => { core.setFailed(`compose down failed ${err}`)}
