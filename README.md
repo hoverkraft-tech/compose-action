@@ -8,9 +8,9 @@ This action runs your docker-compose file and clean up before action finished.
 
 **Optional** The name of the compose file. Default `"./docker-compose.yml"`.
 
-### `down-options`
+### `down-flags`
 
-**Optional** Options to pass to the `docker-compose down` command during cleanup. Default is none. Primarily used to pass the `--volumes` flag if you want persistent volumes to be deleted as well during cleanup.
+**Optional** Used to specify flags to pass to the `docker-compose down` command during cleanup. Default is none. Can be used to pass the `--volumes` flag, for example, if you want persistent volumes to be deleted as well during cleanup. A full list of flags can be found in the [docker-compose down documentation](https://docs.docker.com/compose/reference/down/).
 
 
 ## Example usage

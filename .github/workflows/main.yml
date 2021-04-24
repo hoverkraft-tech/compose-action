@@ -9,4 +9,4 @@ jobs:
       - uses: isbang/compose-action@v0.1
         with:
           compose-file: './docker/docker-compose.yml'
-          down-options: '--volumes'
+          down-flags: '--volumes'

@@ -4,11 +4,11 @@ const fs = require('fs');
 
 try {
   const composeFile = core.getInput('compose-file');
-  const downOptionsString = core.getInput('down-options');
+  const downFlagsString = core.getInput('down-flags');
 
   let options = { config: composeFile, log: true};
-  if (downOptionsString.length > 0)
-    options['commandOptions'] = downOptionsString.split(" ");
+  if (downFlagsString.length > 0)
+    options['commandOptions'] = downFlagsString.split(" ");
 
   if (!fs.existsSync(composeFile)) {
     console.log(`${composeFile} not exists`);
