@@ -6,7 +6,7 @@ jobs:
     name: test compose action
     steps:
       - uses: actions/checkout@v2
-      - uses: isbang/compose-action@v0.1
+      - uses: ./
         with:
           compose-file: './docker/docker-compose.yml'
           down-flags: '--volumes'
