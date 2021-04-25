@@ -19,7 +19,7 @@ This action runs your docker-compose file and clean up before action finished.
 steps:
   # need checkout before using compose-action
   - uses: actions/checkout@v2
-  - uses: isbang/compose-action@v1
+  - uses: isbang/compose-action@v1.0.0
     with:
       compose-file: './docker/docker-compose.yml'
       down-flags: '--volumes'
