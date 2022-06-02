@@ -9,6 +9,10 @@ inputs:
     description: 'additional options to pass to `docker-compose down` command'
     required: false
     default: ''
+  down-flags:  # id of input
+    description: 'service to perform docker-compose up'
+    required: false
+    default: ''
 runs:
   using: 'node12'
   main: 'main.js'
