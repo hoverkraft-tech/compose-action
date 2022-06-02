@@ -10,8 +10,12 @@ try {
     return
   }
 
-  compose.upAll({ config: composeFile, log: true })
-    .then(
+  const upOne = core.getInput('up-one', {required: false});
+  const options = { config: composeFile, log: true }
+
+  const promise = upOne ? compose.upOne(upOne, options) : compose.upAll(options);
+
+  promise.then(
       () => { console.log('compose started')},
       err => { core.setFailed(`compose up failed ${err}`)}
     );
