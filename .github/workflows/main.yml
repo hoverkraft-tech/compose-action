@@ -8,9 +8,11 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./
         with:
-          compose-file: './docker/docker-compose.yml'
-          down-flags: '--volumes'
+          compose-file: "./docker/docker-compose.yml"
+          down-flags: "--volumes"
       - uses: ./
         with:
-          compose-file: './docker/docker-compose.yml'
-          up-one: 'helloworld'
+          compose-file: "./docker/docker-compose.yml"
+          services:
+            - "helloworld2"
+            - "helloworld3"
