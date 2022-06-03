@@ -1,6 +1,7 @@
 const core = require("@actions/core");
 const compose = require("docker-compose");
 const fs = require("fs");
+const utils = require("./utils");
 
 try {
   const composeFile = core.getInput("compose-file");
