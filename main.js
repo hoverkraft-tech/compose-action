@@ -16,6 +16,9 @@ try {
   const upFlagsString = core.getInput("up-flags");
   const options = utils.getOptions(composeFile, upFlagsString);
 
+  // debug
+  compose.config(options).then(console.log);
+
   const promise =
     services.length > 0
       ? compose.upMany(services, options)
