@@ -12,7 +12,6 @@ try {
   }
 
   const services = core.getMultilineInput("services", { required: false });
-  console.log(services);
 
   const upFlagsString = core.getInput("up-flags");
   const options = utils.getOptions(composeFile, upFlagsString);
@@ -24,7 +23,7 @@ try {
 
   promise
     .then(() => { console.log("compose started"); })
-    .catch((err) => { core.setFailed(`compose up failed ${err}`); });
+    .catch((err) => { core.setFailed(`compose up failed ${JSON.stringify(err)}`); });
 } catch (error) {
   core.setFailed(error.message);
 }
