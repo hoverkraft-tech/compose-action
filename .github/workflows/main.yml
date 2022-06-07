@@ -14,8 +14,8 @@ jobs:
         with:
           compose-file: "./docker/docker-compose.yml"
           services: |
-            "helloworld2"
-            "helloworld3"
+            helloworld2
+            helloworld3
       - uses: ./
         with:
           compose-file: "./docker/docker-compose.yml"
