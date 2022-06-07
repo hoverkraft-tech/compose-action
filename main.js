@@ -14,7 +14,7 @@ try {
   const services = core.getMultilineInput("services", { required: false });
 
   const upFlagsString = core.getInput("up-flags");
-  const options = utils.getOptions(upFlagsString);
+  const options = utils.getOptions(composeFile, upFlagsString);
 
   const promise =
     services.length > 0
