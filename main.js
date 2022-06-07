@@ -23,7 +23,7 @@ try {
 
   promise
     .then(() => { console.log("compose started"); })
-    .catch((err) => { core.setFailed(`compose up failed ${err}`); });
+    .catch((err) => { core.setFailed(`compose up failed ${err.message}`); });
 } catch (error) {
   core.setFailed(error.message);
 }
