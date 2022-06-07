@@ -1,18 +1,25 @@
-name: 'Docker Compose Action'
-description: 'Run your docker-compose file'
+name: "Docker Compose Action"
+description: "Run your docker-compose file"
 inputs:
-  compose-file:  # id of input
-    description: 'relative path to compose file'
+  compose-file: # id of input
+    description: "relative path to compose file"
     required: false
-    default: './docker-compose.yml'
-  down-flags:  # id of input
-    description: 'additional options to pass to `docker-compose down` command'
+    default: "./docker-compose.yml"
+  down-flags: # id of input
+    description: "additional options to pass to `docker-compose down` command"
     required: false
-    default: ''
+    default: ""
+  services: # id of input
+    description: "services to perform docker-compose up"
+    required: false
+  up-flags: # id of input
+    description: "additional options to pass to `docker-compose up` command"
+    required: false
+    default: ""
 runs:
-  using: 'node12'
-  main: 'main.js'
-  post: 'post.js'
+  using: "node12"
+  main: "main.js"
+  post: "post.js"
 branding:
   icon: anchor
   color: blue
