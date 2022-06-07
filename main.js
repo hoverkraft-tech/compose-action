@@ -14,21 +14,16 @@ try {
   const services = core.getMultilineInput("services", { required: false });
 
   const upFlagsString = core.getInput("up-flags");
-  const options = utils.getOptions(upFlagsString);
+  const options = utils.getOptions(composeFile, upFlagsString);
 
   const promise =
     services.length > 0
       ? compose.upMany(services, options)
       : compose.upAll(options);
 
-  promise.then(
-    () => {
-      console.log("compose started");
-    },
-    (err) => {
-      core.setFailed(`compose up failed ${err}`);
-    }
-  );
+  promise
+    .then(() => { console.log("compose started"); })
+    .catch((err) => { core.setFailed(`compose up failed ${JSON.stringify(err)}`); });
 } catch (error) {
   core.setFailed(error.message);
 }

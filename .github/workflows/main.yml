@@ -9,14 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     name: test compose action
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: ./
+        with:
+          compose-file: "./docker/docker-compose.yml"
+          services: |
+            helloworld2
+            helloworld3
       - uses: ./
         with:
           compose-file: "./docker/docker-compose.yml"
           down-flags: "--volumes"
-      - uses: ./
-        with:
-          compose-file: "./docker/docker-compose.yml"
-          services:
-            - "helloworld2"
-            - "helloworld3"

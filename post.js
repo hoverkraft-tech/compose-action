@@ -11,7 +11,7 @@ try {
   }
 
   const downFlagsString = core.getInput("down-flags");
-  const options = utils.getOptions(downFlagsString);
+  const options = utils.getOptions(composeFile, downFlagsString);
 
   compose.down(options).then(
     () => {
