@@ -25,9 +25,12 @@ This action runs your docker-compose file and clean up before action finished.
 ```yaml
 steps:
   # need checkout before using compose-action
-  - uses: actions/checkout@v2
-  - uses: isbang/compose-action@v1.0.0
+  - uses: actions/checkout@v3
+  - uses: isbang/compose-action@v1.1.0
     with:
       compose-file: "./docker/docker-compose.yml"
       down-flags: "--volumes"
+      services: |
+        helloworld2
+        helloworld3
 ```
