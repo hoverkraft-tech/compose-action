@@ -10,8 +10,12 @@ try {
     return;
   }
 
-  const downFlagsString = core.getInput("down-flags");
-  const options = utils.getOptions(composeFile, downFlagsString);
+  const options = {
+    config: composeFile,
+    log: true,
+    composeOptions: utils.parseFlags(core.getInput("compose-flags")),
+    commandOptions: utils.parseFlags(core.getInput("up-flags"))
+  };
 
   compose.down(options).then(
     () => {

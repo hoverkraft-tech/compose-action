@@ -5,6 +5,10 @@ inputs:
     description: "relative path to compose file"
     required: false
     default: "./docker-compose.yml"
+  compose-flags: # id of input
+    description: "additional options to pass to `docker-compose` command"
+    required: false
+    default: ""
   down-flags: # id of input
     description: "additional options to pass to `docker-compose down` command"
     required: false
