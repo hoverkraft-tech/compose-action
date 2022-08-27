@@ -11,10 +11,13 @@ try {
     return;
   }
 
-  const services = core.getMultilineInput("services", { required: false });
-
-  const upFlagsString = core.getInput("up-flags");
-  const options = utils.getOptions(composeFile, upFlagsString);
+  const services = core.getMultilineInput("services", { required: false });;
+  const options = {
+    config: composeFile,
+    log: true,
+    composeOptions: utils.parseFlags(core.getInput("compose-flags")),
+    commandOptions: utils.parseFlags(core.getInput("up-flags"))
+  };
 
   const promise =
     services.length > 0

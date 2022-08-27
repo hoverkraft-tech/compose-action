@@ -1,8 +1,7 @@
-module.exports.getOptions = (composeFile, flags) => {
-  const options = { config: composeFile, log: true };
+module.exports.parseFlags = (flags) => {
   if (flags != null && typeof flags == "string" && flags.length > 0) {
-    options["commandOptions"] = flags.split(" ");
+    return flags.split(" ");
   }
 
-  return options;
+  return [];
 };

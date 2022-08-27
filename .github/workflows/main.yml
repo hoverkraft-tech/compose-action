@@ -20,3 +20,8 @@ jobs:
         with:
           compose-file: "./docker/docker-compose.yml"
           down-flags: "--volumes"
+      - uses: ./
+        with:
+          compose-file: "./docker/docker-compose.yml"
+          compose-flags: "--profile profile-1"
+          down-flags: "--volumes"
