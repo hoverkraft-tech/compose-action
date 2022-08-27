@@ -20,13 +20,17 @@ This action runs your docker-compose file and clean up before action finished.
 
 **Optional** Used to specify flags to pass to the `docker-compose down` command during cleanup. Default is none. Can be used to pass the `--volumes` flag, for example, if you want persistent volumes to be deleted as well during cleanup. A full list of flags can be found in the [docker-compose down documentation](https://docs.docker.com/compose/reference/down/).
 
+### `compose-flags`
+
+**Optional**  Used to specify flags to pass to the `docker-compose` command. Default is none. A full list of flags can be found in the [docker-compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
+
 ## Example usage
 
 ```yaml
 steps:
   # need checkout before using compose-action
   - uses: actions/checkout@v3
-  - uses: isbang/compose-action@v1.1.0
+  - uses: isbang/compose-action@v1.2.0
     with:
       compose-file: "./docker/docker-compose.yml"
       down-flags: "--volumes"
