@@ -25,3 +25,8 @@ jobs:
           compose-file: "./docker/docker-compose.yml"
           compose-flags: "--profile profile-1"
           down-flags: "--volumes"
+      - uses: ./
+        with:
+          compose-file: "./docker/docker-compose-with-env.yml"
+        env:
+          IMAGE_NAME: hello-world

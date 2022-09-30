@@ -22,7 +22,7 @@ This action runs your docker-compose file and clean up before action finished.
 
 ### `compose-flags`
 
-**Optional**  Used to specify flags to pass to the `docker-compose` command. Default is none. A full list of flags can be found in the [docker-compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
+**Optional** Used to specify flags to pass to the `docker-compose` command. Default is none. A full list of flags can be found in the [docker-compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
 
 ## Example usage
 
@@ -37,4 +37,16 @@ steps:
       services: |
         helloworld2
         helloworld3
+```
+
+### Using environment variables
+
+```yaml
+steps:
+  - uses: actions/checkout@v3
+  - uses: isbang/compose-action@v1.2.0
+    with:
+      compose-file: "./docker/docker-compose.yml"
+    env:
+      CUSTOM_VARIABLE: "test"
 ```

@@ -1,0 +1,8 @@
+version: "3.8"
+
+volumes:
+  test_volume: {}
+
+services:
+  helloworld:
+    image: ${IMAGE_NAME}
