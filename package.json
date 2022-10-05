@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{js,json}\"",
+    "check-format": "prettier --check \"**/*.{js,json}\""
   },
   "keywords": [],
   "author": "",
@@ -12,6 +15,10 @@
   "devDependencies": {
     "@actions/core": "^1.8.2",
     "@actions/github": "^4.0.0",
-    "docker-compose": "^0.23.5"
+    "docker-compose": "^0.23.5",
+    "eslint": "^8.24.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1"
   }
 }
