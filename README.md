@@ -46,3 +46,15 @@ steps:
         helloworld2
         helloworld3
 ```
+
+### Using environment variables
+
+```yaml
+steps:
+  - uses: actions/checkout@v3
+  - uses: isbang/compose-action@v1.2.0
+    with:
+      compose-file: "./docker/docker-compose.yml"
+    env:
+      CUSTOM_VARIABLE: "test"
+```

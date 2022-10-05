@@ -18,6 +18,7 @@ try {
     commandOptions: utils.parseFlags(core.getInput("up-flags")),
   };
 
+  const services = core.getMultilineInput("services", { required: false });
   const promise =
     services.length > 0
       ? compose.upMany(services, options)
