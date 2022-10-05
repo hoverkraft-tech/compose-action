@@ -10,6 +10,10 @@ jobs:
     name: test compose action
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm install
       - uses: ./
         with:
           compose-file: "./docker/docker-compose.yml"
@@ -47,6 +51,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+
+      - run: npm install
 
       - name: eslint
         run: npm run lint
