@@ -25,3 +25,11 @@ jobs:
           compose-file: "./docker/docker-compose.yml"
           compose-flags: "--profile profile-1"
           down-flags: "--volumes"
+      - uses: ./
+        with:
+          compose-file: |
+            ./docker/docker-compose.yml
+            ./docker/docker-compose.ci.yml
+          services: |
+            helloworld2
+            helloworld4

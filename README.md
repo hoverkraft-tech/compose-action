@@ -8,6 +8,14 @@ This action runs your docker-compose file and clean up before action finished.
 
 **Optional** The name of the compose file. Default `"./docker-compose.yml"`.
 
+It can be a list of files:
+
+```yml
+compose-file: |
+  docker-compose.yml
+  docker-compose.ci.yml
+```
+
 ### `services`
 
 **Optional** Just perform `docker-compose up` to one service instead of all of them
@@ -22,7 +30,7 @@ This action runs your docker-compose file and clean up before action finished.
 
 ### `compose-flags`
 
-**Optional**  Used to specify flags to pass to the `docker-compose` command. Default is none. A full list of flags can be found in the [docker-compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
+**Optional** Used to specify flags to pass to the `docker-compose` command. Default is none. A full list of flags can be found in the [docker-compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
 
 ## Example usage
 
