@@ -2,7 +2,7 @@ name: "Docker Compose Action"
 description: "Run your docker-compose file"
 inputs:
   compose-file: # id of input
-    description: "relative path to compose file"
+    description: "relative path to compose file(s)"
     required: false
     default: "./docker-compose.yml"
   compose-flags: # id of input

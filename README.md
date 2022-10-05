@@ -8,6 +8,14 @@ This action runs your docker-compose file and clean up before action finished.
 
 **Optional** The name of the compose file. Default `"./docker-compose.yml"`.
 
+It can be a list of files:
+
+```yml
+compose-file: |
+  docker-compose.yml
+  docker-compose.ci.yml
+```
+
 ### `services`
 
 **Optional** Just perform `docker-compose up` to one service instead of all of them

@@ -1,17 +1,17 @@
 const core = require("@actions/core");
 const compose = require("docker-compose");
-const fs = require("fs");
 const utils = require("./utils");
 
 try {
-  const composeFile = core.getInput("compose-file");
-  if (!fs.existsSync(composeFile)) {
-    console.log(`${composeFile} not exists`);
+  const composeFiles = utils.parseComposeFiles(
+    core.getMultilineInput("compose-file")
+  );
+  if (!composeFiles.length) {
     return;
   }
 
   const options = {
-    config: composeFile,
+    config: composeFiles,
     log: true,
     composeOptions: utils.parseFlags(core.getInput("compose-flags")),
     commandOptions: utils.parseFlags(core.getInput("up-flags")),
