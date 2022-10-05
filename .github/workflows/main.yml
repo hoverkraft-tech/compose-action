@@ -38,3 +38,18 @@ jobs:
           services: |
             helloworld2
             helloworld4
+  lint:
+    runs-on: ubuntu-latest
+    name: lint test
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: eslint
+        run: npm run lint
+
+      - name: prettier
+        run: npm run check-format
