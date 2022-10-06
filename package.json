@@ -12,10 +12,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
+  "dependencies": {
     "@actions/core": "^1.8.2",
     "@actions/github": "^4.0.0",
-    "docker-compose": "^0.23.5",
+    "docker-compose": "^0.23.5"
+  },
+  "devDependencies": {
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
