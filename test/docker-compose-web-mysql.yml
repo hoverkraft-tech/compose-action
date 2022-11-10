@@ -1,0 +1,23 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/vendor
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=12345
+      - DATABASE=testing
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mariadb:latest
+    environment:
+      - MYSQL_HOST=127.0.0.1
+      - MYSQL_USER=root
+      - MARIADB_ROOT_PASSWORD=12345
+      - MYSQL_DB=testing
