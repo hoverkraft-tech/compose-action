@@ -14,7 +14,7 @@ try {
     config: composeFiles,
     log: true,
     composeOptions: utils.parseFlags(core.getInput("compose-flags")),
-    commandOptions: utils.parseFlags(core.getInput("up-flags")),
+    commandOptions: utils.parseFlags(core.getInput("down-flags")),
   };
 
   compose.down(options).then(
