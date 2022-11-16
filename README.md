@@ -52,7 +52,7 @@ steps:
 ```yaml
 steps:
   - uses: actions/checkout@v3
-  - uses: isbang/compose-action@v1.4.0
+  - uses: isbang/compose-action@v1.4.1
     with:
       compose-file: "./docker/docker-compose.yml"
     env:
