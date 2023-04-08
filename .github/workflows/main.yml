@@ -24,6 +24,8 @@ jobs:
         with:
           compose-file: "./docker/docker-compose.yml"
           down-flags: "--volumes"
+          test-container: hellowworld
+          test-command: ls
       - uses: ./
         with:
           compose-file: "./docker/docker-compose.yml"
