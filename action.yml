@@ -1,5 +1,5 @@
-name: "Docker Compose Action"
-description: "Run your docker-compose file"
+name: "Docker Compose with Tests Action"
+description: "Run your docker-compose file and excute tests inside one of the containers."
 inputs:
   compose-file: # id of input
     description: "relative path to compose file(s)"
@@ -20,6 +20,12 @@ inputs:
     description: "additional options to pass to `docker-compose up` command"
     required: false
     default: ""
+  test-container:
+    description: "Name of the container to run tests in."
+    required: false
+  test-command:
+    description: "The command to use to execute tests."
+    required: false
 runs:
   using: "node16"
   main: "main.js"
