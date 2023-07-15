@@ -6,7 +6,7 @@ const utils = require("./utils");
 // ref: https://github.com/PDMLab/docker-compose/tree/master#import-for-docker-compose-v2
 // The migration of Docker was done with Docker Compose. Use the official plugin instead.
 // ref: https://docs.docker.com/compose/migrate/
-const composeV2 = compose.v2
+const composeV2 = compose.v2;
 
 try {
   const composeFiles = utils.parseComposeFiles(
