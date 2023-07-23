@@ -1,0 +1,21 @@
+
+ RUN  v0.30.1 /home/alexzeitler/src/oss/docker-compose
+
+stdout | test/compose.test.ts > when calling ps command > ps shows status data for started containers
+exiting command up
+
+NAME                 IMAGE                 COMMAND                  SERVICE             CREATED             STATUS                  PORTS
+compose_test_proxy   nginx:1.19.9-alpine   "/docker-entrypoint.…"   proxy               2 seconds ago       Up Less than a second   80/tcp
+compose_test_web     nginx:1.16.0          "nginx -g 'daemon of…"   web                 2 seconds ago       Up Less than a second   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp
+stdout | test/compose.test.ts > when calling ps command > ps shows status data for started containers
+exiting command ps
+
+ ❯ test/compose.test.ts  (30 tests | 1 failed | 29 skipped) 2126ms
+   ❯ test/compose.test.ts > when calling ps command > ps shows status data for started containers
+     → expected 1 to be 3 // Object.is equality
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 29 skipped (30)
+   Start at  18:13:03
+   Duration  3.21s (transform 301ms, setup 0ms, collect 391ms, tests 2.13s, environment 0ms, prepare 116ms)
+

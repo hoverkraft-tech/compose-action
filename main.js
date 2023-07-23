@@ -2,6 +2,12 @@ const core = require("@actions/core");
 const compose = require("docker-compose");
 const utils = require("./utils");
 
+// Use docker compose v2
+// ref: https://github.com/PDMLab/docker-compose/tree/master#import-for-docker-compose-v2
+// The migration of Docker was done with Docker Compose. Use the official plugin instead.
+// ref: https://docs.docker.com/compose/migrate/
+const composeV2 = compose.v2;
+
 try {
   const composeFiles = utils.parseComposeFiles(
     core.getMultilineInput("compose-file")
@@ -21,8 +27,8 @@ try {
 
   const promise =
     services.length > 0
-      ? compose.upMany(services, options)
-      : compose.upAll(options);
+      ? composeV2.upMany(services, options)
+      : composeV2.upAll(options);
 
   promise
     .then(() => {
