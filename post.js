@@ -2,6 +2,12 @@ const core = require("@actions/core");
 const compose = require("docker-compose");
 const utils = require("./utils");
 
+// Use docker compose v2
+// ref: https://github.com/PDMLab/docker-compose/tree/master#import-for-docker-compose-v2
+// The migration of Docker was done with Docker Compose. Use the official plugin instead.
+// ref: https://docs.docker.com/compose/migrate/
+const composeV2 = compose.v2;
+
 try {
   const composeFiles = utils.parseComposeFiles(
     core.getMultilineInput("compose-file")
@@ -17,7 +23,7 @@ try {
     commandOptions: utils.parseFlags(core.getInput("down-flags")),
   };
 
-  compose.down(options).then(
+  composeV2.down(options).then(
     () => {
       console.log("compose removed");
     },
