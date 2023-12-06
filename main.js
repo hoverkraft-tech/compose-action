@@ -20,6 +20,7 @@ try {
 
   const options = {
     config: composeFiles,
+    cwd: core.getInput("cwd"),
     log: true,
     composeOptions: utils.parseFlags(core.getInput("compose-flags")),
     commandOptions: utils.parseFlags(core.getInput("up-flags")),

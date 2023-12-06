@@ -9,6 +9,10 @@ inputs:
     description: "additional options to pass to `docker-compose` command"
     required: false
     default: ""
+  cwd: # id of input
+    description: "Current working directory"
+    required: false
+    default: ""
   down-flags: # id of input
     description: "additional options to pass to `docker-compose down` command"
     required: false

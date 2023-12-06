@@ -15,7 +15,7 @@
   "dependencies": {
     "@actions/core": "^1.8.2",
     "@actions/github": "^4.0.0",
-    "docker-compose": "^0.24.0"
+    "docker-compose": "^0.24.3"
   },
   "devDependencies": {
     "eslint": "^8.24.0",

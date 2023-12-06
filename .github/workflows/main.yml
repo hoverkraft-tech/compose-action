@@ -16,22 +16,26 @@ jobs:
       - run: npm install
       - uses: ./
         with:
-          compose-file: "./docker/docker-compose.yml"
+          compose-file: "${{ github.workspace }}/docker/docker-compose.yml"
+          cwd: "${{ github.workspace }}"
           services: |
             helloworld2
             helloworld3
       - uses: ./
         with:
           compose-file: "./docker/docker-compose.yml"
+          cwd: "${{ github.workspace }}"
           down-flags: "--volumes"
       - uses: ./
         with:
           compose-file: "./docker/docker-compose.yml"
           compose-flags: "--profile profile-1"
+          cwd: "${{ github.workspace }}"
           down-flags: "--volumes"
       - uses: ./
         with:
           compose-file: "./docker/docker-compose-with-env.yml"
+          cwd: "${{ github.workspace }}"
         env:
           IMAGE_NAME: hello-world
       - uses: ./
@@ -39,6 +43,7 @@ jobs:
           compose-file: |
             ./docker/docker-compose.yml
             ./docker/docker-compose.ci.yml
+          cwd: "${{ github.workspace }}"
           services: |
             helloworld2
             helloworld4

@@ -15,7 +15,7 @@ module.exports.parseComposeFiles = (composeFiles) => {
     }
 
     if (!fs.existsSync(composeFile)) {
-      console.log(`${composeFile} not exists`);
+      console.log(`${composeFile} does not exist`);
       return false;
     }
 
