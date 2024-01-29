@@ -6,23 +6,27 @@
   "scripts": {
     "test": "echo \"No test specified\" && exit 1",
     "test:ci": "echo \"No test specified\"",
+    "build": "ncc build main.js -o dist/main && ncc build post.js -o dist/post",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{js,json}\"",
-    "check-format": "prettier --check \"**/*.{js,json}\"",
-    "build": "echo \"No build step\""
+    "check-format": "prettier --check \"**/*.{js,json}\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": "^20"
+  },
   "dependencies": {
-    "@actions/core": "^1.8.2",
-    "@actions/github": "^4.0.0",
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^6.0.0",
     "docker-compose": "^0.24.0"
   },
   "devDependencies": {
-    "eslint": "^8.24.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.7.1"
+    "@vercel/ncc": "^0.38.1",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.2.4"
   }
 }
