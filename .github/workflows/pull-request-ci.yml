@@ -1,0 +1,15 @@
+name: Pull request - Continuous Integration
+
+on:
+  merge_group:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    uses: ./.github/workflows/__shared-ci.yml
+    secrets: inherit

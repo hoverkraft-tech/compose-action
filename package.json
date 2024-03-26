@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"No test specified\" && exit 1",
+    "test:ci": "echo \"No test specified\"",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{js,json}\"",
-    "check-format": "prettier --check \"**/*.{js,json}\""
+    "check-format": "prettier --check \"**/*.{js,json}\"",
+    "build": "echo \"No build step\""
   },
   "keywords": [],
   "author": "",

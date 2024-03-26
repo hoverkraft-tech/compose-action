@@ -1,0 +1,73 @@
+name: Internal - Tests for action
+
+on:
+  workflow_call:
+
+jobs:
+  test-action-with-services:
+    runs-on: ubuntu-latest
+    name: Test compose action
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+      
+      - uses: ./
+        with:
+          compose-file: "./docker/docker-compose.yml"
+          services: |
+            helloworld2
+            helloworld3
+
+  test-action-with-down-flags:
+    runs-on: ubuntu-latest
+    name: Test compose action
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+
+      - uses: ./
+        with:
+          compose-file: "./docker/docker-compose.yml"
+          down-flags: "--volumes"
+
+  test-action-with-compose-flags:
+    runs-on: ubuntu-latest
+    name: Test compose action
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+
+      - uses: ./
+        with:
+          compose-file: "./docker/docker-compose.yml"
+          compose-flags: "--profile profile-1"
+          down-flags: "--volumes"
+
+  test-action-with-env:
+    runs-on: ubuntu-latest
+    name: Test compose action
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+        
+      - uses: ./
+        with:
+          compose-file: "./docker/docker-compose-with-env.yml"
+        env:
+          IMAGE_NAME: hello-world
+
+  test-action-with-multiple-compose-files:
+    runs-on: ubuntu-latest
+    name: Test compose action
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+
+      - uses: ./
+        with:
+          compose-file: |
+            ./docker/docker-compose.yml
+            ./docker/docker-compose.ci.yml
+          services: |
+            helloworld2
+            helloworld4
