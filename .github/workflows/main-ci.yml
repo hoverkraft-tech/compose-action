@@ -12,3 +12,9 @@ jobs:
   ci:
     uses: ./.github/workflows/__shared-ci.yml
     secrets: inherit
+
+  generate-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bitflight-devops/github-action-readme-generator@v1.8.0
