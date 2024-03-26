@@ -10,8 +10,8 @@
     "prefix": "v",
     "branch": "main"
   },
-  "owner": "bitflight-devops",
-  "repo": "github-action-readme-generator",
+  "owner": "hoverkraft-tech",
+  "repo": "compose-action",
   "title_prefix": "GitHub Action: ",
   "prettier": true
 }

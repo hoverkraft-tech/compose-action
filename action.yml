@@ -26,4 +26,4 @@ runs:
   post: "post.js"
 branding:
   icon: anchor
-  color: blue
+  color: gray-dark
