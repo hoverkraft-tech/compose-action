@@ -3,6 +3,7 @@ name: Internal - Main - Continuous Integration
 on:
   push:
     branches: [main]
+    tags: ["*"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
