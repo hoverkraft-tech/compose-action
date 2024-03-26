@@ -11,12 +11,15 @@
 
 <!-- end title -->
 <!-- start badges -->
+
+<a href="https%3A%2F%2Fgithub.com%2F%2F%2Freleases%2Flatest"><img src="https://img.shields.io/github/v/release//?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20tag" /></a><a href="https%3A%2F%2Fgithub.com%2F%2F%2Freleases%2Flatest"><img src="https://img.shields.io/github/release-date//?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20date" /></a><img src="https://img.shields.io/github/last-commit//?logo=github&style=flat-square" alt="Commit" /><a href="https%3A%2F%2Fgithub.com%2F%2F%2Fissues"><img src="https://img.shields.io/github/issues//?logo=github&style=flat-square" alt="Open%20Issues" /></a><img src="https://img.shields.io/github/downloads///total?logo=github&style=flat-square" alt="Downloads" />
+
 <!-- end badges -->
 
 </div>
 <!-- start description -->
 
-Run your docker-compose file
+This action runs your docker-compose file and clean up before action finished
 
 <!-- end description -->
 <!-- start contents -->
