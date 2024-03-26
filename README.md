@@ -2,19 +2,19 @@
 <div align="center" width="100%">
 <!-- start branding -->
 
-<img src=".github/ghadocs/branding.svg" width="15%" align="center" alt="branding<icon:anchor color:blue>" />
+<img src=".github/ghadocs/branding.svg" width="15%" align="center" alt="branding<icon:anchor color:gray-dark>" />
 
 <!-- end branding -->
 <!-- start title -->
 
-# <img src=".github/ghadocs/branding.svg" width="60px" align="center" alt="branding<icon:anchor color:blue>" /> GitHub Action: Docker Compose Action
+# <img src=".github/ghadocs/branding.svg" width="60px" align="center" alt="branding<icon:anchor color:gray-dark>" /> GitHub Action: Docker Compose Action
 
 <!-- end title -->
 <!-- start badges -->
 
 <a href="https%3A%2F%2Fgithub.com%2F%2F%2Freleases%2Flatest"><img src="https://img.shields.io/github/v/release//?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20tag" /></a><a href="https%3A%2F%2Fgithub.com%2F%2F%2Freleases%2Flatest"><img src="https://img.shields.io/github/release-date//?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20date" /></a><img src="https://img.shields.io/github/last-commit//?logo=github&style=flat-square" alt="Commit" /><a href="https%3A%2F%2Fgithub.com%2F%2F%2Fissues"><img src="https://img.shields.io/github/issues//?logo=github&style=flat-square" alt="Open%20Issues" /></a><img src="https://img.shields.io/github/downloads///total?logo=github&style=flat-square" alt="Downloads" />
 
-## <!-- end badges -->
+ <!-- end badges -->
 
 </div>
 <!-- start description -->
