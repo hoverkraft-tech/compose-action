@@ -1,0 +1,18 @@
+name: Common Continuous Integration tasks
+
+on:
+  workflow_call:
+
+jobs:
+  linter:
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/linter.yml@0.12.1
+
+  test-nodejs:
+    name: Test nodejs
+    needs: linter
+    uses: ./.github/workflows/__test-nodejs.yml
+
+  test-action:
+    name: Test action
+    needs: linter
+    uses: ./.github/workflows/__test-action.yml
