@@ -2,22 +2,22 @@ name: "Docker Compose Action"
 description: "Run your docker-compose file"
 inputs:
   compose-file:
-    description: "relative path to compose file(s)"
+    description: "Relative path to compose file(s). It can be a list of files."
     required: false
     default: "./docker-compose.yml"
-  compose-flags:
-    description: "additional options to pass to `docker-compose` command"
+  services:
+    description: "Services to perform docker-compose up."
+    required: false
+  up-flags:
+    description: "Additional options to pass to `docker-compose up` command."
     required: false
     default: ""
   down-flags:
-    description: "additional options to pass to `docker-compose down` command"
+    description: "Additional options to pass to `docker-compose down` command."
     required: false
     default: ""
-  services:
-    description: "services to perform docker-compose up"
-    required: false
-  up-flags:
-    description: "additional options to pass to `docker-compose up` command"
+  compose-flags:
+    description: "Additional options to pass to `docker-compose` command."
     required: false
     default: ""
 runs:
