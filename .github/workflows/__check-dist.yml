@@ -1,0 +1,36 @@
+name: Internal - Checks for dist
+
+on:
+  workflow_call:
+
+jobs:
+  check-dist:
+    name: Check dist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.0
+
+      - name: Build dist/ Directory
+        id: package
+        run: npm run package
+
+      # This will fail the workflow if the PR wasn't created by Dependabot.
+      - name: Compare Directories
+        id: diff
+        run: |
+          if [ "$(git diff --ignore-space-at-eol --text dist/ | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after package. See status below:"
+            git diff --ignore-space-at-eol --text dist/
+            exit 1
+          fi
+
+      # If `dist/` was different than expected, and this was not a Dependabot
+      # PR, upload the expected version as a workflow artifact.
+      - if: ${{ failure() && steps.diff.outcome == 'failure' }}
+        name: Upload Artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/

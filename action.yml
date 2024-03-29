@@ -1,29 +1,32 @@
-name: "Docker Compose Action"
-description: "This action runs your docker-compose file and clean up before action finished"
-inputs:
-  compose-file:
-    description: "Relative path to compose file(s). It can be a list of files."
-    required: false
-    default: "./docker-compose.yml"
-  services:
-    description: "Services to perform docker-compose up."
-    required: false
-  up-flags:
-    description: "Additional options to pass to `docker-compose up` command."
-    required: false
-    default: ""
-  down-flags:
-    description: "Additional options to pass to `docker-compose down` command."
-    required: false
-    default: ""
-  compose-flags:
-    description: "Additional options to pass to `docker-compose` command."
-    required: false
-    default: ""
-runs:
-  using: "node16"
-  main: "main.js"
-  post: "post.js"
+name: 'Docker Compose Action'
+description:
+  'This action runs your docker-compose file and clean up before action finished'
+author: 'Hoverkraft'
 branding:
   icon: anchor
   color: gray-dark
+
+inputs:
+  compose-file:
+    description: 'Relative path to compose file(s). It can be a list of files.'
+    required: false
+    default: './docker-compose.yml'
+  services:
+    description: 'Services to perform docker-compose up.'
+    required: false
+  up-flags:
+    description: 'Additional options to pass to `docker-compose up` command.'
+    required: false
+    default: ''
+  down-flags:
+    description: 'Additional options to pass to `docker-compose down` command.'
+    required: false
+    default: ''
+  compose-flags:
+    description: 'Additional options to pass to `docker-compose` command.'
+    required: false
+    default: ''
+runs:
+  using: node20
+  main: dist/index.js
+  post: dist/post.js

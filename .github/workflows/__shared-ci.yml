@@ -5,14 +5,29 @@ on:
 
 jobs:
   linter:
-    uses: hoverkraft-tech/ci-github-common/.github/workflows/linter.yml@0.12.1
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/linter.yml@feat/linter-extra-env-input
+    with:
+      linter-env: |
+        FILTER_REGEX_EXCLUDE=dist/**/*
+        VALIDATE_JSCPD=false
+        VALIDATE_TYPESCRIPT_STANDARD=false
+        VALIDATE_TYPESCRIPT_ES=false
+        VALIDATE_TYPESCRIPT_PRETTIER=false
+        VALIDATE_JAVASCRIPT_ES=false
+        VALIDATE_JAVASCRIPT_STANDARD=false
 
-  test-nodejs:
+  check-nodejs:
     name: Test nodejs
     needs: linter
-    uses: ./.github/workflows/__test-nodejs.yml
+    uses: ./.github/workflows/__check-nodejs.yml
+    secrets: inherit
 
-  test-action:
-    name: Test action
+  check-dist:
+    name: Test nodejs
     needs: linter
-    uses: ./.github/workflows/__test-action.yml
+    uses: ./.github/workflows/__check-dist.yml
+
+  check-action:
+    name: Test action
+    needs: [check-nodejs, check-dist]
+    uses: ./.github/workflows/__check-action.yml

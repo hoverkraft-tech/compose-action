@@ -1,0 +1,103 @@
+name: Internal - Tests for action
+
+on:
+  workflow_call:
+
+jobs:
+  test-action-with-services:
+    runs-on: ubuntu-latest
+    name: Test with services
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+
+      - name: Act
+        uses: ./
+        with:
+          compose-file: "./docker/docker-compose.yml"
+          services: |
+            helloworld2
+            helloworld3
+
+      - name: "Assert: only expected services are running"
+        run: |
+          docker-compose -f ./docker/docker-compose.yml ps
+
+          docker-compose -f ./docker/docker-compose.yml ps | grep docker-helloworld2-1
+          docker-compose -f ./docker/docker-compose.yml ps | grep docker-helloworld3-1
+          docker-compose -f ./docker/docker-compose.yml ps | (grep docker-helloworld-1 && echo "Unexpected service helloworld is running" && exit 1) || true
+
+  test-action-with-down-flags:
+    runs-on: ubuntu-latest
+    name: Test compose action
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+
+      - name: Act
+        uses: ./
+        with:
+          compose-file: "./docker/docker-compose.yml"
+          down-flags: "--volumes"
+
+  test-action-with-compose-flags:
+    runs-on: ubuntu-latest
+    name: Test with compose flags
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+
+      - name: Act
+        uses: ./
+        with:
+          compose-file: "./docker/docker-compose.yml"
+          compose-flags: "--profile profile-1"
+          down-flags: "--volumes"
+
+      - name: "Assert: profile is used"
+        run: |
+          docker-compose -f ./docker/docker-compose.yml -p profile-1 ps || (echo "Profile not used" && exit 1)
+
+  test-action-with-env:
+    runs-on: ubuntu-latest
+    name: Test with env
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+
+      - name: Act
+        uses: ./
+        with:
+          compose-file: "./docker/docker-compose-with-env.yml"
+        env:
+          IMAGE_NAME: hello-world
+
+      - name: "Assert: env is used"
+        run: |
+          docker-compose -f ./docker/docker-compose-with-env.yml ps
+          docker-compose -f ./docker/docker-compose-with-env.yml ps | grep docker-helloworld-1
+
+  test-action-with-multiple-compose-files:
+    runs-on: ubuntu-latest
+    name: Test with multiple compose files
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+
+      - name: Act
+        uses: ./
+        with:
+          compose-file: |
+            ./docker/docker-compose.yml
+            ./docker/docker-compose.ci.yml
+          services: |
+            helloworld2
+            helloworld4
+
+      - name: "Assert: only expected services are running"
+        run: |
+          docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps
+          docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | grep docker-helloworld2-1
+          docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | grep docker-helloworld4-1
+          docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | (grep docker-helloworld-1 && echo "Unexpected service is running" && exit 1) || true
+          docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | (grep docker-helloworld3-1 && echo "Unexpected service is running" && exit 1) || true

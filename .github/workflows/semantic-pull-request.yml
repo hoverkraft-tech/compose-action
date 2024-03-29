@@ -1,4 +1,4 @@
-name: "Pull Request - Semantic Lint"
+name: 'Pull Request - Semantic Lint'
 
 on:
   pull_request_target:
