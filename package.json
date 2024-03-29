@@ -73,7 +73,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.1",
-    "@actions/github": "^4.0.0",
+    "@actions/github": "^6.0.0",
     "@ts-dev-tools/core": "^1.6.2",
     "docker-compose": "^0.24.7"
   },
