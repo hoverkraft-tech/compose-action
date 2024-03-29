@@ -1,28 +1,142 @@
 {
   "name": "compose-action",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"No test specified\" && exit 1",
-    "test:ci": "echo \"No test specified\"",
-    "lint": "eslint .",
-    "format": "prettier --write \"**/*.{js,json}\"",
-    "check-format": "prettier --check \"**/*.{js,json}\"",
-    "build": "echo \"No build step\""
-  },
-  "keywords": [],
+  "description": "Docker Compose Action",
+  "version": "0.0.0",
   "author": "",
-  "license": "ISC",
+  "private": true,
+  "homepage": "https://github.com/hoverkraft-tech/compose-action",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoverkraft-tech/compose-action.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hoverkraft-tech/compose-action/issues"
+  },
+  "keywords": [
+    "actions",
+    "docker-compose"
+  ],
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "package": "npm run package:index && npm run package:post",
+    "package:index": "ncc build src/index.ts -o dist --license licenses.txt",
+    "package:post": "ncc build src/post.ts -o dist/post && mv dist/post/index.js dist/post.js && rm -rf dist/post",
+    "package:watch": "npm run package -- --watch",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "all": "npm run format && npm run lint && npm run test && npm run package",
+    "build": "tsc --noEmit",
+    "format": "prettier --cache --write '**/*.ts'",
+    "jest": "jest --detectOpenHandles --forceExit",
+    "test": "npm run jest --maxWorkers=50%",
+    "test:watch": "npm run jest --watch --maxWorkers=25%",
+    "test:cov": "npm run test --coverage",
+    "test:ci": "npm run test:cov --runInBand",
+    "prepare": "ts-dev-tools install"
+  },
+  "license": "MIT",
+  "jest": {
+    "preset": "ts-jest",
+    "verbose": true,
+    "clearMocks": true,
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ],
+    "testMatch": [
+      "**/*.test.ts",
+      "**/__tests__/**/*.[jt]s?(x)",
+      "**/?(*.)+(spec|test)?(.*).+(ts|tsx|js)"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "coverageReporters": [
+      "json-summary",
+      "text",
+      "lcov"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "./src/**",
+      "**/src/**/*.[jt]s?(x)"
+    ]
+  },
   "dependencies": {
-    "@actions/core": "^1.8.2",
+    "@actions/core": "^1.10.1",
     "@actions/github": "^4.0.0",
-    "docker-compose": "^0.24.0"
+    "@ts-dev-tools/core": "^1.6.2",
+    "docker-compose": "^0.24.7"
   },
   "devDependencies": {
-    "eslint": "^8.24.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.7.1"
+    "@vercel/ncc": "^0.38.1",
+    "eslint-plugin-github": "^4.10.2",
+    "eslint-plugin-jsonc": "^2.14.1"
+  },
+  "eslintConfig": {
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint",
+      "jest"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:jest/recommended",
+      "prettier"
+    ],
+    "env": {
+      "es2021": true
+    },
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      },
+      "ecmaVersion": 12,
+      "sourceType": "module"
+    },
+    "settings": {
+      "jest": {
+        "version": "detect"
+      }
+    },
+    "ignorePatterns": [
+      "dist",
+      "node_modules"
+    ]
+  },
+  "prettier": {
+    "semi": true,
+    "printWidth": 100,
+    "trailingComma": "es5"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "eslint --fix"
+    ]
+  },
+  "importSort": {
+    ".js, .jsx, .ts, .tsx": {
+      "style": "module",
+      "parser": "typescript"
+    }
+  },
+  "tsDevTools": {
+    "version": "20220617100200-prettier-cache"
   }
 }

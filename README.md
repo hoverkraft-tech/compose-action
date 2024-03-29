@@ -11,9 +11,6 @@
 
 <!-- end title -->
 <!-- start badges -->
-
-<a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Freleases%2Flatest"><img src="https://img.shields.io/github/v/release/hoverkraft-tech/compose-action?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20tag" /></a><a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Freleases%2Flatest"><img src="https://img.shields.io/github/release-date/hoverkraft-tech/compose-action?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20date" /></a><img src="https://img.shields.io/github/last-commit/hoverkraft-tech/compose-action?logo=github&style=flat-square" alt="Commit" /><a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Fissues"><img src="https://img.shields.io/github/issues/hoverkraft-tech/compose-action?logo=github&style=flat-square" alt="Open%20Issues" /></a><img src="https://img.shields.io/github/downloads/hoverkraft-tech/compose-action/total?logo=github&style=flat-square" alt="Downloads" />
-
 <!-- end badges -->
 
 </div>
@@ -32,26 +29,26 @@ This action runs your docker-compose file and clean up before action finished
     # Description: Relative path to compose file(s). It can be a list of files.
     #
     # Default: ./docker-compose.yml
-    compose-file: ""
+    compose-file: ''
 
     # Description: Services to perform docker-compose up.
     #
-    services: ""
+    services: ''
 
     # Description: Additional options to pass to `docker-compose up` command.
     #
     # Default:
-    up-flags: ""
+    up-flags: ''
 
     # Description: Additional options to pass to `docker-compose down` command.
     #
     # Default:
-    down-flags: ""
+    down-flags: ''
 
     # Description: Additional options to pass to `docker-compose` command.
     #
     # Default:
-    compose-flags: ""
+    compose-flags: ''
 ```
 
 <!-- end usage -->
@@ -84,9 +81,9 @@ steps:
   - uses: actions/checkout@v4
   - uses: hoverkraft-tech/compose-action@v1.5.1
     with:
-      compose-file: "./docker/docker-compose.yml"
+      compose-file: './docker/docker-compose.yml'
     env:
-      CUSTOM_VARIABLE: "test"
+      CUSTOM_VARIABLE: 'test'
 ```
 
 ### Example using `services`
@@ -99,7 +96,7 @@ steps:
   - uses: actions/checkout@v3
   - uses: hoverkraft-tech/compose-action@v1.5.1
     with:
-      compose-file: "./docker/docker-compose.yml"
+      compose-file: './docker/docker-compose.yml'
       services: |
         helloworld2
         helloworld3
@@ -107,15 +104,24 @@ steps:
 
 ### Example using `up-flags`
 
-Specify flags to pass to the `docker-compose up`. Default is none. Can be used to pass the `--build` flag, for example, if you want persistent volumes to be deleted as well during cleanup. A full list of flags can be found in the [docker-compose up documentation](https://docs.docker.com/compose/reference/up/).
+Specify flags to pass to the `docker-compose up`. Default is none. Can be used
+to pass the `--build` flag, for example, if you want persistent volumes to be
+deleted as well during cleanup. A full list of flags can be found in the
+[docker-compose up documentation](https://docs.docker.com/compose/reference/up/).
 
 ### Example using `down-flags`
 
-Specify flags to pass to the `docker-compose down` command during cleanup. Default is none. Can be used to pass the `--volumes` flag, for example, if you want persistent volumes to be deleted as well during cleanup. A full list of flags can be found in the [docker-compose down documentation](https://docs.docker.com/compose/reference/down/).
+Specify flags to pass to the `docker-compose down` command during cleanup.
+Default is none. Can be used to pass the `--volumes` flag, for example, if you
+want persistent volumes to be deleted as well during cleanup. A full list of
+flags can be found in the
+[docker-compose down documentation](https://docs.docker.com/compose/reference/down/).
 
 ### Example using `compose-flags`
 
-Specify flags to pass to the `docker-compose` command. Default is none. A full list of flags can be found in the [docker-compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
+Specify flags to pass to the `docker-compose` command. Default is none. A full
+list of flags can be found in the
+[docker-compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
 
 ```yaml
 steps:
@@ -123,7 +129,7 @@ steps:
   - uses: actions/checkout@v3
   - uses: hoverkraft-tech/compose-action@v1.5.1
     with:
-      compose-file: "./docker/docker-compose.yml"
+      compose-file: './docker/docker-compose.yml'
       services: |
         helloworld2
         helloworld3

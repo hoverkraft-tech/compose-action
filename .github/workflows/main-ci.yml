@@ -3,7 +3,7 @@ name: Internal - Main - Continuous Integration
 on:
   push:
     branches: [main]
-    tags: ["*"]
+    tags: ['*']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,7 +34,7 @@ jobs:
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update
-          title: "docs: update actions and workflows documentation"
+          title: 'docs: update actions and workflows documentation'
           body: Update actions and workflows documentation
           commit-message: |
             docs: update actions and workflows documentation
