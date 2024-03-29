@@ -9,7 +9,7 @@ jobs:
     name: Test with services
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
 
       - name: Act
         uses: ./
@@ -32,7 +32,7 @@ jobs:
     name: Test compose action
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
 
       - name: Act
         uses: ./
@@ -45,7 +45,7 @@ jobs:
     name: Test with compose flags
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
 
       - name: Act
         uses: ./
@@ -63,7 +63,7 @@ jobs:
     name: Test with env
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
 
       - name: Act
         uses: ./
@@ -82,7 +82,7 @@ jobs:
     name: Test with multiple compose files
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.3.2
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
 
       - name: Act
         uses: ./
