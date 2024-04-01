@@ -3,6 +3,9 @@ name: Internal - Checks for dist
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   check-dist:
     name: Check dist

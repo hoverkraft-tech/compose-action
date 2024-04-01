@@ -3,6 +3,11 @@ name: Internal - Checks for nodejs
 on:
   workflow_call:
 
+permissions:
+  contents: read
+  security-events: write
+  id-token: write
+
 jobs:
   test-nodejs:
     uses: hoverkraft-tech/ci-github-nodejs/.github/workflows/continuous-integration.yml@0.4.2

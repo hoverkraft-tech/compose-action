@@ -3,9 +3,16 @@ name: Common Continuous Integration tasks
 on:
   workflow_call:
 
+permissions:
+  contents: read
+  packages: read
+  statuses: write
+  security-events: write
+  id-token: write
+
 jobs:
   linter:
-    uses: hoverkraft-tech/ci-github-common/.github/workflows/linter.yml@feat/linter-extra-env-input
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/linter.yml@0.13.0
     with:
       linter-env: |
         FILTER_REGEX_EXCLUDE=dist/**/*

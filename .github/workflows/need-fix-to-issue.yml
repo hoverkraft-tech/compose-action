@@ -6,18 +6,21 @@ on:
       - main
   workflow_dispatch:
     inputs:
+      #checkov:skip=CKV_GHA_7: required
       manual-commit-ref:
-        description: 'The SHA of the commit to get the diff for'
+        description: "The SHA of the commit to get the diff for"
         required: true
       manual-base-ref:
-        description:
-          'By default, the commit entered above is compared to the one directly
-          before it; to go back further, enter an earlier SHA here'
+        description: "By default, the commit entered above is compared to the one directly
+          before it; to go back further, enter an earlier SHA here"
         required: false
+
+permissions:
+  contents: read
 
 jobs:
   main:
-    uses: hoverkraft-tech/ci-github-common/.github/workflows/need-fix-to-issue.yml@0.12.1
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/need-fix-to-issue.yml@0.13.0
     with:
       manual-commit-ref: ${{ inputs.manual-commit-ref }}
       manual-base-ref: ${{ inputs.manual-base-ref }}

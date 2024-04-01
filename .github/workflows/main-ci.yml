@@ -3,7 +3,14 @@ name: Internal - Main - Continuous Integration
 on:
   push:
     branches: [main]
-    tags: ['*']
+    tags: ["*"]
+
+permissions:
+  contents: read
+  packages: read
+  statuses: write
+  security-events: write
+  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,11 +37,11 @@ jobs:
           app-id: ${{ vars.CI_BOT_APP_ID }}
           private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
 
-      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@main
+      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@0.13.0
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update
-          title: 'docs: update actions and workflows documentation'
+          title: "docs: update actions and workflows documentation"
           body: Update actions and workflows documentation
           commit-message: |
             docs: update actions and workflows documentation
