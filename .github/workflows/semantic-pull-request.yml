@@ -1,4 +1,4 @@
-name: 'Pull Request - Semantic Lint'
+name: "Pull Request - Semantic Lint"
 
 on:
   pull_request_target:
@@ -7,6 +7,9 @@ on:
       - edited
       - synchronize
 
+permissions:
+  contents: read
+
 jobs:
   main:
-    uses: hoverkraft-tech/ci-github-common/.github/workflows/semantic-pull-request.yml@0.12.1
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/semantic-pull-request.yml@0.13.0

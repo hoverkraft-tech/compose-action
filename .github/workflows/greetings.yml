@@ -1,0 +1,14 @@
+name: Greetings
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  greetings:
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/greetings.yml@0.13.0

@@ -3,6 +3,9 @@ name: Internal - Tests for action
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   test-action-with-services:
     runs-on: ubuntu-latest
