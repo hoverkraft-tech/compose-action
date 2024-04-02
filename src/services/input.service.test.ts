@@ -71,6 +71,7 @@ describe("InputService", () => {
         expect(inputs.composeFiles).toEqual(["file1"]);
       });
     });
+
     describe("services", () => {
       it("should return given services input", () => {
         getMultilineInputMock.mockImplementation((inputName) => {
@@ -89,6 +90,7 @@ describe("InputService", () => {
         expect(inputs.services).toEqual(["service1", "service2"]);
       });
     });
+
     describe("compose-flags", () => {
       it("should return given compose-flags input", () => {
         getMultilineInputMock.mockReturnValue([]);
@@ -116,6 +118,7 @@ describe("InputService", () => {
         expect(inputs.composeFlags).toEqual([]);
       });
     });
+
     describe("up-flags", () => {
       it("should return given up-flags input", () => {
         getMultilineInputMock.mockReturnValue([]);
@@ -143,6 +146,7 @@ describe("InputService", () => {
         expect(inputs.upFlags).toEqual([]);
       });
     });
+
     describe("down-flags", () => {
       it("should return given down-flags input", () => {
         getMultilineInputMock.mockReturnValue([]);
@@ -168,6 +172,24 @@ describe("InputService", () => {
         const inputs = service.getInputs();
 
         expect(inputs.downFlags).toEqual([]);
+      });
+    });
+
+    describe("cwd", () => {
+      it("should return given cwd input", () => {
+        getMultilineInputMock.mockReturnValue([]);
+        getInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.Cwd:
+              return "cwd";
+            default:
+              return "";
+          }
+        });
+
+        const inputs = service.getInputs();
+
+        expect(inputs.cwd).toEqual("cwd");
       });
     });
   });

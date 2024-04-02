@@ -30,6 +30,7 @@ export class DockerComposeService {
       config: inputs.composeFiles,
       log: true,
       composeOptions: inputs.composeFlags,
+      cwd: inputs.cwd,
     };
   }
 }

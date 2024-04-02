@@ -1,31 +1,34 @@
-name: 'Docker Compose Action'
-description:
-  'This action runs your docker-compose file and clean up before action finished'
-author: 'Hoverkraft'
+name: "Docker Compose Action"
+description: "This action runs your docker-compose file and clean up before action finished"
+author: "Hoverkraft"
 branding:
   icon: anchor
   color: gray-dark
 
 inputs:
   compose-file:
-    description: 'Relative path to compose file(s). It can be a list of files.'
+    description: "Relative path to compose file(s). It can be a list of files."
     required: false
-    default: './docker-compose.yml'
+    default: "./docker-compose.yml"
   services:
-    description: 'Services to perform docker-compose up.'
+    description: "Services to perform docker-compose up."
     required: false
   up-flags:
-    description: 'Additional options to pass to `docker-compose up` command.'
+    description: "Additional options to pass to `docker-compose up` command."
     required: false
-    default: ''
+    default: ""
   down-flags:
-    description: 'Additional options to pass to `docker-compose down` command.'
+    description: "Additional options to pass to `docker-compose down` command."
     required: false
-    default: ''
+    default: ""
   compose-flags:
-    description: 'Additional options to pass to `docker-compose` command.'
+    description: "Additional options to pass to `docker-compose` command."
     required: false
-    default: ''
+    default: ""
+  cwd:
+    description: "Current working directory"
+    required: false
+    default: ${{ github.workspace }}
 runs:
   using: node20
   main: dist/index.js

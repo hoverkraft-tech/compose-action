@@ -104,3 +104,27 @@ jobs:
           docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | grep docker-helloworld4-1
           docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | (grep docker-helloworld-1 && echo "Unexpected service is running" && exit 1) || true
           docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | (grep docker-helloworld3-1 && echo "Unexpected service is running" && exit 1) || true
+
+  test-action-with-cwd:
+    runs-on: ubuntu-latest
+    name: Test with cwd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
+
+      - name: Act
+        uses: ./
+        with:
+          compose-file: "docker-compose.yml"
+          cwd: "./docker"
+          services: |
+            helloworld2
+            helloworld3
+
+      - name: "Assert: only expected services are running"
+        run: |
+          docker-compose -f ./docker/docker-compose.yml ps
+
+          docker-compose -f ./docker/docker-compose.yml ps | grep docker-helloworld2-1
+          docker-compose -f ./docker/docker-compose.yml ps | grep docker-helloworld3-1
+          docker-compose -f ./docker/docker-compose.yml ps | (grep docker-helloworld-1 && echo "Unexpected service helloworld is running" && exit 1) || true
