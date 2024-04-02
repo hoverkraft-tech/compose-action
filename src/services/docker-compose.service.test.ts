@@ -29,6 +29,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         upFlags: [],
         downFlags: [],
+        cwd: "/current/working/dir",
       };
 
       await service.up(inputs);
@@ -38,6 +39,7 @@ describe("DockerComposeService", () => {
         commandOptions: [],
         config: ["docker-compose.yml"],
         log: true,
+        cwd: "/current/working/dir",
       });
     });
 
@@ -48,6 +50,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         upFlags: ["--build"],
         downFlags: [],
+        cwd: "/current/working/dir",
       };
 
       await service.up(inputs);
@@ -57,6 +60,7 @@ describe("DockerComposeService", () => {
         commandOptions: ["--build"],
         config: ["docker-compose.yml"],
         log: true,
+        cwd: "/current/working/dir",
       });
     });
   });
@@ -69,6 +73,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         upFlags: [],
         downFlags: ["--volumes", "--remove-orphans"],
+        cwd: "/current/working/dir",
       };
 
       await service.down(inputs);
@@ -78,6 +83,7 @@ describe("DockerComposeService", () => {
         commandOptions: ["--volumes", "--remove-orphans"],
         config: [],
         log: true,
+        cwd: "/current/working/dir",
       });
     });
   });

@@ -1,6 +1,7 @@
 import { getInput, getMultilineInput } from "@actions/core";
 import { LoggerService } from "./logger.service";
 import { existsSync } from "fs";
+import { join } from "path";
 
 export type Inputs = {
   composeFiles: string[];
@@ -8,6 +9,7 @@ export type Inputs = {
   composeFlags: string[];
   upFlags: string[];
   downFlags: string[];
+  cwd: string;
 };
 
 export enum InputNames {
@@ -16,6 +18,7 @@ export enum InputNames {
   ComposeFlags = "compose-flags",
   UpFlags = "up-flags",
   DownFlags = "down-flags",
+  Cwd = "cwd",
 }
 
 export class InputService {
@@ -28,17 +31,19 @@ export class InputService {
       composeFlags: this.getComposeFlags(),
       upFlags: this.getUpFlags(),
       downFlags: this.getDownFlags(),
+      cwd: this.getCwd(),
     };
   }
 
   private getComposeFiles(): string[] {
+    const cwd = this.getCwd();
     return getMultilineInput(InputNames.ComposeFile).filter((composeFile) => {
       if (!composeFile.length) {
         return false;
       }
 
-      if (!existsSync(composeFile)) {
-        this.logger.warn(`${composeFile} not exists`);
+      if (!existsSync(join(cwd, composeFile))) {
+        this.logger.warn(`${composeFile} does not exist in ${cwd}`);
         return false;
       }
 
@@ -68,5 +73,9 @@ export class InputService {
     }
 
     return flags.trim().split(" ");
+  }
+
+  private getCwd(): string {
+    return getInput(InputNames.Cwd);
   }
 }

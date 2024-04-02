@@ -26002,6 +26002,7 @@ class DockerComposeService {
             config: inputs.composeFiles,
             log: true,
             composeOptions: inputs.composeFlags,
+            cwd: inputs.cwd,
         };
     }
 }
@@ -26019,6 +26020,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.InputService = exports.InputNames = void 0;
 const core_1 = __nccwpck_require__(2186);
 const fs_1 = __nccwpck_require__(7147);
+const path_1 = __nccwpck_require__(1017);
 var InputNames;
 (function (InputNames) {
     InputNames["ComposeFile"] = "compose-file";
@@ -26026,6 +26028,7 @@ var InputNames;
     InputNames["ComposeFlags"] = "compose-flags";
     InputNames["UpFlags"] = "up-flags";
     InputNames["DownFlags"] = "down-flags";
+    InputNames["Cwd"] = "cwd";
 })(InputNames || (exports.InputNames = InputNames = {}));
 class InputService {
     logger;
@@ -26039,15 +26042,17 @@ class InputService {
             composeFlags: this.getComposeFlags(),
             upFlags: this.getUpFlags(),
             downFlags: this.getDownFlags(),
+            cwd: this.getCwd(),
         };
     }
     getComposeFiles() {
+        const cwd = this.getCwd();
         return (0, core_1.getMultilineInput)(InputNames.ComposeFile).filter((composeFile) => {
             if (!composeFile.length) {
                 return false;
             }
-            if (!(0, fs_1.existsSync)(composeFile)) {
-                this.logger.warn(`${composeFile} not exists`);
+            if (!(0, fs_1.existsSync)((0, path_1.join)(cwd, composeFile))) {
+                this.logger.warn(`${composeFile} does not exist in ${cwd}`);
                 return false;
             }
             return true;
@@ -26070,6 +26075,9 @@ class InputService {
             return [];
         }
         return flags.trim().split(" ");
+    }
+    getCwd() {
+        return (0, core_1.getInput)(InputNames.Cwd);
     }
 }
 exports.InputService = InputService;

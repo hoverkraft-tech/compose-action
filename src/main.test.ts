@@ -44,6 +44,7 @@ describe("run", () => {
       composeFlags: [],
       upFlags: [],
       downFlags: [],
+      cwd: "/current/working/dir",
     }));
 
     await main.run(main.RunAction.UP);
@@ -52,7 +53,7 @@ describe("run", () => {
     // Verify that all of the functions were called correctly
     expect(debugMock).toHaveBeenNthCalledWith(
       1,
-      'inputs: {"composeFiles":[],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[]}'
+      'inputs: {"composeFiles":[],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir"}'
     );
     expect(warnMock).toHaveBeenNthCalledWith(1, "no compose files found");
     expect(upMock).not.toHaveBeenCalled();
@@ -66,6 +67,7 @@ describe("run", () => {
       composeFlags: [],
       upFlags: [],
       downFlags: [],
+      cwd: "/current/working/dir",
     }));
 
     upMock.mockResolvedValueOnce();
@@ -76,7 +78,7 @@ describe("run", () => {
     // Verify that all of the functions were called correctly
     expect(debugMock).toHaveBeenNthCalledWith(
       1,
-      'inputs: {"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[]}'
+      'inputs: {"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir"}'
     );
 
     expect(upMock).toHaveBeenCalledWith({
@@ -85,6 +87,7 @@ describe("run", () => {
       composeFlags: [],
       upFlags: [],
       downFlags: [],
+      cwd: "/current/working/dir",
     });
 
     expect(setFailedMock).not.toHaveBeenCalled();
@@ -98,6 +101,7 @@ describe("run", () => {
       composeFlags: [],
       upFlags: [],
       downFlags: [],
+      cwd: "/current/working/dir",
     }));
 
     upMock.mockRejectedValueOnce(new Error("unkown error"));
@@ -116,6 +120,7 @@ describe("run", () => {
       composeFlags: [],
       upFlags: [],
       downFlags: [],
+      cwd: "/current/working/dir",
     }));
 
     downMock.mockResolvedValueOnce();
@@ -126,7 +131,7 @@ describe("run", () => {
     // Verify that all of the functions were called correctly
     expect(debugMock).toHaveBeenNthCalledWith(
       1,
-      'inputs: {"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[]}'
+      'inputs: {"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir"}'
     );
 
     expect(downMock).toHaveBeenCalledWith({
@@ -135,6 +140,7 @@ describe("run", () => {
       composeFlags: [],
       upFlags: [],
       downFlags: [],
+      cwd: "/current/working/dir",
     });
 
     expect(setFailedMock).not.toHaveBeenCalled();
