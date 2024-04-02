@@ -11,9 +11,6 @@
 
 <!-- end title -->
 <!-- start badges -->
-
-<a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Freleases%2Flatest"><img src="https://img.shields.io/github/v/release/hoverkraft-tech/compose-action?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20tag" /></a><a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Freleases%2Flatest"><img src="https://img.shields.io/github/release-date/hoverkraft-tech/compose-action?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20date" /></a><img src="https://img.shields.io/github/last-commit/hoverkraft-tech/compose-action?logo=github&style=flat-square" alt="Commit" /><a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Fissues"><img src="https://img.shields.io/github/issues/hoverkraft-tech/compose-action?logo=github&style=flat-square" alt="Open%20Issues" /></a><img src="https://img.shields.io/github/downloads/hoverkraft-tech/compose-action/total?logo=github&style=flat-square" alt="Downloads" />
-
 <!-- end badges -->
 
 </div>
@@ -22,8 +19,25 @@
 This action runs your docker-compose file and clean up before action finished
 
 <!-- end description -->
+
 <!-- start contents -->
 <!-- end contents -->
+
+## Usage
+
+### Action
+
+The action will run `docker-compose up` to start the services defined in the given compose file(s).
+The compose file(s) can be specified using the `compose-file` input.
+Some extra options can be passed to the `docker-compose up` command using the `up-flags` input.
+
+### Post hook
+
+On post hook, the action will run `docker-compose down` to clean up the services.
+In debug mode, the logs of the running services are printed before the cleanup.
+
+Some extra options can be passed to the `docker-compose down` command using the `down-flags` input.
+
 <!-- start usage -->
 
 ```yaml

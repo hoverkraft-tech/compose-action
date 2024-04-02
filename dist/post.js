@@ -25919,50 +25919,36 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 399:
+/***/ 3878:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = exports.RunAction = void 0;
+exports.run = void 0;
 const core_1 = __nccwpck_require__(2186);
-const docker_compose_service_1 = __nccwpck_require__(2911);
 const input_service_1 = __nccwpck_require__(6492);
 const logger_service_1 = __nccwpck_require__(6716);
-var RunAction;
-(function (RunAction) {
-    RunAction["UP"] = "up";
-    RunAction["DOWN"] = "down";
-})(RunAction || (exports.RunAction = RunAction = {}));
+const docker_compose_service_1 = __nccwpck_require__(2911);
 /**
- * The main function for the action.
+ * The run function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
-async function run(run) {
+async function run(callback) {
     try {
         const loggerService = new logger_service_1.LoggerService();
-        const dockerComposeService = new docker_compose_service_1.DockerComposeService();
         const inputService = new input_service_1.InputService(loggerService);
+        const dockerComposeService = new docker_compose_service_1.DockerComposeService();
         const inputs = inputService.getInputs();
-        (0, core_1.debug)(`inputs: ${JSON.stringify(inputs)}`);
+        loggerService.debug(`inputs: ${JSON.stringify(inputs)}`);
         if (!inputs.composeFiles.length) {
             loggerService.warn("no compose files found");
             return;
         }
-        switch (run) {
-            case RunAction.UP:
-                await dockerComposeService.up(inputs);
-                loggerService.info("compose started");
-                break;
-            case RunAction.DOWN:
-                await dockerComposeService.down(inputs);
-                loggerService.info("compose removed");
-                break;
-        }
+        await callback(inputs, loggerService, dockerComposeService);
     }
     catch (error) {
-        (0, core_1.setFailed)(`compose ${run} failed. ${error instanceof Error ? error : JSON.stringify(error)}`);
+        (0, core_1.setFailed)(`${error instanceof Error ? error : JSON.stringify(error)}`);
     }
 }
 exports.run = run;
@@ -25996,6 +25982,17 @@ class DockerComposeService {
             commandOptions: inputs.downFlags,
         };
         await docker_compose_1.v2.down(options);
+    }
+    async logs(inputs) {
+        const options = {
+            ...this.getCommonOptions(inputs),
+            follow: false,
+        };
+        const { err, out } = await docker_compose_1.v2.logs(inputs.services, options);
+        return {
+            error: err,
+            output: out,
+        };
     }
     getCommonOptions(inputs) {
         return {
@@ -26099,6 +26096,9 @@ class LoggerService {
     }
     info(message) {
         (0, core_1.info)(message);
+    }
+    debug(message) {
+        (0, core_1.debug)(message);
     }
 }
 exports.LoggerService = LoggerService;
@@ -36438,9 +36438,18 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 /**
  * The entrypoint for the post action.
  */
-const main_1 = __nccwpck_require__(399);
+const runner_1 = __nccwpck_require__(3878);
+const callback = async (inputs, loggerService, dockerComposeService) => {
+    const { error, output } = await dockerComposeService.logs(inputs);
+    if (error) {
+        loggerService.debug("compose error:\n" + error);
+    }
+    loggerService.debug("compose logs:\n" + output);
+    await dockerComposeService.down(inputs);
+    loggerService.info("compose removed");
+};
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-(0, main_1.run)(main_1.RunAction.DOWN);
+(0, runner_1.run)(callback);
 
 })();
 
