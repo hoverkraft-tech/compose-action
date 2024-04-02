@@ -39,6 +39,11 @@ export class DockerComposeService {
     };
   }
 
+  async version(inputs: Inputs): Promise<string> {
+    const result = await v2.version(this.getCommonOptions(inputs));
+    return result.data.version;
+  }
+
   private getCommonOptions(inputs: Inputs): IDockerComposeOptions {
     return {
       config: inputs.composeFiles,

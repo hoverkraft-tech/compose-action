@@ -54,7 +54,7 @@ describe("post", () => {
       cwd: "/current/working/dir",
     });
 
-    expect(debugMock).toHaveBeenNthCalledWith(2, "compose logs:\nlog");
+    expect(debugMock).toHaveBeenNthCalledWith(2, "docker-compose logs:\nlog");
 
     expect(downMock).toHaveBeenCalledWith({
       composeFiles: ["docker-compose.yml"],
@@ -66,6 +66,6 @@ describe("post", () => {
     });
 
     expect(setFailedMock).not.toHaveBeenCalled();
-    expect(infoMock).toHaveBeenCalledWith("compose removed");
+    expect(infoMock).toHaveBeenCalledWith("docker-compose is down");
   });
 });

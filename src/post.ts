@@ -11,17 +11,18 @@ const callback: RunCallback = async (
   loggerService: LoggerService,
   dockerComposeService: DockerComposeService
 ) => {
+  console.log("ok");
   const { error, output } = await dockerComposeService.logs(inputs);
 
   if (error) {
-    loggerService.debug("compose error:\n" + error);
+    loggerService.debug("docker-compose error:\n" + error);
   }
 
-  loggerService.debug("compose logs:\n" + output);
+  loggerService.debug("docker-compose logs:\n" + output);
 
   await dockerComposeService.down(inputs);
 
-  loggerService.info("compose removed");
+  loggerService.info("docker-compose is down");
 };
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises

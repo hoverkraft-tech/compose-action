@@ -1,6 +1,7 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  helloworld4:
+  service-d:
+    image: busybox
+    command: ["tail", "-f", "/dev/null"]
     profiles: [profile-2]
-    image: hello-world

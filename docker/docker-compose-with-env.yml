@@ -1,8 +1,9 @@
-version: '3.8'
+version: "3.8"
 
 volumes:
   test_volume: {}
 
 services:
-  helloworld:
+  service-a:
     image: ${IMAGE_NAME}
+    command: ["tail", "-f", "/dev/null"]
