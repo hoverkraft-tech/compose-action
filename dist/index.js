@@ -25937,14 +25937,10 @@ const docker_compose_service_1 = __nccwpck_require__(2911);
 async function run(callback) {
     try {
         const loggerService = new logger_service_1.LoggerService();
-        const inputService = new input_service_1.InputService(loggerService);
+        const inputService = new input_service_1.InputService();
         const dockerComposeService = new docker_compose_service_1.DockerComposeService();
         const inputs = inputService.getInputs();
         loggerService.debug(`inputs: ${JSON.stringify(inputs)}`);
-        if (!inputs.composeFiles.length) {
-            loggerService.warn("no compose files found");
-            return;
-        }
         await callback(inputs, loggerService, dockerComposeService);
     }
     catch (error) {
@@ -26032,10 +26028,6 @@ var InputNames;
     InputNames["Cwd"] = "cwd";
 })(InputNames || (exports.InputNames = InputNames = {}));
 class InputService {
-    logger;
-    constructor(logger) {
-        this.logger = logger;
-    }
     getInputs() {
         return {
             composeFiles: this.getComposeFiles(),
@@ -26048,16 +26040,19 @@ class InputService {
     }
     getComposeFiles() {
         const cwd = this.getCwd();
-        return (0, core_1.getMultilineInput)(InputNames.ComposeFile).filter((composeFile) => {
+        const composeFiles = (0, core_1.getMultilineInput)(InputNames.ComposeFile).filter((composeFile) => {
             if (!composeFile.length) {
                 return false;
             }
             if (!(0, fs_1.existsSync)((0, path_1.join)(cwd, composeFile))) {
-                this.logger.warn(`${composeFile} does not exist in ${cwd}`);
-                return false;
+                throw new Error(`${composeFile} does not exist in ${cwd}`);
             }
             return true;
         });
+        if (!composeFiles.length) {
+            throw new Error("No compose files found");
+        }
+        return composeFiles;
     }
     getServices() {
         return (0, core_1.getMultilineInput)(InputNames.Services, { required: false });

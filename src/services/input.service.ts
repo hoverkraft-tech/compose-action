@@ -1,5 +1,4 @@
 import { getInput, getMultilineInput } from "@actions/core";
-import { LoggerService } from "./logger.service";
 import { existsSync } from "fs";
 import { join } from "path";
 
@@ -22,8 +21,6 @@ export enum InputNames {
 }
 
 export class InputService {
-  constructor(private readonly logger: LoggerService) {}
-
   getInputs(): Inputs {
     return {
       composeFiles: this.getComposeFiles(),
@@ -37,18 +34,23 @@ export class InputService {
 
   private getComposeFiles(): string[] {
     const cwd = this.getCwd();
-    return getMultilineInput(InputNames.ComposeFile).filter((composeFile) => {
+    const composeFiles = getMultilineInput(InputNames.ComposeFile).filter((composeFile) => {
       if (!composeFile.length) {
         return false;
       }
 
       if (!existsSync(join(cwd, composeFile))) {
-        this.logger.warn(`${composeFile} does not exist in ${cwd}`);
-        return false;
+        throw new Error(`${composeFile} does not exist in ${cwd}`);
       }
 
       return true;
     });
+
+    if (!composeFiles.length) {
+      throw new Error("No compose files found");
+    }
+
+    return composeFiles;
   }
 
   private getServices(): string[] {
