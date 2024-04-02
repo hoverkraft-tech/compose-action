@@ -52,6 +52,11 @@ This action runs your docker-compose file and clean up before action finished
     #
     # Default:
     compose-flags: ""
+
+    # Description: Current working directory
+    #
+    # Default: ${{ github.workspace }}
+    cwd: ""
 ```
 
 <!-- end usage -->
@@ -60,13 +65,14 @@ This action runs your docker-compose file and clean up before action finished
 
 <!-- start inputs -->
 
-| **Input**                  | **Description**                                                         | **Default**                       | **Required** |
-| -------------------------- | ----------------------------------------------------------------------- | --------------------------------- | ------------ |
-| <code>compose-file</code>  | Relative path to compose file(s). It can be a list of files.            | <code>./docker-compose.yml</code> | **false**    |
-| <code>services</code>      | Services to perform docker-compose up.                                  |                                   | **false**    |
-| <code>up-flags</code>      | Additional options to pass to <code>docker-compose up</code> command.   |                                   | **false**    |
-| <code>down-flags</code>    | Additional options to pass to <code>docker-compose down</code> command. |                                   | **false**    |
-| <code>compose-flags</code> | Additional options to pass to <code>docker-compose</code> command.      |                                   | **false**    |
+| **Input**                  | **Description**                                                         | **Default**                          | **Required** |
+| -------------------------- | ----------------------------------------------------------------------- | ------------------------------------ | ------------ |
+| <code>compose-file</code>  | Relative path to compose file(s). It can be a list of files.            | <code>./docker-compose.yml</code>    | **false**    |
+| <code>services</code>      | Services to perform docker-compose up.                                  |                                      | **false**    |
+| <code>up-flags</code>      | Additional options to pass to <code>docker-compose up</code> command.   |                                      | **false**    |
+| <code>down-flags</code>    | Additional options to pass to <code>docker-compose down</code> command. |                                      | **false**    |
+| <code>compose-flags</code> | Additional options to pass to <code>docker-compose</code> command.      |                                      | **false**    |
+| <code>cwd</code>           | Current working directory                                               | <code>${{ github.workspace }}</code> | **false**    |
 
 <!-- end inputs -->
 <!-- start outputs -->
