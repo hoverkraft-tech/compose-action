@@ -16,16 +16,11 @@ export type RunCallback = (
 export async function run(callback: RunCallback): Promise<void> {
   try {
     const loggerService = new LoggerService();
-    const inputService = new InputService(loggerService);
+    const inputService = new InputService();
     const dockerComposeService = new DockerComposeService();
 
     const inputs = inputService.getInputs();
     loggerService.debug(`inputs: ${JSON.stringify(inputs)}`);
-
-    if (!inputs.composeFiles.length) {
-      loggerService.warn("no compose files found");
-      return;
-    }
 
     await callback(inputs, loggerService, dockerComposeService);
   } catch (error) {

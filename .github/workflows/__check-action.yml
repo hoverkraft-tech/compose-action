@@ -23,11 +23,11 @@ jobs:
 
       - name: "Assert: only expected services are running"
         run: |
-          docker-compose -f ./docker/docker-compose.yml ps
+          docker compose -f ./docker/docker-compose.yml ps
 
-          docker-compose -f ./docker/docker-compose.yml ps | grep docker-service-b-1 || (echo "Service service-b is not running" && exit 1)
-          docker-compose -f ./docker/docker-compose.yml ps | grep docker-service-c-1 || (echo "Service service-c is not running" && exit 1)
-          (docker-compose -f ./docker/docker-compose.yml ps | grep docker-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
+          docker compose -f ./docker/docker-compose.yml ps | grep docker-service-b-1 || (echo "Service service-b is not running" && exit 1)
+          docker compose -f ./docker/docker-compose.yml ps | grep docker-service-c-1 || (echo "Service service-c is not running" && exit 1)
+          (docker compose -f ./docker/docker-compose.yml ps | grep docker-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
 
   test-action-with-down-flags:
     runs-on: ubuntu-latest
