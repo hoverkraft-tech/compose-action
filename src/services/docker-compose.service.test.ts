@@ -9,12 +9,14 @@ describe("DockerComposeService", () => {
   let upAllMock: jest.SpiedFunction<typeof v2.upAll>;
   let upManyMock: jest.SpiedFunction<typeof v2.upMany>;
   let downMock: jest.SpiedFunction<typeof v2.down>;
+  let logsMock: jest.SpiedFunction<typeof v2.logs>;
 
   beforeEach(() => {
     service = new DockerComposeService();
     upAllMock = jest.spyOn(v2, "upAll").mockImplementation();
     upManyMock = jest.spyOn(v2, "upMany").mockImplementation();
     downMock = jest.spyOn(v2, "down").mockImplementation();
+    logsMock = jest.spyOn(v2, "logs").mockImplementation();
   });
 
   afterEach(() => {
@@ -84,6 +86,31 @@ describe("DockerComposeService", () => {
         config: [],
         log: true,
         cwd: "/current/working/dir",
+      });
+    });
+  });
+
+  describe("logs", () => {
+    it("should call logs with correct options", async () => {
+      const inputs: Inputs = {
+        composeFiles: ["docker-compose.yml"],
+        services: ["helloworld2", "helloworld3"],
+        composeFlags: [],
+        upFlags: [],
+        downFlags: [],
+        cwd: "/current/working/dir",
+      };
+
+      logsMock.mockResolvedValue({ exitCode: 0, err: "", out: "logs" });
+
+      await service.logs(inputs);
+
+      expect(v2.logs).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
+        composeOptions: [],
+        config: ["docker-compose.yml"],
+        log: true,
+        cwd: "/current/working/dir",
+        follow: false,
       });
     });
   });
