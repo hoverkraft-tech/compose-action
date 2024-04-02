@@ -10,6 +10,7 @@ describe("DockerComposeService", () => {
   let upManyMock: jest.SpiedFunction<typeof v2.upMany>;
   let downMock: jest.SpiedFunction<typeof v2.down>;
   let logsMock: jest.SpiedFunction<typeof v2.logs>;
+  let versionMock: jest.SpiedFunction<typeof v2.version>;
 
   beforeEach(() => {
     service = new DockerComposeService();
@@ -17,6 +18,7 @@ describe("DockerComposeService", () => {
     upManyMock = jest.spyOn(v2, "upMany").mockImplementation();
     downMock = jest.spyOn(v2, "down").mockImplementation();
     logsMock = jest.spyOn(v2, "logs").mockImplementation();
+    versionMock = jest.spyOn(v2, "version").mockImplementation();
   });
 
   afterEach(() => {
@@ -111,6 +113,37 @@ describe("DockerComposeService", () => {
         log: true,
         cwd: "/current/working/dir",
         follow: false,
+      });
+    });
+  });
+
+  describe("version", () => {
+    it("should call version with correct options", async () => {
+      const inputs: Inputs = {
+        composeFiles: ["docker-compose.yml"],
+        services: [],
+        composeFlags: [],
+        upFlags: [],
+        downFlags: [],
+        cwd: "/current/working/dir",
+      };
+
+      versionMock.mockResolvedValue({
+        exitCode: 0,
+        out: "",
+        err: "",
+        data: {
+          version: "1.2.3",
+        },
+      });
+
+      await service.version(inputs);
+
+      expect(versionMock).toHaveBeenCalledWith({
+        composeOptions: [],
+        config: ["docker-compose.yml"],
+        log: true,
+        cwd: "/current/working/dir",
       });
     });
   });

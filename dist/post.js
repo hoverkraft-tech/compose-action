@@ -25994,6 +25994,10 @@ class DockerComposeService {
             output: out,
         };
     }
+    async version(inputs) {
+        const result = await docker_compose_1.v2.version(this.getCommonOptions(inputs));
+        return result.data.version;
+    }
     getCommonOptions(inputs) {
         return {
             config: inputs.composeFiles,
@@ -36440,13 +36444,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
  */
 const runner_1 = __nccwpck_require__(3878);
 const callback = async (inputs, loggerService, dockerComposeService) => {
+    console.log("ok");
     const { error, output } = await dockerComposeService.logs(inputs);
     if (error) {
-        loggerService.debug("compose error:\n" + error);
+        loggerService.debug("docker-compose error:\n" + error);
     }
-    loggerService.debug("compose logs:\n" + output);
+    loggerService.debug("docker-compose logs:\n" + output);
     await dockerComposeService.down(inputs);
-    loggerService.info("compose removed");
+    loggerService.info("docker-compose is down");
 };
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (0, runner_1.run)(callback);

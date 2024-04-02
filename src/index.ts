@@ -11,8 +11,11 @@ const callback: RunCallback = async (
   loggerService: LoggerService,
   dockerComposeService: DockerComposeService
 ) => {
+  const composeVersion = await dockerComposeService.version(inputs);
+  loggerService.info(`docker-compose version: ${composeVersion}`);
+
   await dockerComposeService.up(inputs);
-  loggerService.info("compose started");
+  loggerService.info("docker-compose is up");
 };
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises

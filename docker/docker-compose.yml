@@ -1,16 +1,19 @@
-version: '3.8'
+version: "3.8"
+
+services:
+  service-a:
+    image: busybox
+    command: ["tail", "-f", "/dev/null"]
+    volumes:
+      - test_volume:/test:Z
+  service-b:
+    image: busybox
+    command: ["tail", "-f", "/dev/null"]
+    profiles: [profile-1]
+  service-c:
+    image: busybox
+    command: ["tail", "-f", "/dev/null"]
+    profiles: [profile-2]
 
 volumes:
   test_volume: {}
-
-services:
-  helloworld:
-    image: hello-world
-    volumes:
-      - test_volume:/test:Z
-  helloworld2:
-    profiles: [profile-1]
-    image: hello-world
-  helloworld3:
-    profiles: [profile-2]
-    image: hello-world

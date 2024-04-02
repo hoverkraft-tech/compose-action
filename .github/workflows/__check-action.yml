@@ -12,30 +12,28 @@ jobs:
     name: Test with services
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
 
       - name: Act
         uses: ./
         with:
           compose-file: "./docker/docker-compose.yml"
           services: |
-            helloworld2
-            helloworld3
+            service-b
+            service-c
 
       - name: "Assert: only expected services are running"
         run: |
           docker-compose -f ./docker/docker-compose.yml ps
 
-          docker-compose -f ./docker/docker-compose.yml ps | grep docker-helloworld2-1
-          docker-compose -f ./docker/docker-compose.yml ps | grep docker-helloworld3-1
-          docker-compose -f ./docker/docker-compose.yml ps | (grep docker-helloworld-1 && echo "Unexpected service helloworld is running" && exit 1) || true
+          docker-compose -f ./docker/docker-compose.yml ps | grep docker-service-b-1 || (echo "Service service-b is not running" && exit 1)
+          docker-compose -f ./docker/docker-compose.yml ps | grep docker-service-c-1 || (echo "Service service-c is not running" && exit 1)
+          (docker-compose -f ./docker/docker-compose.yml ps | grep docker-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
 
   test-action-with-down-flags:
     runs-on: ubuntu-latest
     name: Test compose action
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
 
       - name: Act
         uses: ./
@@ -48,7 +46,6 @@ jobs:
     name: Test with compose flags
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
 
       - name: Act
         uses: ./
@@ -59,33 +56,34 @@ jobs:
 
       - name: "Assert: profile is used"
         run: |
-          docker-compose -f ./docker/docker-compose.yml -p profile-1 ps || (echo "Profile not used" && exit 1)
+          docker compose -f ./docker/docker-compose.yml -p profile-1 ps || (echo "Profile not used" && exit 1)
 
   test-action-with-env:
     runs-on: ubuntu-latest
     name: Test with env
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
 
       - name: Act
         uses: ./
         with:
           compose-file: "./docker/docker-compose-with-env.yml"
         env:
-          IMAGE_NAME: hello-world
+          IMAGE_NAME: busybox
 
       - name: "Assert: env is used"
+        env:
+          IMAGE_NAME: busybox
         run: |
-          docker-compose -f ./docker/docker-compose-with-env.yml ps
-          docker-compose -f ./docker/docker-compose-with-env.yml ps | grep docker-helloworld-1
+          docker compose -f ./docker/docker-compose-with-env.yml ps
+
+          docker compose -f ./docker/docker-compose-with-env.yml ps | grep docker-service-a-1 || (echo "Service service-a is not running" && exit 1)
 
   test-action-with-multiple-compose-files:
     runs-on: ubuntu-latest
     name: Test with multiple compose files
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
 
       - name: Act
         uses: ./
@@ -94,23 +92,23 @@ jobs:
             ./docker/docker-compose.yml
             ./docker/docker-compose.ci.yml
           services: |
-            helloworld2
-            helloworld4
+            service-b
+            service-d
 
       - name: "Assert: only expected services are running"
         run: |
-          docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps
-          docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | grep docker-helloworld2-1
-          docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | grep docker-helloworld4-1
-          docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | (grep docker-helloworld-1 && echo "Unexpected service is running" && exit 1) || true
-          docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | (grep docker-helloworld3-1 && echo "Unexpected service is running" && exit 1) || true
+          docker compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps
+
+          docker compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | grep docker-service-b-1 || (echo "Service service-b is not running" && exit 1)
+          docker compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | grep docker-service-d-1 || (echo "Service service-d is not running" && exit 1)
+          (docker compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | grep docker-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
+          (docker compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.ci.yml ps | grep docker-service-c-1 && echo "Unexpected service service-c is running" && exit 1) || true
 
   test-action-with-cwd:
     runs-on: ubuntu-latest
     name: Test with cwd
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.4.2
 
       - name: Act
         uses: ./
@@ -118,13 +116,13 @@ jobs:
           compose-file: "docker-compose.yml"
           cwd: "./docker"
           services: |
-            helloworld2
-            helloworld3
+            service-b
+            service-c
 
       - name: "Assert: only expected services are running"
         run: |
-          docker-compose -f ./docker/docker-compose.yml ps
+          docker compose -f ./docker/docker-compose.yml ps
 
-          docker-compose -f ./docker/docker-compose.yml ps | grep docker-helloworld2-1
-          docker-compose -f ./docker/docker-compose.yml ps | grep docker-helloworld3-1
-          docker-compose -f ./docker/docker-compose.yml ps | (grep docker-helloworld-1 && echo "Unexpected service helloworld is running" && exit 1) || true
+          docker compose -f ./docker/docker-compose.yml ps | grep docker-service-b-1 || (echo "Service service-b is not running" && exit 1)
+          docker compose -f ./docker/docker-compose.yml ps | grep docker-service-c-1 || (echo "Service service-c is not running" && exit 1)
+          (docker compose -f ./docker/docker-compose.yml ps | grep docker-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true

@@ -25994,6 +25994,10 @@ class DockerComposeService {
             output: out,
         };
     }
+    async version(inputs) {
+        const result = await docker_compose_1.v2.version(this.getCommonOptions(inputs));
+        return result.data.version;
+    }
     getCommonOptions(inputs) {
         return {
             config: inputs.composeFiles,
@@ -36440,8 +36444,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
  */
 const runner_1 = __nccwpck_require__(3878);
 const callback = async (inputs, loggerService, dockerComposeService) => {
+    const composeVersion = await dockerComposeService.version(inputs);
+    loggerService.info(`docker-compose version: ${composeVersion}`);
     await dockerComposeService.up(inputs);
-    loggerService.info("compose started");
+    loggerService.info("docker-compose is up");
 };
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (0, runner_1.run)(callback);
