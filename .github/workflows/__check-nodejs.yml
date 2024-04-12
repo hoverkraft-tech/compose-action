@@ -17,5 +17,3 @@ jobs:
       contents: read
     with:
       build: ""
-    secrets:
-      codecov-token: ${{ secrets.CODECOV_TOKEN }}
