@@ -138,3 +138,20 @@ jobs:
         with:
           compose-file: "test/docker-compose-web-mysql.yml"
           up-flags: "--build --abort-on-container-exit --exit-code-from=web"
+
+  test-attach-dependencies-failure:
+    runs-on: ubuntu-latest
+    name: Test with --attach-dependencies and service failure
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Act
+        uses: ./
+        with:
+          compose-file: "test/docker-compose-fail.yml"
+          up-flags: "--attach-dependencies"
+
+      - name: Assert
+        run: |
+          EXIT_CODE=$(docker compose -f ./test/docker-compose-fail.yml ps service-a --all --format json | jq ".ExitCode")
+          [ "$EXIT_CODE" == "1" ] || (echo "Service service-a did not exit with code 1" && exit 1)
