@@ -36664,7 +36664,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
  */
 const runner_1 = __nccwpck_require__(3878);
 const callback = async (inputs, loggerService, dockerComposeService) => {
-    console.log("ok");
     const { error, output } = await dockerComposeService.logs(inputs);
     if (error) {
         loggerService.debug("docker-compose error:\n" + error);

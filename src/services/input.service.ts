@@ -34,7 +34,7 @@ export class InputService {
 
   private getComposeFiles(): string[] {
     const cwd = this.getCwd();
-    const composeFiles = getMultilineInput(InputNames.ComposeFile).filter((composeFile) => {
+    const composeFiles = getMultilineInput(InputNames.ComposeFile).filter((composeFile: string) => {
       if (!composeFile.length) {
         return false;
       }
