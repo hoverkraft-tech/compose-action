@@ -11,7 +11,6 @@ const callback: RunCallback = async (
   loggerService: LoggerService,
   dockerComposeService: DockerComposeService
 ) => {
-  console.log("ok");
   const { error, output } = await dockerComposeService.logs(inputs);
 
   if (error) {
