@@ -1,0 +1,4 @@
+services:
+  service-a:
+    image: busybox
+    command: ["sh", "-c", "exit 1"]
