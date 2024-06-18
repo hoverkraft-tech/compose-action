@@ -44,7 +44,7 @@ Some extra options can be passed to the `docker-compose down` command using the 
 <!-- start usage -->
 
 ```yaml
-- uses: hoverkraft-tech/compose-action@v0.0.0
+- uses: hoverkraft-tech/compose-action@v2.0.1
   with:
     # Description: Relative path to compose file(s). It can be a list of files.
     #
@@ -97,6 +97,30 @@ Some extra options can be passed to the `docker-compose down` command using the 
 
 ## Examples
 
+### Example using in a full workflow
+
+```yaml
+name: Docker Compose Action
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run docker-compose
+        uses: hoverkraft-tech/compose-action@v2.0.1
+        with:
+          compose-file: "./docker/docker-compose.yml"
+
+      - name: Execute tests in the running services
+        run: |
+          docker-compose exec test-app pytest
+```
+
 <!-- start [.github/ghadocs/examples/] -->
 <!-- end [.github/ghadocs/examples/] -->
 
@@ -105,7 +129,7 @@ Some extra options can be passed to the `docker-compose down` command using the 
 ```yaml
 steps:
   - uses: actions/checkout@v4
-  - uses: hoverkraft-tech/compose-action@v1.5.1
+  - uses: hoverkraft-tech/compose-action@v2.0.1
     with:
       compose-file: "./docker/docker-compose.yml"
     env:
@@ -120,7 +144,7 @@ Perform `docker-compose up` to some given service instead of all of them
 steps:
   # need checkout before using compose-action
   - uses: actions/checkout@v3
-  - uses: hoverkraft-tech/compose-action@v1.5.1
+  - uses: hoverkraft-tech/compose-action@v2.0.1
     with:
       compose-file: "./docker/docker-compose.yml"
       services: |
@@ -153,7 +177,7 @@ list of flags can be found in the
 steps:
   # need checkout before using compose-action
   - uses: actions/checkout@v3
-  - uses: hoverkraft-tech/compose-action@v1.5.1
+  - uses: hoverkraft-tech/compose-action@v2.0.1
     with:
       compose-file: "./docker/docker-compose.yml"
       services: |
