@@ -44,7 +44,7 @@ Some extra options can be passed to the `docker-compose down` command using the 
 <!-- start usage -->
 
 ```yaml
-- uses: hoverkraft-tech/compose-action@v2.0.1
+- uses: hoverkraft-tech/compose-action@v0.0.0
   with:
     # Description: Relative path to compose file(s). It can be a list of files.
     #
