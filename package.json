@@ -76,46 +76,13 @@
     "@actions/github": "^6.0.0",
     "@actions/tool-cache": "^2.0.1",
     "@octokit/action": "^7.0.0",
-    "@ts-dev-tools/core": "^1.6.2",
+    "@ts-dev-tools/core": "^1.8.1",
     "docker-compose": "^1.1.0"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.38.1",
     "eslint-plugin-github": "^5.0.1",
     "eslint-plugin-jsonc": "^2.14.1"
-  },
-  "eslintConfig": {
-    "root": true,
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint",
-      "jest"
-    ],
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:jest/recommended",
-      "prettier"
-    ],
-    "env": {
-      "es2021": true
-    },
-    "parserOptions": {
-      "ecmaFeatures": {
-        "jsx": true
-      },
-      "ecmaVersion": 12,
-      "sourceType": "module"
-    },
-    "settings": {
-      "jest": {
-        "version": "detect"
-      }
-    },
-    "ignorePatterns": [
-      "dist",
-      "node_modules"
-    ]
   },
   "prettier": {
     "semi": true,
@@ -139,6 +106,6 @@
     }
   },
   "tsDevTools": {
-    "version": "20220617100200-prettier-cache"
+    "version": "20240617094000-config-nx-scopes"
   }
 }
