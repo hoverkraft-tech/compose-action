@@ -7,7 +7,7 @@ branding:
 
 inputs:
   compose-file:
-    description: "Relative path to compose file(s). It can be a list of files."
+    description: "Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd)."
     required: false
     default: "./docker-compose.yml"
   services:

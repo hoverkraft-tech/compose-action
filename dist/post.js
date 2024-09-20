@@ -26266,13 +26266,16 @@ class InputService {
     getComposeFiles() {
         const cwd = this.getCwd();
         const composeFiles = (0, core_1.getMultilineInput)(InputNames.ComposeFile).filter((composeFile) => {
-            if (!composeFile.length) {
+            if (!composeFile.trim().length) {
                 return false;
             }
-            if (!(0, fs_1.existsSync)((0, path_1.join)(cwd, composeFile))) {
-                throw new Error(`${composeFile} does not exist in ${cwd}`);
+            const possiblePaths = [(0, path_1.join)(cwd, composeFile), composeFile];
+            for (const path of possiblePaths) {
+                if ((0, fs_1.existsSync)(path)) {
+                    return true;
+                }
             }
-            return true;
+            throw new Error(`Compose file not found in "${possiblePaths.join('", "')}"`);
         });
         if (!composeFiles.length) {
             throw new Error("No compose files found");

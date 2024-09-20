@@ -127,6 +127,28 @@ jobs:
           docker compose -f ./test/docker-compose.yml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
           (docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
 
+  test-action-with-absolute-path:
+    runs-on: ubuntu-latest
+    name: Test with absolute path
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Act
+        uses: ./
+        with:
+          compose-file: "${{ github.workspace }}/test/docker-compose.yml"
+          services: |
+            service-b
+            service-c
+
+      - name: "Assert: only expected services are running"
+        run: |
+          docker compose -f ./test/docker-compose.yml ps
+
+          docker compose -f ./test/docker-compose.yml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
+          docker compose -f ./test/docker-compose.yml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
+          (docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
+
   test-abort-on-container-exit:
     runs-on: ubuntu-latest
     name: Test with --abort-on-container-exit
