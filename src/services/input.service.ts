@@ -35,15 +35,19 @@ export class InputService {
   private getComposeFiles(): string[] {
     const cwd = this.getCwd();
     const composeFiles = getMultilineInput(InputNames.ComposeFile).filter((composeFile: string) => {
-      if (!composeFile.length) {
+      if (!composeFile.trim().length) {
         return false;
       }
 
-      if (!existsSync(join(cwd, composeFile))) {
-        throw new Error(`${composeFile} does not exist in ${cwd}`);
+      const possiblePaths = [join(cwd, composeFile), composeFile];
+
+      for (const path of possiblePaths) {
+        if (existsSync(path)) {
+          return true;
+        }
       }
 
-      return true;
+      throw new Error(`Compose file not found in "${possiblePaths.join('", "')}"`);
     });
 
     if (!composeFiles.length) {

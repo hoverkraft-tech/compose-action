@@ -71,7 +71,7 @@ describe("InputService", () => {
         existsSyncMock.mockImplementation((file) => file === "/current/working/directory/file1");
 
         expect(() => service.getInputs()).toThrow(
-          "file2 does not exist in /current/working/directory"
+          'Compose file not found in "/current/working/directory/file2", "file2"'
         );
       });
 
