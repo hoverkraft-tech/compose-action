@@ -75,7 +75,7 @@
     "@actions/core": "^1.10.1",
     "@actions/github": "^6.0.0",
     "@ts-dev-tools/core": "^1.6.2",
-    "docker-compose": "^0.24.7"
+    "docker-compose": "^1.1.0"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.38.1",

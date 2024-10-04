@@ -1,4 +1,4 @@
-import { v2 } from "docker-compose";
+import * as dockerCompose from "docker-compose";
 import { DockerComposeService } from "./docker-compose.service";
 import { Inputs } from "./input.service";
 
@@ -6,19 +6,19 @@ jest.mock("docker-compose");
 
 describe("DockerComposeService", () => {
   let service: DockerComposeService;
-  let upAllMock: jest.SpiedFunction<typeof v2.upAll>;
-  let upManyMock: jest.SpiedFunction<typeof v2.upMany>;
-  let downMock: jest.SpiedFunction<typeof v2.down>;
-  let logsMock: jest.SpiedFunction<typeof v2.logs>;
-  let versionMock: jest.SpiedFunction<typeof v2.version>;
+  let upAllMock: jest.SpiedFunction<typeof dockerCompose.upAll>;
+  let upManyMock: jest.SpiedFunction<typeof dockerCompose.upMany>;
+  let downMock: jest.SpiedFunction<typeof dockerCompose.down>;
+  let logsMock: jest.SpiedFunction<typeof dockerCompose.logs>;
+  let versionMock: jest.SpiedFunction<typeof dockerCompose.version>;
 
   beforeEach(() => {
     service = new DockerComposeService();
-    upAllMock = jest.spyOn(v2, "upAll").mockImplementation();
-    upManyMock = jest.spyOn(v2, "upMany").mockImplementation();
-    downMock = jest.spyOn(v2, "down").mockImplementation();
-    logsMock = jest.spyOn(v2, "logs").mockImplementation();
-    versionMock = jest.spyOn(v2, "version").mockImplementation();
+    upAllMock = jest.spyOn(dockerCompose, "upAll").mockImplementation();
+    upManyMock = jest.spyOn(dockerCompose, "upMany").mockImplementation();
+    downMock = jest.spyOn(dockerCompose, "down").mockImplementation();
+    logsMock = jest.spyOn(dockerCompose, "logs").mockImplementation();
+    versionMock = jest.spyOn(dockerCompose, "version").mockImplementation();
   });
 
   afterEach(() => {
@@ -107,7 +107,7 @@ describe("DockerComposeService", () => {
 
       await service.logs(inputs);
 
-      expect(v2.logs).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
+      expect(dockerCompose.logs).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
         composeOptions: [],
         config: ["docker-compose.yml"],
         log: true,

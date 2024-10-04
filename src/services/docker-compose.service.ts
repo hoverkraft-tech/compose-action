@@ -1,4 +1,12 @@
-import { IDockerComposeLogOptions, IDockerComposeOptions, v2 } from "docker-compose";
+import {
+  down,
+  IDockerComposeLogOptions,
+  IDockerComposeOptions,
+  logs,
+  upAll,
+  upMany,
+  version,
+} from "docker-compose";
 import { Inputs } from "./input.service";
 
 export class DockerComposeService {
@@ -9,11 +17,11 @@ export class DockerComposeService {
     };
 
     if (inputs.services.length > 0) {
-      await v2.upMany(inputs.services, options);
+      await upMany(inputs.services, options);
       return;
     }
 
-    await v2.upAll(options);
+    await upAll(options);
   }
 
   async down(inputs: Inputs): Promise<void> {
@@ -22,7 +30,7 @@ export class DockerComposeService {
       commandOptions: inputs.downFlags,
     };
 
-    await v2.down(options);
+    await down(options);
   }
 
   async logs(inputs: Inputs): Promise<{ error: string; output: string }> {
@@ -31,7 +39,7 @@ export class DockerComposeService {
       follow: false,
     };
 
-    const { err, out } = await v2.logs(inputs.services, options);
+    const { err, out } = await logs(inputs.services, options);
 
     return {
       error: err,
@@ -40,7 +48,7 @@ export class DockerComposeService {
   }
 
   async version(inputs: Inputs): Promise<string> {
-    const result = await v2.version(this.getCommonOptions(inputs));
+    const result = await version(this.getCommonOptions(inputs));
     return result.data.version;
   }
 
