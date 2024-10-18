@@ -177,3 +177,80 @@ jobs:
         run: |
           EXIT_CODE=$(docker compose -f ./test/docker-compose-fail.yml ps service-a --all --format json | jq ".ExitCode")
           [ "$EXIT_CODE" == "1" ] || (echo "Service service-a did not exit with code 1" && exit 1)
+
+  test-action-with-compose-version:
+    runs-on: ubuntu-latest
+    name: Test with compose version
+    env:
+      DOCKER_COMPOSE_VERSION: "2.29.0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Arrange: ensure original docker compose version is not the expected one"
+        run: |
+          CURRENT_DOCKER_COMPOSE_VERSION=$(docker compose version --short)
+          echo "Current docker compose version: $CURRENT_DOCKER_COMPOSE_VERSION"
+
+          if [ "$CURRENT_DOCKER_COMPOSE_VERSION" == "$DOCKER_COMPOSE_VERSION" ]; then
+            echo "Docker compose version is already in $DOCKER_COMPOSE_VERSION version"
+            exit 1
+          fi
+
+      - name: Act
+        uses: ./
+        with:
+          compose-file: "./test/docker-compose.yml"
+          compose-version: "2.29.0"
+
+      - name: "Assert: compose version is used"
+        run: |
+          CURRENT_DOCKER_COMPOSE_VERSION=$(docker compose version --short)
+          echo "Current docker compose version: $CURRENT_DOCKER_COMPOSE_VERSION"
+
+          if [ "$CURRENT_DOCKER_COMPOSE_VERSION" != "$DOCKER_COMPOSE_VERSION" ]; then
+            echo "Docker compose version is not in $DOCKER_COMPOSE_VERSION version"
+            exit 1
+          fi
+
+  test-action-with-compose-version-latest:
+    runs-on: ubuntu-latest
+    name: Test with compose version latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Arrange: retrieve latest version of docker compose"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const dockerComposeVersion = (await github.rest.repos.getLatestRelease({
+                owner: "docker",
+                repo: "compose",
+              })).data.tag_name.replace("v", "");
+
+            core.exportVariable('DOCKER_COMPOSE_VERSION', dockerComposeVersion);
+
+      - name: "Arrange: ensure original docker compose version is not the expected one"
+        run: |
+          CURRENT_DOCKER_COMPOSE_VERSION=$(docker compose version --short)
+          echo "Current docker compose version: $CURRENT_DOCKER_COMPOSE_VERSION"
+
+          if [ "$CURRENT_DOCKER_COMPOSE_VERSION" == "$DOCKER_COMPOSE_VERSION" ]; then
+            echo "Docker compose version is already in $DOCKER_COMPOSE_VERSION version"
+            exit 1
+          fi
+
+      - name: Act
+        uses: ./
+        with:
+          compose-file: "./test/docker-compose.yml"
+          compose-version: "latest"
+
+      - name: "Assert: compose version is used"
+        run: |
+          CURRENT_DOCKER_COMPOSE_VERSION=$(docker compose version --short)
+          echo "Current docker compose version: $CURRENT_DOCKER_COMPOSE_VERSION"
+
+          if [ "$CURRENT_DOCKER_COMPOSE_VERSION" != "$DOCKER_COMPOSE_VERSION" ]; then
+            echo "Docker compose version is not in $DOCKER_COMPOSE_VERSION version"
+            exit 1
+          fi

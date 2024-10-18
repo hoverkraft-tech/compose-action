@@ -29,6 +29,17 @@ inputs:
     description: "Current working directory"
     required: false
     default: ${{ github.workspace }}
+  compose-version:
+    description: |
+      Compose version to use.
+      If null (default), it will use the current installed version.
+      If "latest", it will install the latest version.
+    required: false
+  github-token:
+    description: The GitHub token used to create an authenticated client (to fetch the latest version of docker-compose).
+    default: ${{ github.token }}
+    required: false
+
 runs:
   using: node20
   main: dist/index.js

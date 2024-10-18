@@ -25607,7 +25607,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 4813:
+/***/ 7080:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -25622,14 +25622,29 @@ const docker_compose_service_1 = __nccwpck_require__(1390);
  * The run function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
-async function run(callback) {
+async function run() {
     try {
         const loggerService = new logger_service_1.LoggerService();
         const inputService = new input_service_1.InputService();
         const dockerComposeService = new docker_compose_service_1.DockerComposeService();
         const inputs = inputService.getInputs();
-        loggerService.debug(`inputs: ${JSON.stringify(inputs)}`);
-        await callback(inputs, loggerService, dockerComposeService);
+        const { error, output } = await dockerComposeService.logs({
+            composeFiles: inputs.composeFiles,
+            composeFlags: inputs.composeFlags,
+            cwd: inputs.cwd,
+            services: inputs.services,
+        });
+        if (error) {
+            loggerService.debug("docker compose error:\n" + error);
+        }
+        loggerService.debug("docker compose logs:\n" + output);
+        await dockerComposeService.down({
+            composeFiles: inputs.composeFiles,
+            composeFlags: inputs.composeFlags,
+            cwd: inputs.cwd,
+            downFlags: inputs.downFlags,
+        });
+        loggerService.info("docker compose is down");
     }
     catch (error) {
         (0, core_1.setFailed)(`${error instanceof Error ? error : JSON.stringify(error)}`);
@@ -25649,45 +25664,41 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DockerComposeService = void 0;
 const docker_compose_1 = __nccwpck_require__(3162);
 class DockerComposeService {
-    async up(inputs) {
+    async up({ upFlags, services, ...optionsInputs }) {
         const options = {
-            ...this.getCommonOptions(inputs),
-            commandOptions: inputs.upFlags,
+            ...this.getCommonOptions(optionsInputs),
+            commandOptions: upFlags,
         };
-        if (inputs.services.length > 0) {
-            await (0, docker_compose_1.upMany)(inputs.services, options);
+        if (services.length > 0) {
+            await (0, docker_compose_1.upMany)(services, options);
             return;
         }
         await (0, docker_compose_1.upAll)(options);
     }
-    async down(inputs) {
+    async down({ downFlags, ...optionsInputs }) {
         const options = {
-            ...this.getCommonOptions(inputs),
-            commandOptions: inputs.downFlags,
+            ...this.getCommonOptions(optionsInputs),
+            commandOptions: downFlags,
         };
         await (0, docker_compose_1.down)(options);
     }
-    async logs(inputs) {
+    async logs({ services, ...optionsInputs }) {
         const options = {
-            ...this.getCommonOptions(inputs),
+            ...this.getCommonOptions(optionsInputs),
             follow: false,
         };
-        const { err, out } = await (0, docker_compose_1.logs)(inputs.services, options);
+        const { err, out } = await (0, docker_compose_1.logs)(services, options);
         return {
             error: err,
             output: out,
         };
     }
-    async version(inputs) {
-        const result = await (0, docker_compose_1.version)(this.getCommonOptions(inputs));
-        return result.data.version;
-    }
-    getCommonOptions(inputs) {
+    getCommonOptions({ composeFiles, composeFlags, cwd, }) {
         return {
-            config: inputs.composeFiles,
+            config: composeFiles,
             log: true,
-            composeOptions: inputs.composeFlags,
-            cwd: inputs.cwd,
+            composeOptions: composeFlags,
+            cwd: cwd,
         };
     }
 }
@@ -25702,7 +25713,7 @@ exports.DockerComposeService = DockerComposeService;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.InputService = exports.InputNames = void 0;
+exports.InputService = exports.COMPOSE_VERSION_LATEST = exports.InputNames = void 0;
 const core_1 = __nccwpck_require__(7484);
 const fs_1 = __nccwpck_require__(9896);
 const path_1 = __nccwpck_require__(6928);
@@ -25714,7 +25725,10 @@ var InputNames;
     InputNames["UpFlags"] = "up-flags";
     InputNames["DownFlags"] = "down-flags";
     InputNames["Cwd"] = "cwd";
+    InputNames["ComposeVersion"] = "compose-version";
+    InputNames["GithubToken"] = "github-token";
 })(InputNames || (exports.InputNames = InputNames = {}));
+exports.COMPOSE_VERSION_LATEST = "latest";
 class InputService {
     getInputs() {
         return {
@@ -25724,6 +25738,8 @@ class InputService {
             upFlags: this.getUpFlags(),
             downFlags: this.getDownFlags(),
             cwd: this.getCwd(),
+            composeVersion: this.getComposeVersion(),
+            githubToken: this.getGithubToken(),
         };
     }
     getComposeFiles() {
@@ -25765,6 +25781,16 @@ class InputService {
     }
     getCwd() {
         return (0, core_1.getInput)(InputNames.Cwd);
+    }
+    getComposeVersion() {
+        return ((0, core_1.getInput)(InputNames.ComposeVersion, {
+            required: false,
+        }) || null);
+    }
+    getGithubToken() {
+        return ((0, core_1.getInput)(InputNames.GithubToken, {
+            required: false,
+        }) || null);
     }
 }
 exports.InputService = InputService;
@@ -36183,18 +36209,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 /**
  * The entrypoint for the post action.
  */
-const runner_1 = __nccwpck_require__(4813);
-const callback = async (inputs, loggerService, dockerComposeService) => {
-    const { error, output } = await dockerComposeService.logs(inputs);
-    if (error) {
-        loggerService.debug("docker-compose error:\n" + error);
-    }
-    loggerService.debug("docker-compose logs:\n" + output);
-    await dockerComposeService.down(inputs);
-    loggerService.info("docker-compose is down");
-};
+const post_runner_1 = __nccwpck_require__(7080);
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-(0, runner_1.run)(callback);
+(0, post_runner_1.run)();
 
 })();
 

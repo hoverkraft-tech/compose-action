@@ -9,6 +9,8 @@ export type Inputs = {
   upFlags: string[];
   downFlags: string[];
   cwd: string;
+  composeVersion: string | null;
+  githubToken: string | null;
 };
 
 export enum InputNames {
@@ -18,7 +20,11 @@ export enum InputNames {
   UpFlags = "up-flags",
   DownFlags = "down-flags",
   Cwd = "cwd",
+  ComposeVersion = "compose-version",
+  GithubToken = "github-token",
 }
+
+export const COMPOSE_VERSION_LATEST = "latest";
 
 export class InputService {
   getInputs(): Inputs {
@@ -29,6 +35,8 @@ export class InputService {
       upFlags: this.getUpFlags(),
       downFlags: this.getDownFlags(),
       cwd: this.getCwd(),
+      composeVersion: this.getComposeVersion(),
+      githubToken: this.getGithubToken(),
     };
   }
 
@@ -83,5 +91,21 @@ export class InputService {
 
   private getCwd(): string {
     return getInput(InputNames.Cwd);
+  }
+
+  private getComposeVersion(): string | null {
+    return (
+      getInput(InputNames.ComposeVersion, {
+        required: false,
+      }) || null
+    );
+  }
+
+  private getGithubToken(): string | null {
+    return (
+      getInput(InputNames.GithubToken, {
+        required: false,
+      }) || null
+    );
   }
 }
