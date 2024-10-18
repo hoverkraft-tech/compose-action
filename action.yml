@@ -29,6 +29,10 @@ inputs:
     description: "Current working directory"
     required: false
     default: ${{ github.workspace }}
+  compose-version:
+    description: "Compose version to use. By defautl it will use the current installed version."
+    required: false
+
 runs:
   using: node20
   main: dist/index.js

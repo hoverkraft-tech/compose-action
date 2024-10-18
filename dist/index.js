@@ -25607,7 +25607,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 4813:
+/***/ 5310:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -25618,24 +25618,70 @@ const core_1 = __nccwpck_require__(7484);
 const input_service_1 = __nccwpck_require__(2301);
 const logger_service_1 = __nccwpck_require__(8187);
 const docker_compose_service_1 = __nccwpck_require__(1390);
+const docker_compose_installer_service_1 = __nccwpck_require__(2687);
 /**
  * The run function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
-async function run(callback) {
+async function run() {
     try {
         const loggerService = new logger_service_1.LoggerService();
         const inputService = new input_service_1.InputService();
+        const dockerComposeInstallerService = new docker_compose_installer_service_1.DockerComposeInstallerService();
         const dockerComposeService = new docker_compose_service_1.DockerComposeService();
         const inputs = inputService.getInputs();
         loggerService.debug(`inputs: ${JSON.stringify(inputs)}`);
-        await callback(inputs, loggerService, dockerComposeService);
+        loggerService.info("Setting up docker compose" +
+            (inputs.composeVersion ? ` version ${inputs.composeVersion}` : ""));
+        const installedVersion = await dockerComposeInstallerService.install({
+            composeVersion: inputs.composeVersion,
+            cwd: inputs.cwd,
+        });
+        loggerService.info(`docker compose version: ${installedVersion}`);
+        loggerService.info("Bringing up docker compose service(s)");
+        await dockerComposeService.up({
+            composeFiles: inputs.composeFiles,
+            composeFlags: inputs.composeFlags,
+            cwd: inputs.cwd,
+            upFlags: inputs.upFlags,
+            services: inputs.services,
+        });
+        loggerService.info("docker compose service(s) are up");
     }
     catch (error) {
         (0, core_1.setFailed)(`${error instanceof Error ? error : JSON.stringify(error)}`);
     }
 }
 exports.run = run;
+
+
+/***/ }),
+
+/***/ 2687:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DockerComposeInstallerService = void 0;
+const docker_compose_1 = __nccwpck_require__(3162);
+class DockerComposeInstallerService {
+    constructor() { }
+    async install({ composeVersion, cwd }) {
+        const currentVersion = await this.version({ cwd });
+        if (composeVersion && currentVersion !== composeVersion) {
+            throw new Error(`Requested version ${composeVersion} does not match current version ${currentVersion}`);
+        }
+        return currentVersion;
+    }
+    async version({ cwd }) {
+        const result = await (0, docker_compose_1.version)({
+            cwd,
+        });
+        return result.data.version;
+    }
+}
+exports.DockerComposeInstallerService = DockerComposeInstallerService;
 
 
 /***/ }),
@@ -25649,45 +25695,41 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DockerComposeService = void 0;
 const docker_compose_1 = __nccwpck_require__(3162);
 class DockerComposeService {
-    async up(inputs) {
+    async up({ upFlags, services, ...optionsInputs }) {
         const options = {
-            ...this.getCommonOptions(inputs),
-            commandOptions: inputs.upFlags,
+            ...this.getCommonOptions(optionsInputs),
+            commandOptions: upFlags,
         };
-        if (inputs.services.length > 0) {
-            await (0, docker_compose_1.upMany)(inputs.services, options);
+        if (services.length > 0) {
+            await (0, docker_compose_1.upMany)(services, options);
             return;
         }
         await (0, docker_compose_1.upAll)(options);
     }
-    async down(inputs) {
+    async down({ downFlags, ...optionsInputs }) {
         const options = {
-            ...this.getCommonOptions(inputs),
-            commandOptions: inputs.downFlags,
+            ...this.getCommonOptions(optionsInputs),
+            commandOptions: downFlags,
         };
         await (0, docker_compose_1.down)(options);
     }
-    async logs(inputs) {
+    async logs({ services, ...optionsInputs }) {
         const options = {
-            ...this.getCommonOptions(inputs),
+            ...this.getCommonOptions(optionsInputs),
             follow: false,
         };
-        const { err, out } = await (0, docker_compose_1.logs)(inputs.services, options);
+        const { err, out } = await (0, docker_compose_1.logs)(services, options);
         return {
             error: err,
             output: out,
         };
     }
-    async version(inputs) {
-        const result = await (0, docker_compose_1.version)(this.getCommonOptions(inputs));
-        return result.data.version;
-    }
-    getCommonOptions(inputs) {
+    getCommonOptions({ composeFiles, composeFlags, cwd, }) {
         return {
-            config: inputs.composeFiles,
+            config: composeFiles,
             log: true,
-            composeOptions: inputs.composeFlags,
-            cwd: inputs.cwd,
+            composeOptions: composeFlags,
+            cwd: cwd,
         };
     }
 }
@@ -25714,6 +25756,7 @@ var InputNames;
     InputNames["UpFlags"] = "up-flags";
     InputNames["DownFlags"] = "down-flags";
     InputNames["Cwd"] = "cwd";
+    InputNames["ComposeVersion"] = "compose-version";
 })(InputNames || (exports.InputNames = InputNames = {}));
 class InputService {
     getInputs() {
@@ -25724,6 +25767,7 @@ class InputService {
             upFlags: this.getUpFlags(),
             downFlags: this.getDownFlags(),
             cwd: this.getCwd(),
+            composeVersion: this.getComposeVersion(),
         };
     }
     getComposeFiles() {
@@ -25765,6 +25809,11 @@ class InputService {
     }
     getCwd() {
         return (0, core_1.getInput)(InputNames.Cwd);
+    }
+    getComposeVersion() {
+        return ((0, core_1.getInput)(InputNames.ComposeVersion, {
+            required: false,
+        }) || null);
     }
 }
 exports.InputService = InputService;
@@ -36183,15 +36232,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 /**
  * The entrypoint for the action.
  */
-const runner_1 = __nccwpck_require__(4813);
-const callback = async (inputs, loggerService, dockerComposeService) => {
-    const composeVersion = await dockerComposeService.version(inputs);
-    loggerService.info(`docker-compose version: ${composeVersion}`);
-    await dockerComposeService.up(inputs);
-    loggerService.info("docker-compose is up");
-};
+const index_runner_1 = __nccwpck_require__(5310);
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-(0, runner_1.run)(callback);
+(0, index_runner_1.run)();
 
 })();
 

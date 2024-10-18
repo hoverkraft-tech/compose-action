@@ -9,6 +9,7 @@ export type Inputs = {
   upFlags: string[];
   downFlags: string[];
   cwd: string;
+  composeVersion: string | null;
 };
 
 export enum InputNames {
@@ -18,6 +19,7 @@ export enum InputNames {
   UpFlags = "up-flags",
   DownFlags = "down-flags",
   Cwd = "cwd",
+  ComposeVersion = "compose-version",
 }
 
 export class InputService {
@@ -29,6 +31,7 @@ export class InputService {
       upFlags: this.getUpFlags(),
       downFlags: this.getDownFlags(),
       cwd: this.getCwd(),
+      composeVersion: this.getComposeVersion(),
     };
   }
 
@@ -83,5 +86,13 @@ export class InputService {
 
   private getCwd(): string {
     return getInput(InputNames.Cwd);
+  }
+
+  private getComposeVersion(): string | null {
+    return (
+      getInput(InputNames.ComposeVersion, {
+        required: false,
+      }) || null
+    );
   }
 }
