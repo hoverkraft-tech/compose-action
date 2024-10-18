@@ -271,5 +271,31 @@ describe("InputService", () => {
         expect(inputs.cwd).toEqual("cwd");
       });
     });
+
+    describe("compose-version", () => {
+      it("should return given compose-version input", () => {
+        getMultilineInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.ComposeFile:
+              return ["file1"];
+            default:
+              return [];
+          }
+        });
+        getInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.ComposeVersion:
+              return "compose-version";
+            default:
+              return "";
+          }
+        });
+        existsSyncMock.mockReturnValue(true);
+
+        const inputs = service.getInputs();
+
+        expect(inputs.composeVersion).toEqual("compose-version");
+      });
+    });
   });
 });

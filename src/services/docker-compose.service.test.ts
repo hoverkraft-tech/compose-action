@@ -1,6 +1,5 @@
 import * as dockerCompose from "docker-compose";
-import { DockerComposeService } from "./docker-compose.service";
-import { Inputs } from "./input.service";
+import { DockerComposeService, DownInputs, LogsInputs, UpInputs } from "./docker-compose.service";
 
 jest.mock("docker-compose");
 
@@ -10,7 +9,6 @@ describe("DockerComposeService", () => {
   let upManyMock: jest.SpiedFunction<typeof dockerCompose.upMany>;
   let downMock: jest.SpiedFunction<typeof dockerCompose.down>;
   let logsMock: jest.SpiedFunction<typeof dockerCompose.logs>;
-  let versionMock: jest.SpiedFunction<typeof dockerCompose.version>;
 
   beforeEach(() => {
     service = new DockerComposeService();
@@ -18,7 +16,6 @@ describe("DockerComposeService", () => {
     upManyMock = jest.spyOn(dockerCompose, "upMany").mockImplementation();
     downMock = jest.spyOn(dockerCompose, "down").mockImplementation();
     logsMock = jest.spyOn(dockerCompose, "logs").mockImplementation();
-    versionMock = jest.spyOn(dockerCompose, "version").mockImplementation();
   });
 
   afterEach(() => {
@@ -27,16 +24,15 @@ describe("DockerComposeService", () => {
 
   describe("up", () => {
     it("should call up with correct options", async () => {
-      const inputs: Inputs = {
+      const upInputs: UpInputs = {
         composeFiles: ["docker-compose.yml"],
         services: [],
         composeFlags: [],
         upFlags: [],
-        downFlags: [],
         cwd: "/current/working/dir",
       };
 
-      await service.up(inputs);
+      await service.up(upInputs);
 
       expect(upAllMock).toHaveBeenCalledWith({
         composeOptions: [],
@@ -48,16 +44,15 @@ describe("DockerComposeService", () => {
     });
 
     it("should call up with specific services", async () => {
-      const inputs: Inputs = {
+      const upInputs: UpInputs = {
         composeFiles: ["docker-compose.yml"],
         services: ["helloworld2", "helloworld3"],
         composeFlags: [],
         upFlags: ["--build"],
-        downFlags: [],
         cwd: "/current/working/dir",
       };
 
-      await service.up(inputs);
+      await service.up(upInputs);
 
       expect(upManyMock).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
         composeOptions: [],
@@ -71,16 +66,14 @@ describe("DockerComposeService", () => {
 
   describe("down", () => {
     it("should call down with correct options", async () => {
-      const inputs: Inputs = {
+      const downInputs: DownInputs = {
         composeFiles: [],
-        services: [],
         composeFlags: [],
-        upFlags: [],
         downFlags: ["--volumes", "--remove-orphans"],
         cwd: "/current/working/dir",
       };
 
-      await service.down(inputs);
+      await service.down(downInputs);
 
       expect(downMock).toHaveBeenCalledWith({
         composeOptions: [],
@@ -94,18 +87,16 @@ describe("DockerComposeService", () => {
 
   describe("logs", () => {
     it("should call logs with correct options", async () => {
-      const inputs: Inputs = {
+      const logsInputs: LogsInputs = {
         composeFiles: ["docker-compose.yml"],
         services: ["helloworld2", "helloworld3"],
         composeFlags: [],
-        upFlags: [],
-        downFlags: [],
         cwd: "/current/working/dir",
       };
 
       logsMock.mockResolvedValue({ exitCode: 0, err: "", out: "logs" });
 
-      await service.logs(inputs);
+      await service.logs(logsInputs);
 
       expect(dockerCompose.logs).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
         composeOptions: [],
@@ -113,37 +104,6 @@ describe("DockerComposeService", () => {
         log: true,
         cwd: "/current/working/dir",
         follow: false,
-      });
-    });
-  });
-
-  describe("version", () => {
-    it("should call version with correct options", async () => {
-      const inputs: Inputs = {
-        composeFiles: ["docker-compose.yml"],
-        services: [],
-        composeFlags: [],
-        upFlags: [],
-        downFlags: [],
-        cwd: "/current/working/dir",
-      };
-
-      versionMock.mockResolvedValue({
-        exitCode: 0,
-        out: "",
-        err: "",
-        data: {
-          version: "1.2.3",
-        },
-      });
-
-      await service.version(inputs);
-
-      expect(versionMock).toHaveBeenCalledWith({
-        composeOptions: [],
-        config: ["docker-compose.yml"],
-        log: true,
-        cwd: "/current/working/dir",
       });
     });
   });
