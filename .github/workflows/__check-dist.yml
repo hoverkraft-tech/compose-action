@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.6.0
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0.7.0
 
       - name: Build dist/ Directory
         id: package
