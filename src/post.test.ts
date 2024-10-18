@@ -7,8 +7,8 @@ let setFailedMock: jest.SpiedFunction<typeof core.setFailed>;
 let getInputsMock: jest.SpiedFunction<typeof InputService.prototype.getInputs>;
 let debugMock: jest.SpiedFunction<typeof LoggerService.prototype.debug>;
 let infoMock: jest.SpiedFunction<typeof LoggerService.prototype.info>;
-let downMock: jest.SpiedFunction<typeof DockerComposeService.prototype.down>;
 let logsMock: jest.SpiedFunction<typeof DockerComposeService.prototype.logs>;
+let downMock: jest.SpiedFunction<typeof DockerComposeService.prototype.down>;
 
 describe("post", () => {
   beforeEach(() => {
@@ -18,8 +18,8 @@ describe("post", () => {
     infoMock = jest.spyOn(LoggerService.prototype, "info").mockImplementation();
     debugMock = jest.spyOn(LoggerService.prototype, "debug").mockImplementation();
     getInputsMock = jest.spyOn(InputService.prototype, "getInputs");
-    downMock = jest.spyOn(DockerComposeService.prototype, "down");
     logsMock = jest.spyOn(DockerComposeService.prototype, "logs");
+    downMock = jest.spyOn(DockerComposeService.prototype, "down");
   });
 
   it("calls run when imported", async () => {
@@ -30,42 +30,34 @@ describe("post", () => {
       upFlags: [],
       downFlags: [],
       cwd: "/current/working/dir",
+      composeVersion: null,
+      githubToken: null,
     }));
 
-    logsMock.mockResolvedValueOnce({ error: "", output: "log" });
+    logsMock.mockResolvedValue({ error: "", output: "test logs" });
     downMock.mockResolvedValueOnce();
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     await require("../src/post");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    // Verify that all of the functions were called correctly
-    expect(debugMock).toHaveBeenNthCalledWith(
-      1,
-      'inputs: {"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir"}'
-    );
-
     expect(logsMock).toHaveBeenCalledWith({
       composeFiles: ["docker-compose.yml"],
-      services: [],
       composeFlags: [],
-      upFlags: [],
-      downFlags: [],
       cwd: "/current/working/dir",
+      services: [],
     });
-
-    expect(debugMock).toHaveBeenNthCalledWith(2, "docker-compose logs:\nlog");
 
     expect(downMock).toHaveBeenCalledWith({
       composeFiles: ["docker-compose.yml"],
-      services: [],
       composeFlags: [],
-      upFlags: [],
-      downFlags: [],
       cwd: "/current/working/dir",
+      downFlags: [],
     });
 
+    expect(debugMock).toHaveBeenNthCalledWith(1, "docker compose logs:\ntest logs");
+    expect(infoMock).toHaveBeenNthCalledWith(1, "docker compose is down");
+
     expect(setFailedMock).not.toHaveBeenCalled();
-    expect(infoMock).toHaveBeenCalledWith("docker-compose is down");
   });
 });
