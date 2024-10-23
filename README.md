@@ -75,6 +75,17 @@ Some extra options can be passed to the `docker-compose down` command using the 
     #
     # Default: ${{ github.workspace }}
     cwd: ""
+
+    # Description: Compose version to use. If null (default), it will use the current
+    # installed version. If "latest", it will install the latest version.
+    #
+    compose-version: ""
+
+    # Description: The GitHub token used to create an authenticated client (to fetch
+    # the latest version of docker-compose).
+    #
+    # Default: ${{ github.token }}
+    github-token: ""
 ```
 
 <!-- end usage -->
@@ -83,14 +94,16 @@ Some extra options can be passed to the `docker-compose down` command using the 
 
 <!-- start inputs -->
 
-| **Input**                  | **Description**                                                                                                            | **Default**                          | **Required** |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------ |
-| <code>compose-file</code>  | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd). | <code>./docker-compose.yml</code>    | **false**    |
-| <code>services</code>      | Services to perform docker-compose up.                                                                                     |                                      | **false**    |
-| <code>up-flags</code>      | Additional options to pass to <code>docker-compose up</code> command.                                                      |                                      | **false**    |
-| <code>down-flags</code>    | Additional options to pass to <code>docker-compose down</code> command.                                                    |                                      | **false**    |
-| <code>compose-flags</code> | Additional options to pass to <code>docker-compose</code> command.                                                         |                                      | **false**    |
-| <code>cwd</code>           | Current working directory                                                                                                  | <code>${{ github.workspace }}</code> | **false**    |
+| **Input**                    | **Description**                                                                                                                                  | **Default**                          | **Required** |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ | ------------ |
+| <code>compose-file</code>    | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd).                       | <code>./docker-compose.yml</code>    | **false**    |
+| <code>services</code>        | Services to perform docker-compose up.                                                                                                           |                                      | **false**    |
+| <code>up-flags</code>        | Additional options to pass to <code>docker-compose up</code> command.                                                                            |                                      | **false**    |
+| <code>down-flags</code>      | Additional options to pass to <code>docker-compose down</code> command.                                                                          |                                      | **false**    |
+| <code>compose-flags</code>   | Additional options to pass to <code>docker-compose</code> command.                                                                               |                                      | **false**    |
+| <code>cwd</code>             | Current working directory                                                                                                                        | <code>${{ github.workspace }}</code> | **false**    |
+| <code>compose-version</code> | Compose version to use.<br />If null (default), it will use the current installed version.<br />If "latest", it will install the latest version. |                                      | **false**    |
+| <code>github-token</code>    | The GitHub token used to create an authenticated client (to fetch the latest version of docker-compose).                                         | <code>${{ github.token }}</code>     | **false**    |
 
 <!-- end inputs -->
 <!-- start outputs -->
