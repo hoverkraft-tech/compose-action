@@ -1,9 +1,9 @@
 ---
 name: Bug report
 about: Create a bug report
-title: ''
+title: ""
 labels: bug, needs triage
-assignees: ''
+assignees: ""
 ---
 
 <!--- Please direct any generic questions related to actions to our support community forum at https://github.community/c/code-to-cloud/github-actions/41 --->
