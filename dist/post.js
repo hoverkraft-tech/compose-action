@@ -25613,7 +25613,7 @@ exports["default"] = _default;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = void 0;
+exports.run = run;
 const core_1 = __nccwpck_require__(7484);
 const input_service_1 = __nccwpck_require__(2301);
 const logger_service_1 = __nccwpck_require__(8187);
@@ -25650,7 +25650,6 @@ async function run() {
         (0, core_1.setFailed)(`${error instanceof Error ? error : JSON.stringify(error)}`);
     }
 }
-exports.run = run;
 
 
 /***/ }),
