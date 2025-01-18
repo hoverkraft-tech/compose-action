@@ -1,14 +1,6 @@
-import { InputService, InputNames } from "./input.service";
 import * as core from "@actions/core";
-import * as fs from "fs";
-
-jest.mock("fs", () => ({
-  existsSync: jest.fn(),
-  promises: {
-    access: jest.fn(),
-  },
-}));
-jest.mock("@actions/core");
+import fs from "fs";
+import { InputService, InputNames } from "./input.service";
 
 describe("InputService", () => {
   let service: InputService;
@@ -17,11 +9,13 @@ describe("InputService", () => {
   let existsSyncMock: jest.SpiedFunction<typeof fs.existsSync>;
 
   beforeEach(() => {
-    service = new InputService();
+    jest.clearAllMocks();
 
     existsSyncMock = jest.spyOn(fs, "existsSync").mockImplementation();
     getInputMock = jest.spyOn(core, "getInput").mockImplementation();
     getMultilineInputMock = jest.spyOn(core, "getMultilineInput").mockImplementation();
+
+    service = new InputService();
   });
 
   afterEach(() => {

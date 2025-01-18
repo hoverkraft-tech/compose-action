@@ -5,15 +5,15 @@ import { DockerComposeInstallerService } from "./services/docker-compose-install
 import * as indexRunner from "./index-runner";
 import { DockerComposeService } from "./services/docker-compose.service";
 
-// Mock the external libraries and services used by the action
-let infoMock: jest.SpiedFunction<typeof LoggerService.prototype.info>;
-let debugMock: jest.SpiedFunction<typeof LoggerService.prototype.debug>;
-let setFailedMock: jest.SpiedFunction<typeof core.setFailed>;
-let getInputsMock: jest.SpiedFunction<typeof InputService.prototype.getInputs>;
-let installMock: jest.SpiedFunction<typeof DockerComposeInstallerService.prototype.install>;
-let upMock: jest.SpiedFunction<typeof DockerComposeService.prototype.up>;
-
 describe("run", () => {
+  // Mock the external libraries and services used by the action
+  let infoMock: jest.SpiedFunction<typeof LoggerService.prototype.info>;
+  let debugMock: jest.SpiedFunction<typeof LoggerService.prototype.debug>;
+  let setFailedMock: jest.SpiedFunction<typeof core.setFailed>;
+  let getInputsMock: jest.SpiedFunction<typeof InputService.prototype.getInputs>;
+  let installMock: jest.SpiedFunction<typeof DockerComposeInstallerService.prototype.install>;
+  let upMock: jest.SpiedFunction<typeof DockerComposeService.prototype.up>;
+
   beforeEach(() => {
     jest.clearAllMocks();
 
