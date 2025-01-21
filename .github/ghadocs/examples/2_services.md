@@ -1,7 +1,7 @@
 <!-- markdownlint-disable-next-line first-line-heading -->
 ### Example using `services`
 
-Perform `docker-compose up` to some given service instead of all of them
+Perform `docker compose up` to some given service instead of all of them
 
 ```yaml
 steps:

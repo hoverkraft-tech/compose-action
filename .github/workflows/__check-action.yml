@@ -254,3 +254,20 @@ jobs:
             echo "Docker compose version is not in $DOCKER_COMPOSE_VERSION version"
             exit 1
           fi
+
+  test-action-with-docker-context:
+    runs-on: ubuntu-latest
+    name: Test with docker context
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+        with:
+          context: test-context
+
+      - name: Act
+        uses: ./
+        with:
+          compose-file: "./test/docker-compose.yml"
+          compose-version: "latest"
