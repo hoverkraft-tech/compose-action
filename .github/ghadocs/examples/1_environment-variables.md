@@ -1,4 +1,5 @@
-<!-- markdownlint-disable-next-line first-line-heading -->
+<!-- markdownlint-disable first-line-heading -->
+
 ### Example Using environment variables
 
 ```yaml

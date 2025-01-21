@@ -1,4 +1,5 @@
-<!-- markdownlint-disable-next-line first-line-heading -->
+<!-- markdownlint-disable first-line-heading -->
+
 ### Example using `up-flags`
 
 Specify flags to pass to the `docker compose up`. Default is none. Can be used

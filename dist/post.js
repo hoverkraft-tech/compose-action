@@ -26335,6 +26335,7 @@ async function run() {
         const dockerComposeService = new docker_compose_service_1.DockerComposeService();
         const inputs = inputService.getInputs();
         const { error, output } = await dockerComposeService.logs({
+            dockerFlags: inputs.dockerFlags,
             composeFiles: inputs.composeFiles,
             composeFlags: inputs.composeFlags,
             cwd: inputs.cwd,
@@ -26346,6 +26347,7 @@ async function run() {
         }
         loggerService.debug("docker compose logs:\n" + output);
         await dockerComposeService.down({
+            dockerFlags: inputs.dockerFlags,
             composeFiles: inputs.composeFiles,
             composeFlags: inputs.composeFlags,
             cwd: inputs.cwd,
@@ -26401,12 +26403,16 @@ class DockerComposeService {
             output: out,
         };
     }
-    getCommonOptions({ composeFiles, composeFlags, cwd, debug, }) {
+    getCommonOptions({ dockerFlags, composeFiles, composeFlags, cwd, debug, }) {
         return {
             config: composeFiles,
             composeOptions: composeFlags,
             cwd: cwd,
             callback: (chunk) => debug(chunk.toString()),
+            executable: {
+                executablePath: "docker",
+                options: dockerFlags,
+            },
         };
     }
 }
@@ -26427,6 +26433,7 @@ const fs_1 = __nccwpck_require__(9896);
 const path_1 = __nccwpck_require__(6928);
 var InputNames;
 (function (InputNames) {
+    InputNames["DockerFlags"] = "docker-flags";
     InputNames["ComposeFile"] = "compose-file";
     InputNames["Services"] = "services";
     InputNames["ComposeFlags"] = "compose-flags";
@@ -26440,6 +26447,7 @@ exports.COMPOSE_VERSION_LATEST = "latest";
 class InputService {
     getInputs() {
         return {
+            dockerFlags: this.getDockerFlags(),
             composeFiles: this.getComposeFiles(),
             services: this.getServices(),
             composeFlags: this.getComposeFlags(),
@@ -26449,6 +26457,9 @@ class InputService {
             composeVersion: this.getComposeVersion(),
             githubToken: this.getGithubToken(),
         };
+    }
+    getDockerFlags() {
+        return this.parseFlags((0, core_1.getInput)(InputNames.DockerFlags));
     }
     getComposeFiles() {
         const cwd = this.getCwd();

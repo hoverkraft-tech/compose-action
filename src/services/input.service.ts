@@ -3,6 +3,7 @@ import { existsSync } from "fs";
 import { join } from "path";
 
 export type Inputs = {
+  dockerFlags: string[];
   composeFiles: string[];
   services: string[];
   composeFlags: string[];
@@ -14,6 +15,7 @@ export type Inputs = {
 };
 
 export enum InputNames {
+  DockerFlags = "docker-flags",
   ComposeFile = "compose-file",
   Services = "services",
   ComposeFlags = "compose-flags",
@@ -29,6 +31,7 @@ export const COMPOSE_VERSION_LATEST = "latest";
 export class InputService {
   getInputs(): Inputs {
     return {
+      dockerFlags: this.getDockerFlags(),
       composeFiles: this.getComposeFiles(),
       services: this.getServices(),
       composeFlags: this.getComposeFlags(),
@@ -38,6 +41,10 @@ export class InputService {
       composeVersion: this.getComposeVersion(),
       githubToken: this.getGithubToken(),
     };
+  }
+
+  private getDockerFlags(): string[] {
+    return this.parseFlags(getInput(InputNames.DockerFlags));
   }
 
   private getComposeFiles(): string[] {

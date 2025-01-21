@@ -25,6 +25,7 @@ describe("index", () => {
 
   it("calls run when imported", async () => {
     getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       services: [],
       composeFlags: [],
@@ -48,12 +49,13 @@ describe("index", () => {
     // Verify that all of the functions were called correctly
     expect(debugMock).toHaveBeenNthCalledWith(
       1,
-      'inputs: {"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir","composeVersion":null,"githubToken":null}'
+      'inputs: {"dockerFlags":[],"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir","composeVersion":null,"githubToken":null}'
     );
 
     expect(infoMock).toHaveBeenNthCalledWith(3, "Bringing up docker compose service(s)");
 
     expect(upMock).toHaveBeenCalledWith({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       services: [],
       composeFlags: [],

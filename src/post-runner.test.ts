@@ -27,6 +27,7 @@ describe("run", () => {
   it("should bring down docker compose service(s) and log output", async () => {
     // Arrange
     getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       services: [],
       composeFlags: [],
@@ -46,6 +47,7 @@ describe("run", () => {
 
     // Assert
     expect(logsMock).toHaveBeenCalledWith({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],
       cwd: "/current/working/dir",
@@ -54,6 +56,7 @@ describe("run", () => {
     });
 
     expect(downMock).toHaveBeenCalledWith({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],
       cwd: "/current/working/dir",
@@ -71,6 +74,7 @@ describe("run", () => {
   it("should log docker composer errors if any", async () => {
     // Arrange
     getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       services: [],
       composeFlags: [],
@@ -96,6 +100,7 @@ describe("run", () => {
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],
       cwd: "/current/working/dir",
+      dockerFlags: [],
       services: [],
       debug: debugMock,
     });
@@ -104,6 +109,7 @@ describe("run", () => {
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],
       cwd: "/current/working/dir",
+      dockerFlags: [],
       downFlags: [],
       debug: debugMock,
     });
@@ -133,6 +139,7 @@ describe("run", () => {
     downMock.mockRejectedValue(error);
 
     getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       services: ["web"],
       composeFlags: [],
@@ -156,6 +163,7 @@ describe("run", () => {
     downMock.mockRejectedValue(error);
 
     getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       services: ["web"],
       composeFlags: [],

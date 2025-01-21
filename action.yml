@@ -1,11 +1,14 @@
 name: "Docker Compose Action"
-description: "This action runs your compose file and clean up before action finished"
+description: "This action runs your compose file(s) and clean up before action finished"
 author: "Hoverkraft"
 branding:
   icon: anchor
   color: gray-dark
 
 inputs:
+  docker-flags:
+    description: "Additional options to pass to `docker` command."
+    required: false
   compose-file:
     description: "Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd)."
     required: false
