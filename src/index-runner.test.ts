@@ -28,6 +28,7 @@ describe("run", () => {
   it("should install docker compose with specified version", async () => {
     // Arrange
     getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       services: [],
       composeFlags: [],
@@ -49,7 +50,7 @@ describe("run", () => {
     expect(infoMock).toHaveBeenCalledWith("Setting up docker compose version 1.29.2");
 
     expect(debugMock).toHaveBeenCalledWith(
-      'inputs: {"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir","composeVersion":"1.29.2","githubToken":null}'
+      'inputs: {"dockerFlags":[],"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir","composeVersion":"1.29.2","githubToken":null}'
     );
 
     expect(installMock).toHaveBeenCalledWith({
@@ -59,6 +60,7 @@ describe("run", () => {
     });
 
     expect(upMock).toHaveBeenCalledWith({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],
       cwd: "/current/working/dir",
@@ -73,6 +75,7 @@ describe("run", () => {
   it("should bring up docker compose services", async () => {
     // Arrange
     getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       services: ["web"],
       composeFlags: [],
@@ -88,6 +91,7 @@ describe("run", () => {
 
     // Assert
     expect(upMock).toHaveBeenCalledWith({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],
       cwd: "/current/working/dir",
@@ -104,6 +108,7 @@ describe("run", () => {
     upMock.mockRejectedValue(error);
 
     getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       services: ["web"],
       composeFlags: [],
@@ -127,6 +132,7 @@ describe("run", () => {
     upMock.mockRejectedValue(error);
 
     getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       services: ["web"],
       composeFlags: [],

@@ -23,6 +23,53 @@ describe("InputService", () => {
   });
 
   describe("getInputs", () => {
+    describe("docker-flags", () => {
+      it("should return given docker-flags input", () => {
+        getMultilineInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.ComposeFile:
+              return ["file1"];
+            default:
+              return [];
+          }
+        });
+
+        getInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.DockerFlags:
+              return "docker-flag1 docker-flag2";
+            default:
+              return "";
+          }
+        });
+
+        existsSyncMock.mockReturnValue(true);
+
+        const inputs = service.getInputs();
+
+        expect(inputs.dockerFlags).toEqual(["docker-flag1", "docker-flag2"]);
+      });
+
+      it("should return empty array when no docker-flags input", () => {
+        getMultilineInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.ComposeFile:
+              return ["file1"];
+            default:
+              return [];
+          }
+        });
+
+        getInputMock.mockReturnValue("");
+
+        existsSyncMock.mockReturnValue(true);
+
+        const inputs = service.getInputs();
+
+        expect(inputs.dockerFlags).toEqual([]);
+      });
+    });
+
     describe("composeFiles", () => {
       it("should return given composeFiles input", () => {
         getMultilineInputMock.mockImplementation((inputName) => {

@@ -24,6 +24,7 @@ describe("post", () => {
 
   it("calls run when imported", async () => {
     getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       services: [],
       composeFlags: [],
@@ -42,6 +43,7 @@ describe("post", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(logsMock).toHaveBeenCalledWith({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],
       cwd: "/current/working/dir",
@@ -50,6 +52,7 @@ describe("post", () => {
     });
 
     expect(downMock).toHaveBeenCalledWith({
+      dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],
       cwd: "/current/working/dir",

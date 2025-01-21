@@ -9,6 +9,7 @@ import {
 import { Inputs } from "./input.service";
 
 type OptionsInputs = {
+  dockerFlags: Inputs["dockerFlags"];
   composeFiles: Inputs["composeFiles"];
   composeFlags: Inputs["composeFlags"];
   cwd: Inputs["cwd"];
@@ -61,6 +62,7 @@ export class DockerComposeService {
   }
 
   private getCommonOptions({
+    dockerFlags,
     composeFiles,
     composeFlags,
     cwd,
@@ -71,6 +73,10 @@ export class DockerComposeService {
       composeOptions: composeFlags,
       cwd: cwd,
       callback: (chunk) => debug(chunk.toString()),
+      executable: {
+        executablePath: "docker",
+        options: dockerFlags,
+      },
     };
   }
 }

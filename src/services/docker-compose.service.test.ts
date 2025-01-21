@@ -25,6 +25,7 @@ describe("DockerComposeService", () => {
   describe("up", () => {
     it("should call up with correct options", async () => {
       const upInputs: UpInputs = {
+        dockerFlags: [],
         composeFiles: ["docker-compose.yml"],
         services: [],
         composeFlags: [],
@@ -39,6 +40,36 @@ describe("DockerComposeService", () => {
         composeOptions: [],
         commandOptions: [],
         config: ["docker-compose.yml"],
+        executable: {
+          executablePath: "docker",
+          options: [],
+        },
+        cwd: "/current/working/dir",
+        callback: expect.any(Function),
+      });
+    });
+
+    it("should call up with specific docker flags", async () => {
+      const upInputs: UpInputs = {
+        dockerFlags: ["--context", "dev"],
+        composeFiles: ["docker-compose.yml"],
+        services: [],
+        composeFlags: [],
+        upFlags: [],
+        cwd: "/current/working/dir",
+        debug: jest.fn(),
+      };
+
+      await service.up(upInputs);
+
+      expect(upAllMock).toHaveBeenCalledWith({
+        composeOptions: [],
+        commandOptions: [],
+        config: ["docker-compose.yml"],
+        executable: {
+          executablePath: "docker",
+          options: ["--context", "dev"],
+        },
         cwd: "/current/working/dir",
         callback: expect.any(Function),
       });
@@ -46,6 +77,7 @@ describe("DockerComposeService", () => {
 
     it("should call up with specific services", async () => {
       const upInputs: UpInputs = {
+        dockerFlags: [],
         composeFiles: ["docker-compose.yml"],
         services: ["helloworld2", "helloworld3"],
         composeFlags: [],
@@ -62,6 +94,10 @@ describe("DockerComposeService", () => {
         config: ["docker-compose.yml"],
         cwd: "/current/working/dir",
         callback: expect.any(Function),
+        executable: {
+          executablePath: "docker",
+          options: [],
+        },
       });
     });
   });
@@ -69,6 +105,7 @@ describe("DockerComposeService", () => {
   describe("down", () => {
     it("should call down with correct options", async () => {
       const downInputs: DownInputs = {
+        dockerFlags: [],
         composeFiles: [],
         composeFlags: [],
         downFlags: ["--volumes", "--remove-orphans"],
@@ -82,6 +119,10 @@ describe("DockerComposeService", () => {
         composeOptions: [],
         commandOptions: ["--volumes", "--remove-orphans"],
         config: [],
+        executable: {
+          executablePath: "docker",
+          options: [],
+        },
         cwd: "/current/working/dir",
         callback: expect.any(Function),
       });
@@ -92,6 +133,7 @@ describe("DockerComposeService", () => {
     it("should call logs with correct options", async () => {
       const debugMock = jest.fn();
       const logsInputs: LogsInputs = {
+        dockerFlags: [],
         composeFiles: ["docker-compose.yml"],
         services: ["helloworld2", "helloworld3"],
         composeFlags: [],
@@ -107,6 +149,10 @@ describe("DockerComposeService", () => {
         composeOptions: [],
         config: ["docker-compose.yml"],
         cwd: "/current/working/dir",
+        executable: {
+          executablePath: "docker",
+          options: [],
+        },
         follow: false,
         callback: expect.any(Function),
       });

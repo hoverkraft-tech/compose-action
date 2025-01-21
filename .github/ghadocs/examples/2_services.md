@@ -1,4 +1,5 @@
-<!-- markdownlint-disable-next-line first-line-heading -->
+<!-- markdownlint-disable first-line-heading -->
+
 ### Example using `services`
 
 Perform `docker compose up` to some given service instead of all of them

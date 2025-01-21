@@ -33172,6 +33172,7 @@ async function run() {
         loggerService.info(`docker compose version: ${installedVersion}`);
         loggerService.info("Bringing up docker compose service(s)");
         await dockerComposeService.up({
+            dockerFlags: inputs.dockerFlags,
             composeFiles: inputs.composeFiles,
             composeFlags: inputs.composeFlags,
             cwd: inputs.cwd,
@@ -33313,12 +33314,16 @@ class DockerComposeService {
             output: out,
         };
     }
-    getCommonOptions({ composeFiles, composeFlags, cwd, debug, }) {
+    getCommonOptions({ dockerFlags, composeFiles, composeFlags, cwd, debug, }) {
         return {
             config: composeFiles,
             composeOptions: composeFlags,
             cwd: cwd,
             callback: (chunk) => debug(chunk.toString()),
+            executable: {
+                executablePath: "docker",
+                options: dockerFlags,
+            },
         };
     }
 }
@@ -33339,6 +33344,7 @@ const fs_1 = __nccwpck_require__(9896);
 const path_1 = __nccwpck_require__(6928);
 var InputNames;
 (function (InputNames) {
+    InputNames["DockerFlags"] = "docker-flags";
     InputNames["ComposeFile"] = "compose-file";
     InputNames["Services"] = "services";
     InputNames["ComposeFlags"] = "compose-flags";
@@ -33352,6 +33358,7 @@ exports.COMPOSE_VERSION_LATEST = "latest";
 class InputService {
     getInputs() {
         return {
+            dockerFlags: this.getDockerFlags(),
             composeFiles: this.getComposeFiles(),
             services: this.getServices(),
             composeFlags: this.getComposeFlags(),
@@ -33361,6 +33368,9 @@ class InputService {
             composeVersion: this.getComposeVersion(),
             githubToken: this.getGithubToken(),
         };
+    }
+    getDockerFlags() {
+        return this.parseFlags((0, core_1.getInput)(InputNames.DockerFlags));
     }
     getComposeFiles() {
         const cwd = this.getCwd();

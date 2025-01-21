@@ -36,6 +36,7 @@ export async function run(): Promise<void> {
 
     loggerService.info("Bringing up docker compose service(s)");
     await dockerComposeService.up({
+      dockerFlags: inputs.dockerFlags,
       composeFiles: inputs.composeFiles,
       composeFlags: inputs.composeFlags,
       cwd: inputs.cwd,

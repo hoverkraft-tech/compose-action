@@ -1,4 +1,5 @@
-<!-- markdownlint-disable-next-line first-line-heading -->
+<!-- markdownlint-disable first-line-heading -->
+
 ### Example using `compose-flags`
 
 Specify flags to pass to the `docker compose` command. Default is none. A full
