@@ -1,5 +1,5 @@
 name: "Docker Compose Action"
-description: "This action runs your docker-compose file and clean up before action finished"
+description: "This action runs your compose file and clean up before action finished"
 author: "Hoverkraft"
 branding:
   icon: anchor
@@ -11,18 +11,18 @@ inputs:
     required: false
     default: "./docker-compose.yml"
   services:
-    description: "Services to perform docker-compose up."
+    description: "Services to perform docker compose up."
     required: false
   up-flags:
-    description: "Additional options to pass to `docker-compose up` command."
+    description: "Additional options to pass to `docker compose up` command."
     required: false
     default: ""
   down-flags:
-    description: "Additional options to pass to `docker-compose down` command."
+    description: "Additional options to pass to `docker compose down` command."
     required: false
     default: ""
   compose-flags:
-    description: "Additional options to pass to `docker-compose` command."
+    description: "Additional options to pass to `docker compose` command."
     required: false
     default: ""
   cwd:
@@ -36,7 +36,7 @@ inputs:
       If "latest", it will install the latest version.
     required: false
   github-token:
-    description: The GitHub token used to create an authenticated client (to fetch the latest version of docker-compose).
+    description: The GitHub token used to create an authenticated client (to fetch the latest version of docker compose).
     default: ${{ github.token }}
     required: false
 
