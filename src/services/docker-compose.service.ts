@@ -12,6 +12,7 @@ type OptionsInputs = {
   composeFiles: Inputs["composeFiles"];
   composeFlags: Inputs["composeFlags"];
   cwd: Inputs["cwd"];
+  debug: (message: string) => void;
 };
 
 export type UpInputs = OptionsInputs & { upFlags: Inputs["upFlags"]; services: Inputs["services"] };
@@ -63,12 +64,13 @@ export class DockerComposeService {
     composeFiles,
     composeFlags,
     cwd,
+    debug,
   }: OptionsInputs): IDockerComposeOptions {
     return {
       config: composeFiles,
-      log: true,
       composeOptions: composeFlags,
       cwd: cwd,
+      callback: (chunk) => debug(chunk.toString()),
     };
   }
 }

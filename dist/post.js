@@ -26339,6 +26339,7 @@ async function run() {
             composeFlags: inputs.composeFlags,
             cwd: inputs.cwd,
             services: inputs.services,
+            debug: loggerService.debug,
         });
         if (error) {
             loggerService.debug("docker compose error:\n" + error);
@@ -26349,6 +26350,7 @@ async function run() {
             composeFlags: inputs.composeFlags,
             cwd: inputs.cwd,
             downFlags: inputs.downFlags,
+            debug: loggerService.debug,
         });
         loggerService.info("docker compose is down");
     }
@@ -26399,12 +26401,12 @@ class DockerComposeService {
             output: out,
         };
     }
-    getCommonOptions({ composeFiles, composeFlags, cwd, }) {
+    getCommonOptions({ composeFiles, composeFlags, cwd, debug, }) {
         return {
             config: composeFiles,
-            log: true,
             composeOptions: composeFlags,
             cwd: cwd,
+            callback: (chunk) => debug(chunk.toString()),
         };
     }
 }
