@@ -37,7 +37,7 @@ Some extra options can be passed to the `docker-compose up` command using the `u
 ### Post hook
 
 On post hook, the action will run `docker-compose down` to clean up the services.
-In debug mode, the logs of the running services are printed before the cleanup.
+In [debug mode](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/troubleshooting-workflows/enabling-debug-logging), the logs of the running services are printed before the cleanup.
 
 Some extra options can be passed to the `docker-compose down` command using the `down-flags` input.
 
