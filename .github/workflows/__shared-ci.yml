@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   linter:
-    uses: hoverkraft-tech/ci-github-common/.github/workflows/linter.yml@0.16.0
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/linter.yml@0.16.1
     with:
       linter-env: |
         FILTER_REGEX_EXCLUDE=dist/**/*
