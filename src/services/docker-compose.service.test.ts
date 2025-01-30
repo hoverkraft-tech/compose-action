@@ -30,6 +30,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         upFlags: [],
         cwd: "/current/working/dir",
+        debug: jest.fn(),
       };
 
       await service.up(upInputs);
@@ -38,8 +39,8 @@ describe("DockerComposeService", () => {
         composeOptions: [],
         commandOptions: [],
         config: ["docker-compose.yml"],
-        log: true,
         cwd: "/current/working/dir",
+        callback: expect.any(Function),
       });
     });
 
@@ -50,6 +51,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         upFlags: ["--build"],
         cwd: "/current/working/dir",
+        debug: jest.fn(),
       };
 
       await service.up(upInputs);
@@ -58,8 +60,8 @@ describe("DockerComposeService", () => {
         composeOptions: [],
         commandOptions: ["--build"],
         config: ["docker-compose.yml"],
-        log: true,
         cwd: "/current/working/dir",
+        callback: expect.any(Function),
       });
     });
   });
@@ -71,6 +73,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         downFlags: ["--volumes", "--remove-orphans"],
         cwd: "/current/working/dir",
+        debug: jest.fn(),
       };
 
       await service.down(downInputs);
@@ -79,19 +82,21 @@ describe("DockerComposeService", () => {
         composeOptions: [],
         commandOptions: ["--volumes", "--remove-orphans"],
         config: [],
-        log: true,
         cwd: "/current/working/dir",
+        callback: expect.any(Function),
       });
     });
   });
 
   describe("logs", () => {
     it("should call logs with correct options", async () => {
+      const debugMock = jest.fn();
       const logsInputs: LogsInputs = {
         composeFiles: ["docker-compose.yml"],
         services: ["helloworld2", "helloworld3"],
         composeFlags: [],
         cwd: "/current/working/dir",
+        debug: debugMock,
       };
 
       logsMock.mockResolvedValue({ exitCode: 0, err: "", out: "logs" });
@@ -101,9 +106,9 @@ describe("DockerComposeService", () => {
       expect(dockerCompose.logs).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
         composeOptions: [],
         config: ["docker-compose.yml"],
-        log: true,
         cwd: "/current/working/dir",
         follow: false,
+        callback: expect.any(Function),
       });
     });
   });

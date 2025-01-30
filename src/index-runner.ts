@@ -41,6 +41,7 @@ export async function run(): Promise<void> {
       cwd: inputs.cwd,
       upFlags: inputs.upFlags,
       services: inputs.services,
+      debug: loggerService.debug,
     });
     loggerService.info("docker compose service(s) are up");
   } catch (error) {

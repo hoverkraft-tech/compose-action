@@ -50,6 +50,7 @@ describe("run", () => {
       composeFlags: [],
       cwd: "/current/working/dir",
       services: [],
+      debug: debugMock,
     });
 
     expect(downMock).toHaveBeenCalledWith({
@@ -57,6 +58,7 @@ describe("run", () => {
       composeFlags: [],
       cwd: "/current/working/dir",
       downFlags: [],
+      debug: debugMock,
     });
 
     expect(debugMock).toHaveBeenCalledWith("docker compose logs:\ntest logs");
@@ -95,6 +97,7 @@ describe("run", () => {
       composeFlags: [],
       cwd: "/current/working/dir",
       services: [],
+      debug: debugMock,
     });
 
     expect(downMock).toHaveBeenCalledWith({
@@ -102,6 +105,7 @@ describe("run", () => {
       composeFlags: [],
       cwd: "/current/working/dir",
       downFlags: [],
+      debug: debugMock,
     });
 
     expect(debugMock).toHaveBeenCalledWith("docker compose error:\ntest logs error");

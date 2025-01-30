@@ -33177,6 +33177,7 @@ async function run() {
             cwd: inputs.cwd,
             upFlags: inputs.upFlags,
             services: inputs.services,
+            debug: loggerService.debug,
         });
         loggerService.info("docker compose service(s) are up");
     }
@@ -33312,12 +33313,12 @@ class DockerComposeService {
             output: out,
         };
     }
-    getCommonOptions({ composeFiles, composeFlags, cwd, }) {
+    getCommonOptions({ composeFiles, composeFlags, cwd, debug, }) {
         return {
             config: composeFiles,
-            log: true,
             composeOptions: composeFlags,
             cwd: cwd,
+            callback: (chunk) => debug(chunk.toString()),
         };
     }
 }

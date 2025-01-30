@@ -20,6 +20,7 @@ export async function run(): Promise<void> {
       composeFlags: inputs.composeFlags,
       cwd: inputs.cwd,
       services: inputs.services,
+      debug: loggerService.debug,
     });
 
     if (error) {
@@ -33,6 +34,7 @@ export async function run(): Promise<void> {
       composeFlags: inputs.composeFlags,
       cwd: inputs.cwd,
       downFlags: inputs.downFlags,
+      debug: loggerService.debug,
     });
 
     loggerService.info("docker compose is down");

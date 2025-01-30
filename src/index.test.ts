@@ -59,6 +59,7 @@ describe("index", () => {
       composeFlags: [],
       upFlags: [],
       cwd: "/current/working/dir",
+      debug: debugMock,
     });
 
     expect(setFailedMock).not.toHaveBeenCalled();

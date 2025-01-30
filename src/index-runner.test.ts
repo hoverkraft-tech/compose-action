@@ -64,6 +64,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       upFlags: [],
       services: [],
+      debug: debugMock,
     });
 
     expect(setFailedMock).not.toHaveBeenCalled();
@@ -92,6 +93,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       upFlags: [],
       services: ["web"],
+      debug: debugMock,
     });
     expect(setFailedMock).not.toHaveBeenCalled();
   });
