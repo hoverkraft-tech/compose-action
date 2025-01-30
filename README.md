@@ -12,18 +12,14 @@
 <!-- end title -->
 <!-- start badges -->
 
-<a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Freleases%2Flatest"><img src="https://img.shields.io/github/v/release/hoverkraft-tech/compose-action?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20tag" /></a>
-<a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Freleases%2Flatest"><img src="https://img.shields.io/github/release-date/hoverkraft-tech/compose-action?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20date" /></a>
-<img src="https://img.shields.io/github/last-commit/hoverkraft-tech/compose-action?logo=github&style=flat-square" alt="Commit" />
-<a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Fissues"><img src="https://img.shields.io/github/issues/hoverkraft-tech/compose-action?logo=github&style=flat-square" alt="Open%20Issues" /></a>
-<img src="https://img.shields.io/github/downloads/hoverkraft-tech/compose-action/total?logo=github&style=flat-square" alt="Downloads" />
+<a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Freleases%2Flatest"><img src="https://img.shields.io/github/v/release/hoverkraft-tech/compose-action?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20tag" /></a><a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Freleases%2Flatest"><img src="https://img.shields.io/github/release-date/hoverkraft-tech/compose-action?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20date" /></a><img src="https://img.shields.io/github/last-commit/hoverkraft-tech/compose-action?logo=github&style=flat-square" alt="Commit" /><a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Fissues"><img src="https://img.shields.io/github/issues/hoverkraft-tech/compose-action?logo=github&style=flat-square" alt="Open%20Issues" /></a><img src="https://img.shields.io/github/downloads/hoverkraft-tech/compose-action/total?logo=github&style=flat-square" alt="Downloads" />
 
 <!-- end badges -->
 
 </div>
 <!-- start description -->
 
-This action runs your [docker compose](https://docs.docker.com/reference/compose-file/) file and clean up before action finished
+This action runs your compose file(s) and clean up before action finished
 
 <!-- end description -->
 
@@ -50,6 +46,10 @@ Some extra options can be passed to the `docker compose down` command using the 
 ```yaml
 - uses: hoverkraft-tech/compose-action@v0.0.0
   with:
+    # Description: Additional options to pass to `docker` command.
+    #
+    docker-flags: ""
+
     # Description: Path to compose file(s). It can be a list of files. It can be
     # absolute or relative to the current working directory (cwd).
     #
@@ -100,6 +100,7 @@ Some extra options can be passed to the `docker compose down` command using the 
 
 | **Input**                    | **Description**                                                                                                                                  | **Default**                          | **Required** |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ | ------------ |
+| <code>docker-flags</code>    | Additional options to pass to <code>docker</code> command.                                                                                       |                                      | **false**    |
 | <code>compose-file</code>    | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd).                       | <code>./docker-compose.yml</code>    | **false**    |
 | <code>services</code>        | Services to perform docker compose up.                                                                                                           |                                      | **false**    |
 | <code>up-flags</code>        | Additional options to pass to <code>docker compose up</code> command.                                                                            |                                      | **false**    |
