@@ -10481,7 +10481,7 @@ var version = function (options) {
     });
 };
 exports.version = version;
-var stats = function (service) {
+var stats = function (service, options) {
     return __awaiter(this, void 0, void 0, function () {
         var args, result, output, error_8;
         return __generator(this, function (_a) {
@@ -10491,7 +10491,7 @@ var stats = function (service) {
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, (0, exports.execCompose)('stats', args)
+                    return [4 /*yield*/, (0, exports.execCompose)('stats', args, options)
                         // Remove first and last quote from output, as well as newline.
                     ];
                 case 2:
