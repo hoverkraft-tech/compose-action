@@ -26,6 +26,18 @@ updates:
         patterns:
           - "*"
 
+  - package-ecosystem: docker-compose
+    directory: "/test"
+    open-pull-requests-limit: 20
+    schedule:
+      interval: weekly
+      day: friday
+      time: "04:00"
+    groups:
+      docker-compose-dependencies:
+        patterns:
+          - "*"
+
   - package-ecosystem: npm
     directory: "/"
     open-pull-requests-limit: 20
