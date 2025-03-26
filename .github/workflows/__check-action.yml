@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test with services
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Act
         uses: ./
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test compose action
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Act
         uses: ./
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test with compose flags
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Act
         uses: ./
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test with env
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Act
         uses: ./
@@ -83,7 +83,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test with multiple compose files
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Act
         uses: ./
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test with cwd
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Act
         uses: ./
@@ -131,7 +131,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test with absolute path
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Act
         uses: ./
@@ -153,7 +153,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test with --abort-on-container-exit
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Act
         uses: ./
@@ -165,7 +165,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test with --attach-dependencies and service failure
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Act
         uses: ./
@@ -184,7 +184,7 @@ jobs:
     env:
       DOCKER_COMPOSE_VERSION: "2.29.0"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: "Arrange: ensure original docker compose version is not the expected one"
         run: |
@@ -216,10 +216,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Test with compose version latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: "Arrange: retrieve latest version of docker compose"
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
           script: |
             const dockerComposeVersion = (await github.rest.repos.getLatestRelease({
@@ -259,10 +259,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Test with docker context
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Set up Docker
-        uses: docker/setup-docker-action@v4
+        uses: docker/setup-docker-action@b60f85385d03ac8acfca6d9996982511d8620a19 # v4.3.0
         with:
           context: test-context
 

@@ -4,7 +4,7 @@
 
 ```yaml
 steps:
-  - uses: actions/checkout@v4
+  - uses: actions/checkout@v4.2.2
   - uses: hoverkraft-tech/compose-action@v1.5.1
     with:
       compose-file: "./docker/docker-compose.yml"
