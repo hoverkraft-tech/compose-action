@@ -81,7 +81,7 @@
   "devDependencies": {
     "@ts-dev-tools/core": "^1.6.2",
     "@vercel/ncc": "^0.38.1",
-    "eslint-plugin-github": "^5.0.1",
+    "eslint-plugin-github": "^6.0.0",
     "eslint-plugin-jsonc": "^2.14.1"
   },
   "eslintConfig": {
