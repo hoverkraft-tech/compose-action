@@ -5,11 +5,17 @@ on:
     branches: [main]
     tags: ["*"]
 
+  workflow_dispatch:
+
+  schedule:
+    - cron: "25 8 * * 1"
+
 permissions:
   contents: read
   packages: read
-  statuses: write
   security-events: write
+  statuses: write
+  # FIXME: This is a workaround for having workflow ref. See https://github.com/orgs/community/discussions/38659
   id-token: write
 
 concurrency:
@@ -21,23 +27,24 @@ jobs:
     uses: ./.github/workflows/__shared-ci.yml
     secrets: inherit
 
-  generate-readme:
+  release:
     needs: ci
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: bitflight-devops/github-action-readme-generator@v1.8.0
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: bitflight-devops/github-action-readme-generator@f750ff0ac8a4b68a3c2d622cc50a5ad20bcebaa1 # v1.8.0
         with:
-          owner: hoverkraft-tech
-          repo: compose-action
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
 
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@af35edadc00be37caa72ed9f3e6d5f7801bfdf09 # v1.11.7
         id: generate-token
         with:
           app-id: ${{ vars.CI_BOT_APP_ID }}
           private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
 
-      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@0.18.0
+      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@edc1e53751a82ce335e7c3208a32b6ee03856a9f # 0.20.0
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update
