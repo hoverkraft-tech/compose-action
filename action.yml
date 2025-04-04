@@ -12,7 +12,11 @@ inputs:
   compose-file:
     description: "Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd)."
     required: false
-    default: "./docker-compose.yml"
+    default: |
+      ./docker-compose.yml
+      ./docker-compose.yaml
+      ./compose.yml
+      ./compose.yaml
   services:
     description: "Services to perform docker compose up."
     required: false
