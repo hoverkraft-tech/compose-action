@@ -46,11 +46,12 @@ jobs:
             service-c
 
       - name: "Assert: docker-compose.yaml is used"
-        run: docker compose -f ./test/docker-compose.yaml ps
+        run: |
+        docker compose -f ./test/docker-compose.yml ps
 
-        docker compose -f ./test/docker-compose.yaml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
-        docker compose -f ./test/docker-compose.yaml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
-        (docker compose -f ./test/docker-compose.yaml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
+        docker compose -f ./test/docker-compose.yml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
+        docker compose -f ./test/docker-compose.yml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
+        (docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
 
   test-action-with-down-flags:
     runs-on: ubuntu-latest
