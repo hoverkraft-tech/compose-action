@@ -90,14 +90,22 @@ describe("InputService", () => {
         expect(inputs.composeFiles).toEqual(["file1", "file2"]);
       });
 
-      it("should throws an error when a compose file does not exist", () => {
+      it("should throws an error when no composeFiles input", () => {
+        getMultilineInputMock.mockReturnValue([]);
+
+        getInputMock.mockReturnValue("");
+
+        expect(() => service.getInputs()).toThrow("No compose files found");
+      });
+
+      it("should throw an error when all compose files do not exist", () => {
         getMultilineInputMock.mockImplementation((inputName) => {
           switch (inputName) {
             case InputNames.ComposeFile:
               return ["file1", "file2"];
             default:
               return [];
-          }
+              }
         });
 
         getInputMock.mockImplementation((inputName) => {
@@ -109,17 +117,7 @@ describe("InputService", () => {
           }
         });
 
-        existsSyncMock.mockImplementation((file) => file === "/current/working/directory/file1");
-
-        expect(() => service.getInputs()).toThrow(
-          'Compose file not found in "/current/working/directory/file2", "file2"'
-        );
-      });
-
-      it("should throws an error when no composeFiles input", () => {
-        getMultilineInputMock.mockReturnValue([]);
-
-        getInputMock.mockReturnValue("");
+        existsSyncMock.mockImplementation((file) => false);
 
         expect(() => service.getInputs()).toThrow("No compose files found");
       });
