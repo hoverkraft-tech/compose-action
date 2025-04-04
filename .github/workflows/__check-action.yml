@@ -29,6 +29,29 @@ jobs:
           docker compose -f ./test/docker-compose.yml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
           (docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
 
+  test-action-with-yaml-compose-file:
+    runs-on: ubuntu-latest
+    name: Test with yaml (not yml) compose file
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: "Rename docker-compose.yml to docker-compose.yaml"
+        run: mv ./test/docker-compose.yml ./test/docker-compose.yaml
+
+      - name: Act
+        uses: ./
+        with:
+          services: |
+            service-b
+            service-c
+
+      - name: "Assert: docker-compose.yaml is used"
+        run: docker compose -f ./test/docker-compose.yaml ps
+
+        docker compose -f ./test/docker-compose.yaml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
+        docker compose -f ./test/docker-compose.yaml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
+        (docker compose -f ./test/docker-compose.yaml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
+
   test-action-with-down-flags:
     runs-on: ubuntu-latest
     name: Test compose action

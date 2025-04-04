@@ -62,7 +62,7 @@ export class InputService {
         }
       }
 
-      throw new Error(`Compose file not found in "${possiblePaths.join('", "')}"`);
+      return false;
     });
 
     if (!composeFiles.length) {
