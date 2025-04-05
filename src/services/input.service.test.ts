@@ -118,7 +118,14 @@ describe("InputService", () => {
 
       it("should check for all compose files by order of preference if no input supplied", () => {
         getMultilineInputMock.mockReturnValue([]);
-        getInputMock.mockReturnValue("");
+        getInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.Cwd:
+              return "/current/working/directory";
+            default:
+              return "";
+          }
+        });
 
         existsSyncMock.mockImplementation((file) => file === "/current/working/directory/compose.yaml" || file === "/current/working/directory/docker-compose.yml");
 

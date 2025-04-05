@@ -86,7 +86,6 @@ export class InputService {
       throw new Error("No compose files found");
     }
 
-    console.log("composeFiles", composeFiles);
     return composeFiles;
   }
 
