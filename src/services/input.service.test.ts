@@ -90,22 +90,14 @@ describe("InputService", () => {
         expect(inputs.composeFiles).toEqual(["file1", "file2"]);
       });
 
-      it("should throws an error when no composeFiles input", () => {
-        getMultilineInputMock.mockReturnValue([]);
-
-        getInputMock.mockReturnValue("");
-
-        expect(() => service.getInputs()).toThrow("No compose files found");
-      });
-
-      it("should throw an error when all compose files do not exist", () => {
+      it("should throws an error when a compose file does not exist", () => {
         getMultilineInputMock.mockImplementation((inputName) => {
           switch (inputName) {
             case InputNames.ComposeFile:
               return ["file1", "file2"];
             default:
               return [];
-              }
+          }
         });
 
         getInputMock.mockImplementation((inputName) => {
@@ -117,7 +109,30 @@ describe("InputService", () => {
           }
         });
 
-        existsSyncMock.mockImplementation((file) => false);
+        existsSyncMock.mockImplementation((file) => file === "/current/working/directory/file1");
+
+        expect(() => service.getInputs()).toThrow(
+          'Compose file not found in "/current/working/directory/file2", "file2"'
+        );
+      });
+
+      it("should check for all compose files by order of preference if no input supplied", () => {
+        getMultilineInputMock.mockReturnValue([]);
+        getInputMock.mockReturnValue("");
+
+        existsSyncMock.mockImplementation((file) => file === "/current/working/directory/compose.yaml" || file === "/current/working/directory/docker-compose.yml");
+
+        expect(() => service.getInputs()).not.toThrow();
+
+        const inputs = service.getInputs();
+
+        expect(inputs.composeFiles).toEqual(["compose.yaml"]);
+      });
+
+      it("should throws an error when no composeFiles found", () => {
+        getMultilineInputMock.mockReturnValue([]);
+
+        getInputMock.mockReturnValue("");
 
         expect(() => service.getInputs()).toThrow("No compose files found");
       });

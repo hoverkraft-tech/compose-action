@@ -49,26 +49,44 @@ export class InputService {
 
   private getComposeFiles(): string[] {
     const cwd = this.getCwd();
-    const composeFiles = getMultilineInput(InputNames.ComposeFile).filter((composeFile: string) => {
-      if (!composeFile.trim().length) {
-        return false;
-      }
+    let composeFiles = getMultilineInput(InputNames.ComposeFile).filter((composeFile: string) => composeFile.trim().length > 0);
 
-      const possiblePaths = [join(cwd, composeFile), composeFile];
+    if (composeFiles.length > 0) {
+      composeFiles = composeFiles.filter((composeFile: string) => {
+        const possiblePaths = [join(cwd, composeFile), composeFile];
 
-      for (const path of possiblePaths) {
-        if (existsSync(path)) {
-          return true;
+        for (const path of possiblePaths) {
+          if (existsSync(path)) {
+            return true;
+          }
         }
-      }
 
-      return false;
-    });
+        throw new Error(`Compose file not found in "${possiblePaths.join('", "')}"`);
+      });
+    } else {
+      // If no compose files are provided, check for all possible compose files by order of preference specified
+      // in official docker compose specs
+      composeFiles = ["compose.yaml", "compose.yml", "docker-compose.yaml", "docker-compose.yml"].filter((composeFile: string) => {
+        const possiblePaths = [join(cwd, composeFile), composeFile];
+
+        for (const path of possiblePaths) {
+          if (existsSync(path)) {
+            return true;
+          }
+        }
+
+        return false;
+      });
+      if (composeFiles.length > 1) {
+        composeFiles = [composeFiles[0]]; // If multiple compose files are found, use the first one (by order of preference)
+      }
+    }
 
     if (!composeFiles.length) {
       throw new Error("No compose files found");
     }
 
+    console.log("composeFiles", composeFiles);
     return composeFiles;
   }
 
