@@ -11,6 +11,7 @@ on:
     - cron: "25 8 * * 1"
 
 permissions:
+  actions: read
   contents: read
   packages: read
   security-events: write

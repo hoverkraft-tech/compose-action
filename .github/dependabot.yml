@@ -52,3 +52,15 @@ updates:
           - "@actions/*"
       npm-dev-dependencies:
         dependency-type: development
+
+  - package-ecosystem: "devcontainers"
+    open-pull-requests-limit: 20
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: friday
+      time: "04:00"
+    groups:
+      devcontainers-dependencies:
+        patterns:
+          - "*"

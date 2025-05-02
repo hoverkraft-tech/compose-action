@@ -4,6 +4,7 @@ on:
   workflow_call:
 
 permissions:
+  actions: read
   contents: read
   packages: read
   security-events: write

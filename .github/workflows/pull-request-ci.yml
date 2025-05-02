@@ -6,6 +6,7 @@ on:
     branches: [main]
 
 permissions:
+  actions: read
   contents: read
   packages: read
   statuses: write
