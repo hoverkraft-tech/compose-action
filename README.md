@@ -55,7 +55,7 @@ Some extra options can be passed to the `docker compose down` command using the 
     # Description: Path to compose file(s). It can be a list of files. It can be
     # absolute or relative to the current working directory (cwd).
     #
-    # Default: ./docker-compose.yml
+    # Default: 
     compose-file: ""
 
     # Description: Services to perform docker compose up.
@@ -103,7 +103,7 @@ Some extra options can be passed to the `docker compose down` command using the 
 | **Input**                    | **Description**                                                                                                                                  | **Default**                          | **Required** |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ | ------------ |
 | <code>docker-flags</code>    | Additional options to pass to <code>docker</code> command.                                                                                       |                                      | **false**    |
-| <code>compose-file</code>    | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd).                       | <code>./docker-compose.yml</code>    | **false**    |
+| <code>compose-file</code>    | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd).<br /> If null (default), it will look for a `compose` / `docker-compose` file similarily to the default logic of `docker compose`.                       |    | **false**    |
 | <code>services</code>        | Services to perform docker compose up.                                                                                                           |                                      | **false**    |
 | <code>up-flags</code>        | Additional options to pass to <code>docker compose up</code> command.                                                                            |                                      | **false**    |
 | <code>down-flags</code>      | Additional options to pass to <code>docker compose down</code> command.                                                                          |                                      | **false**    |
