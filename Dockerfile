@@ -9,4 +9,4 @@ USER ${UID}:${GID}
 ENV RUN_LOCAL=true 
 ENV USE_FIND_ALGORITHM=true
 ENV LOG_LEVEL=WARN
-ENV LOG_FILE="../logs"
+ENV LOG_FILE="/github/home/logs"
