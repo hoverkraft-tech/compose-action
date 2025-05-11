@@ -116,7 +116,27 @@ describe("InputService", () => {
         );
       });
 
-      it("should throws an error when no composeFiles input", () => {
+      it("should check for all compose files by order of preference if no input supplied", () => {
+        getMultilineInputMock.mockReturnValue([]);
+        getInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.Cwd:
+              return "/current/working/directory";
+            default:
+              return "";
+          }
+        });
+
+        existsSyncMock.mockImplementation((file) => file === "/current/working/directory/compose.yaml" || file === "/current/working/directory/docker-compose.yml");
+
+        expect(() => service.getInputs()).not.toThrow();
+
+        const inputs = service.getInputs();
+
+        expect(inputs.composeFiles).toEqual(["compose.yaml"]);
+      });
+
+      it("should throws an error when no composeFiles found", () => {
         getMultilineInputMock.mockReturnValue([]);
 
         getInputMock.mockReturnValue("");
