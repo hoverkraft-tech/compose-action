@@ -39,7 +39,10 @@ Some extra options can be passed to the `docker compose up` command using the `u
 ### Post hook
 
 On post hook, the action will run `docker compose down` to clean up the services.
-In [debug mode](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/troubleshooting-workflows/enabling-debug-logging), the logs of the running services are printed before the cleanup.
+
+Logs of the Docker Compose services are logged using GitHub `core.ts` API before the cleanup.
+The log level can be set using the `services-log-level` input. The default is `debug`, which will
+only print logs if [debug mode](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/troubleshooting-workflows/enabling-debug-logging) is switched on.
 
 Some extra options can be passed to the `docker compose down` command using the `down-flags` input.
 
@@ -92,6 +95,10 @@ Some extra options can be passed to the `docker compose down` command using the 
     #
     # Default: ${{ github.token }}
     github-token: ""
+
+    # Description: The log level used for Docker Compose service logs. Can be one of "debug", "info".
+    # Default: "debug"
+    services-log-level: "debug"
 ```
 
 <!-- end usage -->
@@ -100,17 +107,18 @@ Some extra options can be passed to the `docker compose down` command using the 
 
 <!-- start inputs -->
 
-| **Input**                    | **Description**                                                                                                                                  | **Default**                          | **Required** |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ | ------------ |
-| <code>docker-flags</code>    | Additional options to pass to <code>docker</code> command.                                                                                       |                                      | **false**    |
-| <code>compose-file</code>    | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd).                       | <code>./docker-compose.yml</code>    | **false**    |
-| <code>services</code>        | Services to perform docker compose up.                                                                                                           |                                      | **false**    |
-| <code>up-flags</code>        | Additional options to pass to <code>docker compose up</code> command.                                                                            |                                      | **false**    |
-| <code>down-flags</code>      | Additional options to pass to <code>docker compose down</code> command.                                                                          |                                      | **false**    |
-| <code>compose-flags</code>   | Additional options to pass to <code>docker compose</code> command.                                                                               |                                      | **false**    |
-| <code>cwd</code>             | Current working directory                                                                                                                        | <code>${{ github.workspace }}</code> | **false**    |
-| <code>compose-version</code> | Compose version to use.<br />If null (default), it will use the current installed version.<br />If "latest", it will install the latest version. |                                      | **false**    |
-| <code>github-token</code>    | The GitHub token used to create an authenticated client (to fetch the latest version of docker compose).                                         | <code>${{ github.token }}</code>     | **false**    |
+| **Input**                       | **Description**                                                                                                                                  | **Default**                          | **Required** |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ | ------------ |
+| <code>docker-flags</code>       | Additional options to pass to <code>docker</code> command.                                                                                       |                                      | **false**    |
+| <code>compose-file</code>       | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd).                       | <code>./docker-compose.yml</code>    | **false**    |
+| <code>services</code>           | Services to perform docker compose up.                                                                                                           |                                      | **false**    |
+| <code>up-flags</code>           | Additional options to pass to <code>docker compose up</code> command.                                                                            |                                      | **false**    |
+| <code>down-flags</code>         | Additional options to pass to <code>docker compose down</code> command.                                                                          |                                      | **false**    |
+| <code>compose-flags</code>      | Additional options to pass to <code>docker compose</code> command.                                                                               |                                      | **false**    |
+| <code>cwd</code>                | Current working directory                                                                                                                        | <code>${{ github.workspace }}</code> | **false**    |
+| <code>compose-version</code>    | Compose version to use.<br />If null (default), it will use the current installed version.<br />If "latest", it will install the latest version. |                                      | **false**    |
+| <code>github-token</code>       | The GitHub token used to create an authenticated client (to fetch the latest version of docker compose).                                         | <code>${{ github.token }}</code>     | **false**    |
+| <code>services-log-level</code> | The log level used for Docker Compose service logs. Can be one of "debug", "info".                                                               | debug                                | **false**    |
 
 <!-- end inputs -->
 <!-- start outputs -->
