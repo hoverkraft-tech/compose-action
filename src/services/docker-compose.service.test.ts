@@ -31,7 +31,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         upFlags: [],
         cwd: "/current/working/dir",
-        debug: jest.fn(),
+        serviceLogger: jest.fn(),
       };
 
       await service.up(upInputs);
@@ -57,7 +57,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         upFlags: [],
         cwd: "/current/working/dir",
-        debug: jest.fn(),
+        serviceLogger: jest.fn(),
       };
 
       await service.up(upInputs);
@@ -83,7 +83,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         upFlags: ["--build"],
         cwd: "/current/working/dir",
-        debug: jest.fn(),
+        serviceLogger: jest.fn(),
       };
 
       await service.up(upInputs);
@@ -110,7 +110,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         downFlags: ["--volumes", "--remove-orphans"],
         cwd: "/current/working/dir",
-        debug: jest.fn(),
+        serviceLogger: jest.fn(),
       };
 
       await service.down(downInputs);
@@ -138,7 +138,7 @@ describe("DockerComposeService", () => {
         services: ["helloworld2", "helloworld3"],
         composeFlags: [],
         cwd: "/current/working/dir",
-        debug: debugMock,
+        serviceLogger: debugMock,
       };
 
       logsMock.mockResolvedValue({ exitCode: 0, err: "", out: "logs" });

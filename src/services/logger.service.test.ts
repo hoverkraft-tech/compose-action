@@ -1,4 +1,4 @@
-import { LoggerService } from "./logger.service";
+import { LoggerService, LogLevel } from "./logger.service";
 import { debug, info, warning } from "@actions/core";
 
 jest.mock("@actions/core", () => ({
@@ -41,6 +41,23 @@ describe("LoggerService", () => {
 
       loggerService.debug(message);
       expect(debug).toHaveBeenCalledWith(message);
+    });
+  });
+
+  describe("getServiceLogger", () => {
+    it("should return the correct logger function for debug level", () => {
+      const logger = loggerService.getServiceLogger(LogLevel.Debug);
+      expect(logger).toBe(loggerService.debug);
+    });
+
+    it("should return the correct logger function for info level", () => {
+      const logger = loggerService.getServiceLogger(LogLevel.Info);
+      expect(logger).toBe(loggerService.info);
+    });
+
+    it("should default to info level if an unknown level is provided", () => {
+      const logger = loggerService.getServiceLogger(LogLevel.Info);
+      expect(logger).toBe(loggerService.info);
     });
   });
 });

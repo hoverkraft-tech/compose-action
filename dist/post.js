@@ -26212,7 +26212,7 @@ async function run() {
             composeFlags: inputs.composeFlags,
             cwd: inputs.cwd,
             services: inputs.services,
-            debug: loggerService.debug,
+            serviceLogger: loggerService.getServiceLogger(inputs.serviceLogLevel),
         });
         if (error) {
             loggerService.debug("docker compose error:\n" + error);
@@ -26224,7 +26224,7 @@ async function run() {
             composeFlags: inputs.composeFlags,
             cwd: inputs.cwd,
             downFlags: inputs.downFlags,
-            debug: loggerService.debug,
+            serviceLogger: loggerService.getServiceLogger(inputs.serviceLogLevel),
         });
         loggerService.info("docker compose is down");
     }
@@ -26274,12 +26274,12 @@ class DockerComposeService {
             output: out,
         };
     }
-    getCommonOptions({ dockerFlags, composeFiles, composeFlags, cwd, debug, }) {
+    getCommonOptions({ dockerFlags, composeFiles, composeFlags, cwd, serviceLogger, }) {
         return {
             config: composeFiles,
             composeOptions: composeFlags,
             cwd: cwd,
-            callback: (chunk) => debug(chunk.toString()),
+            callback: (chunk) => serviceLogger(chunk.toString()),
             executable: {
                 executablePath: "docker",
                 options: dockerFlags,
@@ -26302,6 +26302,7 @@ exports.InputService = exports.COMPOSE_VERSION_LATEST = exports.InputNames = voi
 const core_1 = __nccwpck_require__(7484);
 const fs_1 = __nccwpck_require__(9896);
 const path_1 = __nccwpck_require__(6928);
+const logger_service_1 = __nccwpck_require__(8187);
 var InputNames;
 (function (InputNames) {
     InputNames["DockerFlags"] = "docker-flags";
@@ -26313,6 +26314,7 @@ var InputNames;
     InputNames["Cwd"] = "cwd";
     InputNames["ComposeVersion"] = "compose-version";
     InputNames["GithubToken"] = "github-token";
+    InputNames["ServiceLogLevel"] = "services-log-level";
 })(InputNames || (exports.InputNames = InputNames = {}));
 exports.COMPOSE_VERSION_LATEST = "latest";
 class InputService {
@@ -26327,6 +26329,7 @@ class InputService {
             cwd: this.getCwd(),
             composeVersion: this.getComposeVersion(),
             githubToken: this.getGithubToken(),
+            serviceLogLevel: this.getServiceLogLevel(),
         };
     }
     getDockerFlags() {
@@ -26382,6 +26385,13 @@ class InputService {
             required: false,
         }) || null);
     }
+    getServiceLogLevel() {
+        const configuredLevel = (0, core_1.getInput)(InputNames.ServiceLogLevel, { required: false });
+        if (configuredLevel && !Object.values(logger_service_1.LogLevel).includes(configuredLevel)) {
+            throw new Error(`Invalid service log level "${configuredLevel}". Valid values are: ${Object.values(logger_service_1.LogLevel).join(", ")}`);
+        }
+        return configuredLevel || logger_service_1.LogLevel.Debug;
+    }
 }
 exports.InputService = InputService;
 
@@ -26394,7 +26404,7 @@ exports.InputService = InputService;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.LoggerService = void 0;
+exports.LogLevel = exports.LoggerService = void 0;
 const core_1 = __nccwpck_require__(7484);
 class LoggerService {
     warn(message) {
@@ -26406,8 +26416,23 @@ class LoggerService {
     debug(message) {
         (0, core_1.debug)(message);
     }
+    getServiceLogger(level) {
+        switch (level) {
+            case LogLevel.Debug:
+                return this.debug;
+            case LogLevel.Info:
+                return this.info;
+            default:
+                return this.info;
+        }
+    }
 }
 exports.LoggerService = LoggerService;
+var LogLevel;
+(function (LogLevel) {
+    LogLevel["Debug"] = "debug";
+    LogLevel["Info"] = "info";
+})(LogLevel || (exports.LogLevel = LogLevel = {}));
 
 
 /***/ }),
