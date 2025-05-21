@@ -1,6 +1,7 @@
 import { getInput, getMultilineInput } from "@actions/core";
 import { existsSync } from "fs";
 import { join } from "path";
+import { LogLevel } from "./logger.service";
 
 export type Inputs = {
   dockerFlags: string[];
@@ -12,6 +13,7 @@ export type Inputs = {
   cwd: string;
   composeVersion: string | null;
   githubToken: string | null;
+  serviceLogLevel: LogLevel;
 };
 
 export enum InputNames {
@@ -24,6 +26,7 @@ export enum InputNames {
   Cwd = "cwd",
   ComposeVersion = "compose-version",
   GithubToken = "github-token",
+  ServiceLogLevel = "services-log-level",
 }
 
 export const COMPOSE_VERSION_LATEST = "latest";
@@ -40,6 +43,7 @@ export class InputService {
       cwd: this.getCwd(),
       composeVersion: this.getComposeVersion(),
       githubToken: this.getGithubToken(),
+      serviceLogLevel: this.getServiceLogLevel(),
     };
   }
 
@@ -114,5 +118,15 @@ export class InputService {
         required: false,
       }) || null
     );
+  }
+
+  private getServiceLogLevel(): LogLevel {
+    const configuredLevel = getInput(InputNames.ServiceLogLevel, { required: false });
+    if (configuredLevel && !Object.values(LogLevel).includes(configuredLevel as LogLevel)) {
+      throw new Error(
+        `Invalid service log level "${configuredLevel}". Valid values are: ${Object.values(LogLevel).join(", ")}`
+      );
+    }
+    return (configuredLevel as LogLevel) || LogLevel.Debug;
   }
 }
