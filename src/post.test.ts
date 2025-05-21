@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import { DockerComposeService } from "./services/docker-compose.service";
 import { InputService } from "./services/input.service";
-import { LoggerService } from "./services/logger.service";
+import { LoggerService, LogLevel } from "./services/logger.service";
 
 let setFailedMock: jest.SpiedFunction<typeof core.setFailed>;
 let getInputsMock: jest.SpiedFunction<typeof InputService.prototype.getInputs>;
@@ -33,6 +33,7 @@ describe("post", () => {
       cwd: "/current/working/dir",
       composeVersion: null,
       githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
     }));
 
     logsMock.mockResolvedValue({ error: "", output: "test logs" });
@@ -48,7 +49,7 @@ describe("post", () => {
       composeFlags: [],
       cwd: "/current/working/dir",
       services: [],
-      debug: debugMock,
+      serviceLogger: debugMock,
     });
 
     expect(downMock).toHaveBeenCalledWith({
@@ -57,7 +58,7 @@ describe("post", () => {
       composeFlags: [],
       cwd: "/current/working/dir",
       downFlags: [],
-      debug: debugMock,
+      serviceLogger: debugMock,
     });
 
     expect(debugMock).toHaveBeenNthCalledWith(1, "docker compose logs:\ntest logs");

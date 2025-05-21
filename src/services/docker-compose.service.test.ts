@@ -31,7 +31,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         upFlags: [],
         cwd: "/current/working/dir",
-        debug: jest.fn(),
+        serviceLogger: jest.fn(),
       };
 
       await service.up(upInputs);
@@ -47,6 +47,15 @@ describe("DockerComposeService", () => {
         cwd: "/current/working/dir",
         callback: expect.any(Function),
       });
+
+      // Ensure callback is calling the service logger
+      const callback = upAllMock?.mock?.calls[0][0]?.callback;
+      expect(callback).toBeDefined();
+
+      const message = "test log output";
+      callback ? callback(Buffer.from(message)) : null;
+
+      expect(upInputs.serviceLogger).toHaveBeenCalledWith("test log output");
     });
 
     it("should call up with specific docker flags", async () => {
@@ -57,7 +66,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         upFlags: [],
         cwd: "/current/working/dir",
-        debug: jest.fn(),
+        serviceLogger: jest.fn(),
       };
 
       await service.up(upInputs);
@@ -83,7 +92,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         upFlags: ["--build"],
         cwd: "/current/working/dir",
-        debug: jest.fn(),
+        serviceLogger: jest.fn(),
       };
 
       await service.up(upInputs);
@@ -110,7 +119,7 @@ describe("DockerComposeService", () => {
         composeFlags: [],
         downFlags: ["--volumes", "--remove-orphans"],
         cwd: "/current/working/dir",
-        debug: jest.fn(),
+        serviceLogger: jest.fn(),
       };
 
       await service.down(downInputs);
@@ -138,7 +147,7 @@ describe("DockerComposeService", () => {
         services: ["helloworld2", "helloworld3"],
         composeFlags: [],
         cwd: "/current/working/dir",
-        debug: debugMock,
+        serviceLogger: debugMock,
       };
 
       logsMock.mockResolvedValue({ exitCode: 0, err: "", out: "logs" });
