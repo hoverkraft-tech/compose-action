@@ -75,7 +75,7 @@
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.0",
     "@actions/tool-cache": "^2.0.2",
-    "@octokit/action": "^7.0.1",
+    "@octokit/action": "^8.0.1",
     "docker-compose": "^1.2.0"
   },
   "devDependencies": {
