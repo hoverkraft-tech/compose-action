@@ -30,7 +30,7 @@
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "all": "npm run format && npm run lint && npm run test && npm run package",
     "build": "tsc --noEmit",
-    "format": "prettier --cache --write '**/*.ts'",
+    "format": "prettier --cache --write .",
     "jest": "jest --detectOpenHandles --forceExit",
     "test": "npm run jest --maxWorkers=50%",
     "test:watch": "npm run jest --watch --maxWorkers=25%",

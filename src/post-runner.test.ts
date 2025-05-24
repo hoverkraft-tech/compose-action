@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import { InputService } from "./services/input.service";
-import { LoggerService } from "./services/logger.service";
+import { LoggerService, LogLevel } from "./services/logger.service";
 import * as postRunner from "./post-runner";
 import { DockerComposeService } from "./services/docker-compose.service";
 
@@ -36,6 +36,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       composeVersion: null,
       githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
     }));
 
     logsMock.mockResolvedValue({ error: "", output: "test logs" });
@@ -52,7 +53,7 @@ describe("run", () => {
       composeFlags: [],
       cwd: "/current/working/dir",
       services: [],
-      debug: debugMock,
+      serviceLogger: debugMock,
     });
 
     expect(downMock).toHaveBeenCalledWith({
@@ -61,7 +62,7 @@ describe("run", () => {
       composeFlags: [],
       cwd: "/current/working/dir",
       downFlags: [],
-      debug: debugMock,
+      serviceLogger: debugMock,
     });
 
     expect(debugMock).toHaveBeenCalledWith("docker compose logs:\ntest logs");
@@ -83,6 +84,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       composeVersion: null,
       githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
     }));
 
     logsMock.mockResolvedValue({
@@ -102,7 +104,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       dockerFlags: [],
       services: [],
-      debug: debugMock,
+      serviceLogger: debugMock,
     });
 
     expect(downMock).toHaveBeenCalledWith({
@@ -111,7 +113,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       dockerFlags: [],
       downFlags: [],
-      debug: debugMock,
+      serviceLogger: debugMock,
     });
 
     expect(debugMock).toHaveBeenCalledWith("docker compose error:\ntest logs error");
@@ -148,6 +150,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       composeVersion: null,
       githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
     }));
 
     // Act
@@ -172,6 +175,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       composeVersion: null,
       githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
     }));
 
     // Act

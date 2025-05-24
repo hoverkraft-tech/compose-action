@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import { InputService } from "./services/input.service";
-import { LoggerService } from "./services/logger.service";
+import { LoggerService, LogLevel } from "./services/logger.service";
 import { DockerComposeInstallerService } from "./services/docker-compose-installer.service";
 import * as indexRunner from "./index-runner";
 import { DockerComposeService } from "./services/docker-compose.service";
@@ -37,6 +37,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       composeVersion: "1.29.2",
       githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
     }));
 
     installMock.mockResolvedValue("1.29.2");
@@ -50,7 +51,7 @@ describe("run", () => {
     expect(infoMock).toHaveBeenCalledWith("Setting up docker compose version 1.29.2");
 
     expect(debugMock).toHaveBeenCalledWith(
-      'inputs: {"dockerFlags":[],"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir","composeVersion":"1.29.2","githubToken":null}'
+      'inputs: {"dockerFlags":[],"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir","composeVersion":"1.29.2","githubToken":null,"serviceLogLevel":"debug"}'
     );
 
     expect(installMock).toHaveBeenCalledWith({
@@ -66,7 +67,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       upFlags: [],
       services: [],
-      debug: debugMock,
+      serviceLogger: debugMock,
     });
 
     expect(setFailedMock).not.toHaveBeenCalled();
@@ -84,6 +85,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       composeVersion: null,
       githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
     }));
 
     // Act
@@ -97,7 +99,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       upFlags: [],
       services: ["web"],
-      debug: debugMock,
+      serviceLogger: debugMock,
     });
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -117,6 +119,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       composeVersion: null,
       githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
     }));
 
     // Act
@@ -141,6 +144,7 @@ describe("run", () => {
       cwd: "/current/working/dir",
       composeVersion: null,
       githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
     }));
 
     // Act
