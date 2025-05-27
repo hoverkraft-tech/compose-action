@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import { DockerComposeService } from "./services/docker-compose.service";
 import { InputService } from "./services/input.service";
-import { LoggerService } from "./services/logger.service";
+import { LoggerService, LogLevel } from "./services/logger.service";
 import { DockerComposeInstallerService } from "./services/docker-compose-installer.service";
 
 let setFailedMock: jest.SpiedFunction<typeof core.setFailed>;
@@ -34,6 +34,7 @@ describe("index", () => {
       cwd: "/current/working/dir",
       composeVersion: null,
       githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
     }));
 
     installMock.mockResolvedValue("1.2.3");
@@ -49,7 +50,7 @@ describe("index", () => {
     // Verify that all of the functions were called correctly
     expect(debugMock).toHaveBeenNthCalledWith(
       1,
-      'inputs: {"dockerFlags":[],"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir","composeVersion":null,"githubToken":null}'
+      'inputs: {"dockerFlags":[],"composeFiles":["docker-compose.yml"],"services":[],"composeFlags":[],"upFlags":[],"downFlags":[],"cwd":"/current/working/dir","composeVersion":null,"githubToken":null,"serviceLogLevel":"debug"}'
     );
 
     expect(infoMock).toHaveBeenNthCalledWith(3, "Bringing up docker compose service(s)");
@@ -61,7 +62,7 @@ describe("index", () => {
       composeFlags: [],
       upFlags: [],
       cwd: "/current/working/dir",
-      debug: debugMock,
+      serviceLogger: debugMock,
     });
 
     expect(setFailedMock).not.toHaveBeenCalled();

@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import fs from "fs";
 import { InputService, InputNames } from "./input.service";
+import { LogLevel } from "./logger.service";
 
 describe("InputService", () => {
   let service: InputService;
@@ -15,6 +16,15 @@ describe("InputService", () => {
     getInputMock = jest.spyOn(core, "getInput").mockImplementation();
     getMultilineInputMock = jest.spyOn(core, "getMultilineInput").mockImplementation();
 
+    getMultilineInputMock.mockImplementation((inputName) => {
+      switch (inputName) {
+        case InputNames.ComposeFile:
+          return ["file1"];
+        default:
+          return [];
+      }
+    });
+
     service = new InputService();
   });
 
@@ -25,15 +35,6 @@ describe("InputService", () => {
   describe("getInputs", () => {
     describe("docker-flags", () => {
       it("should return given docker-flags input", () => {
-        getMultilineInputMock.mockImplementation((inputName) => {
-          switch (inputName) {
-            case InputNames.ComposeFile:
-              return ["file1"];
-            default:
-              return [];
-          }
-        });
-
         getInputMock.mockImplementation((inputName) => {
           switch (inputName) {
             case InputNames.DockerFlags:
@@ -51,15 +52,6 @@ describe("InputService", () => {
       });
 
       it("should return empty array when no docker-flags input", () => {
-        getMultilineInputMock.mockImplementation((inputName) => {
-          switch (inputName) {
-            case InputNames.ComposeFile:
-              return ["file1"];
-            default:
-              return [];
-          }
-        });
-
         getInputMock.mockReturnValue("");
 
         existsSyncMock.mockReturnValue(true);
@@ -149,15 +141,6 @@ describe("InputService", () => {
 
     describe("compose-flags", () => {
       it("should return given compose-flags input", () => {
-        getMultilineInputMock.mockImplementation((inputName) => {
-          switch (inputName) {
-            case InputNames.ComposeFile:
-              return ["file1"];
-            default:
-              return [];
-          }
-        });
-
         getInputMock.mockImplementation((inputName) => {
           switch (inputName) {
             case InputNames.ComposeFlags:
@@ -175,15 +158,6 @@ describe("InputService", () => {
       });
 
       it("should return empty array when no compose-flags input", () => {
-        getMultilineInputMock.mockImplementation((inputName) => {
-          switch (inputName) {
-            case InputNames.ComposeFile:
-              return ["file1"];
-            default:
-              return [];
-          }
-        });
-
         getInputMock.mockReturnValue("");
 
         existsSyncMock.mockReturnValue(true);
@@ -196,15 +170,6 @@ describe("InputService", () => {
 
     describe("up-flags", () => {
       it("should return given up-flags input", () => {
-        getMultilineInputMock.mockImplementation((inputName) => {
-          switch (inputName) {
-            case InputNames.ComposeFile:
-              return ["file1"];
-            default:
-              return [];
-          }
-        });
-
         getInputMock.mockImplementation((inputName) => {
           switch (inputName) {
             case InputNames.UpFlags:
@@ -222,15 +187,6 @@ describe("InputService", () => {
       });
 
       it("should return empty array when no up-flags input", () => {
-        getMultilineInputMock.mockImplementation((inputName) => {
-          switch (inputName) {
-            case InputNames.ComposeFile:
-              return ["file1"];
-            default:
-              return [];
-          }
-        });
-
         getInputMock.mockReturnValue("");
 
         existsSyncMock.mockReturnValue(true);
@@ -243,15 +199,6 @@ describe("InputService", () => {
 
     describe("down-flags", () => {
       it("should return given down-flags input", () => {
-        getMultilineInputMock.mockImplementation((inputName) => {
-          switch (inputName) {
-            case InputNames.ComposeFile:
-              return ["file1"];
-            default:
-              return [];
-          }
-        });
-
         getInputMock.mockImplementation((inputName) => {
           switch (inputName) {
             case InputNames.DownFlags:
@@ -269,15 +216,6 @@ describe("InputService", () => {
       });
 
       it("should return empty array when no down-flags input", () => {
-        getMultilineInputMock.mockImplementation((inputName) => {
-          switch (inputName) {
-            case InputNames.ComposeFile:
-              return ["file1"];
-            default:
-              return [];
-          }
-        });
-
         getInputMock.mockReturnValue("");
         existsSyncMock.mockReturnValue(true);
 
@@ -289,14 +227,6 @@ describe("InputService", () => {
 
     describe("cwd", () => {
       it("should return given cwd input", () => {
-        getMultilineInputMock.mockImplementation((inputName) => {
-          switch (inputName) {
-            case InputNames.ComposeFile:
-              return ["file1"];
-            default:
-              return [];
-          }
-        });
         getInputMock.mockImplementation((inputName) => {
           switch (inputName) {
             case InputNames.Cwd:
@@ -315,14 +245,6 @@ describe("InputService", () => {
 
     describe("compose-version", () => {
       it("should return given compose-version input", () => {
-        getMultilineInputMock.mockImplementation((inputName) => {
-          switch (inputName) {
-            case InputNames.ComposeFile:
-              return ["file1"];
-            default:
-              return [];
-          }
-        });
         getInputMock.mockImplementation((inputName) => {
           switch (inputName) {
             case InputNames.ComposeVersion:
@@ -336,6 +258,54 @@ describe("InputService", () => {
         const inputs = service.getInputs();
 
         expect(inputs.composeVersion).toEqual("compose-version");
+      });
+    });
+
+    describe("services-log-level", () => {
+      it("should return given services-log-level input", () => {
+        getInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.ServiceLogLevel:
+              return "info";
+            default:
+              return "";
+          }
+        });
+        existsSyncMock.mockReturnValue(true);
+
+        const inputs = service.getInputs();
+        expect(inputs.serviceLogLevel).toEqual(LogLevel.Info);
+      });
+
+      it("should return default services-log-level input", () => {
+        getInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.ServiceLogLevel:
+              return "";
+            default:
+              return "";
+          }
+        });
+        existsSyncMock.mockReturnValue(true);
+
+        const inputs = service.getInputs();
+        expect(inputs.serviceLogLevel).toEqual(LogLevel.Debug);
+      });
+
+      it("should throw an error when services-log-level input is invalid", () => {
+        getInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.ServiceLogLevel:
+              return "invalid-log-level";
+            default:
+              return "";
+          }
+        });
+        existsSyncMock.mockReturnValue(true);
+
+        expect(() => service.getInputs()).toThrow(
+          'Invalid service log level "invalid-log-level". Valid values are: debug, info'
+        );
       });
     });
   });
