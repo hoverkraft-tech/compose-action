@@ -90,15 +90,17 @@ Some extra options can be passed to the `docker compose down` command using the 
     #
     compose-version: ""
 
+    # Description: The log level used for Docker Compose service logs. Can be one of
+    # "debug", "info".
+    #
+    # Default: debug
+    services-log-level: ""
+
     # Description: The GitHub token used to create an authenticated client (to fetch
     # the latest version of docker compose).
     #
     # Default: ${{ github.token }}
     github-token: ""
-
-    # Description: The log level used for Docker Compose service logs. Can be one of "debug", "info".
-    # Default: "debug"
-    services-log-level: "debug"
 ```
 
 <!-- end usage -->
@@ -117,8 +119,8 @@ Some extra options can be passed to the `docker compose down` command using the 
 | <code>compose-flags</code>      | Additional options to pass to <code>docker compose</code> command.                                                                               |                                      | **false**    |
 | <code>cwd</code>                | Current working directory                                                                                                                        | <code>${{ github.workspace }}</code> | **false**    |
 | <code>compose-version</code>    | Compose version to use.<br />If null (default), it will use the current installed version.<br />If "latest", it will install the latest version. |                                      | **false**    |
+| <code>services-log-level</code> | The log level used for Docker Compose service logs.<br />Can be one of "debug", "info".                                                          | <code>debug</code>                   | **false**    |
 | <code>github-token</code>       | The GitHub token used to create an authenticated client (to fetch the latest version of docker compose).                                         | <code>${{ github.token }}</code>     | **false**    |
-| <code>services-log-level</code> | The log level used for Docker Compose service logs. Can be one of "debug", "info".                                                               | debug                                | **false**    |
 
 <!-- end inputs -->
 <!-- start outputs -->
