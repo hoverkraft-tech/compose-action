@@ -38,6 +38,12 @@ inputs:
       If null (default), it will use the current installed version.
       If "latest", it will install the latest version.
     required: false
+  services-log-level:
+    description: |
+      The log level used for Docker Compose service logs.
+      Can be one of "debug", "info".
+    required: false
+    default: "debug"
   github-token:
     description: The GitHub token used to create an authenticated client (to fetch the latest version of docker compose).
     default: ${{ github.token }}
