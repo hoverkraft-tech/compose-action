@@ -1,9 +1,9 @@
 name: "Docker Compose Action"
 description: "This action runs your compose file(s) and clean up before action finished"
-author: "Hoverkraft"
+author: "hoverkraft"
 branding:
   icon: anchor
-  color: gray-dark
+  color: blue
 
 inputs:
   docker-flags:

@@ -2,9 +2,10 @@
   "name": "compose-action",
   "description": "Docker Compose Action",
   "version": "0.0.0",
-  "author": "",
-  "private": true,
+  "author": "hoverkraft",
+  "license": "MIT",
   "homepage": "https://github.com/hoverkraft-tech/compose-action",
+  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hoverkraft-tech/compose-action.git"
@@ -22,6 +23,19 @@
   "engines": {
     "node": ">=20"
   },
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.1",
+    "@actions/tool-cache": "^2.0.2",
+    "@octokit/action": "^8.0.2",
+    "docker-compose": "^1.2.0"
+  },
+  "devDependencies": {
+    "@ts-dev-tools/core": "^1.6.2",
+    "@vercel/ncc": "^0.38.3",
+    "eslint-plugin-github": "^6.0.0",
+    "eslint-plugin-jsonc": "^2.20.1"
+  },
   "scripts": {
     "package": "npm run package:index && npm run package:post",
     "package:index": "ncc build src/index.ts -o dist --license licenses.txt",
@@ -38,7 +52,6 @@
     "test:ci": "npm run test:cov --runInBand",
     "prepare": "ts-dev-tools install"
   },
-  "license": "MIT",
   "jest": {
     "preset": "ts-jest",
     "verbose": true,
@@ -70,19 +83,6 @@
       "./src/**",
       "**/src/**/*.[jt]s?(x)"
     ]
-  },
-  "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@actions/github": "^6.0.1",
-    "@actions/tool-cache": "^2.0.2",
-    "@octokit/action": "^8.0.2",
-    "docker-compose": "^1.2.0"
-  },
-  "devDependencies": {
-    "@ts-dev-tools/core": "^1.6.2",
-    "@vercel/ncc": "^0.38.3",
-    "eslint-plugin-github": "^6.0.0",
-    "eslint-plugin-jsonc": "^2.20.1"
   },
   "eslintConfig": {
     "root": true,
