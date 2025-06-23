@@ -2,12 +2,12 @@
 <div align="center" width="100%">
 <!-- start branding -->
 
-<img src=".github/ghadocs/branding.svg" width="15%" align="center" alt="branding<icon:anchor color:gray-dark>" />
+<img src=".github/ghadocs/branding.svg" width="15%" align="center" alt="branding<icon:anchor color:blue>" />
 
 <!-- end branding -->
 <!-- start title -->
 
-# <img src=".github/ghadocs/branding.svg" width="60px" align="center" alt="branding<icon:anchor color:gray-dark>" /> GitHub Action: Docker Compose Action
+# <img src=".github/ghadocs/branding.svg" width="60px" align="center" alt="branding<icon:anchor color:blue>" /> GitHub Action: Docker Compose Action
 
 <!-- end title -->
 <!-- markdownlint-disable MD013 -->
