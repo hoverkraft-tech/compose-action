@@ -1,5 +1,5 @@
 #checkov:skip=CKV_DOCKER_2: required
-FROM ghcr.io/super-linter/super-linter:slim-v7
+FROM ghcr.io/super-linter/super-linter:slim-v8
 
 ARG UID=1000
 ARG GID=1000
