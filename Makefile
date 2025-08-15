@@ -9,12 +9,14 @@ lint: ## Execute linting
 lint-fix: ## Execute linting and fix
 	$(call run_linter, \
 		-e FIX_JSON_PRETTIER=true \
+		-e FIX_JAVASCRIPT_PRETTIER=true \
 		-e FIX_YAML_PRETTIER=true \
 		-e FIX_MARKDOWN=true \
 		-e FIX_MARKDOWN_PRETTIER=true \
 		-e FIX_NATURAL_LANGUAGE=true)
 
 all: ## Execute all formats and checks
+	@npm audit fix
 	@npm run all
 	$(MAKE) lint-fix
 
@@ -27,13 +29,10 @@ define run_linter
 		-e DEFAULT_WORKSPACE="$$DEFAULT_WORKSPACE" \
 		-e FILTER_REGEX_INCLUDE="$(filter-out $@,$(MAKECMDGOALS))" \
 		-e IGNORE_GITIGNORED_FILES=true \
-		-e KUBERNETES_KUBECONFORM_OPTIONS="--schema-location default --schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'" \
 		-e FILTER_REGEX_EXCLUDE=dist/**/* \
-		-e VALIDATE_TYPESCRIPT_STANDARD=false \
         -e VALIDATE_TYPESCRIPT_ES=false \
         -e VALIDATE_TYPESCRIPT_PRETTIER=false \
         -e VALIDATE_JAVASCRIPT_ES=false \
-        -e VALIDATE_JAVASCRIPT_STANDARD=false \
 		$(1) \
 		-v $$VOLUME \
 		--rm \
