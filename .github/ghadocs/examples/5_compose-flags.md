@@ -4,7 +4,7 @@
 
 Specify flags to pass to the `docker compose` command. Default is none. A full
 list of flags can be found in the
-[docker compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
+[Docker compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
 
 ```yaml
 steps:

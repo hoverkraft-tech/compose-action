@@ -111,16 +111,16 @@ Some extra options can be passed to the `docker compose down` command using the 
 
 | **Input**                       | **Description**                                                                                                                                  | **Default**                          | **Required** |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ | ------------ |
-| <code>docker-flags</code>       | Additional options to pass to <code>docker</code> command.                                                                                       |                                      | **false**    |
+| <code>docker-flags</code>       | Additional options to pass to <code>Docker</code> command.                                                                                       |                                      | **false**    |
 | <code>compose-file</code>       | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd).                       | <code>./docker-compose.yml</code>    | **false**    |
-| <code>services</code>           | Services to perform docker compose up.                                                                                                           |                                      | **false**    |
-| <code>up-flags</code>           | Additional options to pass to <code>docker compose up</code> command.                                                                            |                                      | **false**    |
-| <code>down-flags</code>         | Additional options to pass to <code>docker compose down</code> command.                                                                          |                                      | **false**    |
-| <code>compose-flags</code>      | Additional options to pass to <code>docker compose</code> command.                                                                               |                                      | **false**    |
+| <code>services</code>           | Services to perform Docker compose up.                                                                                                           |                                      | **false**    |
+| <code>up-flags</code>           | Additional options to pass to <code>Docker compose up</code> command.                                                                            |                                      | **false**    |
+| <code>down-flags</code>         | Additional options to pass to <code>Docker compose down</code> command.                                                                          |                                      | **false**    |
+| <code>compose-flags</code>      | Additional options to pass to <code>Docker compose</code> command.                                                                               |                                      | **false**    |
 | <code>cwd</code>                | Current working directory                                                                                                                        | <code>${{ github.workspace }}</code> | **false**    |
 | <code>compose-version</code>    | Compose version to use.<br />If null (default), it will use the current installed version.<br />If "latest", it will install the latest version. |                                      | **false**    |
 | <code>services-log-level</code> | The log level used for Docker Compose service logs.<br />Can be one of "debug", "info".                                                          | <code>debug</code>                   | **false**    |
-| <code>github-token</code>       | The GitHub token used to create an authenticated client (to fetch the latest version of docker compose).                                         | <code>${{ github.token }}</code>     | **false**    |
+| <code>github-token</code>       | The GitHub token used to create an authenticated client (to fetch the latest version of Docker compose).                                         | <code>${{ github.token }}</code>     | **false**    |
 
 <!-- end inputs -->
 <!-- start outputs -->
@@ -188,7 +188,7 @@ steps:
 Specify flags to pass to the `docker compose up`. Default is none. Can be used
 to pass the `--build` flag, for example, if you want persistent volumes to be
 deleted as well during cleanup. A full list of flags can be found in the
-[docker compose up documentation](https://docs.docker.com/compose/reference/up/).
+[Docker compose up documentation](https://docs.docker.com/compose/reference/up/).
 
 ### Example using `down-flags`
 
@@ -196,13 +196,13 @@ Specify flags to pass to the `docker compose down` command during cleanup.
 Default is none. Can be used to pass the `--volumes` flag, for example, if you
 want persistent volumes to be deleted as well during cleanup. A full list of
 flags can be found in the
-[docker compose down documentation](https://docs.docker.com/compose/reference/down/).
+[Docker compose down documentation](https://docs.docker.com/compose/reference/down/).
 
 ### Example using `compose-flags`
 
 Specify flags to pass to the `docker compose` command. Default is none. A full
 list of flags can be found in the
-[docker compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
+[Docker compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
 
 ```yaml
 steps:
