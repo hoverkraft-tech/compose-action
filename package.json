@@ -31,7 +31,7 @@
     "docker-compose": "^1.2.0"
   },
   "devDependencies": {
-    "@ts-dev-tools/core": "^1.6.2",
+    "@ts-dev-tools/core": "^1.9.5",
     "@vercel/ncc": "^0.38.3",
     "eslint-plugin-github": "^6.0.0",
     "eslint-plugin-jsonc": "^2.20.1"
