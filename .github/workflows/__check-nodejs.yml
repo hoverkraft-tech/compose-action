@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   test-nodejs:
-    uses: hoverkraft-tech/ci-github-nodejs/.github/workflows/continuous-integration.yml@284b3a225640afe54977ca18caf464dff1ee856b # 0.14.0
+    uses: hoverkraft-tech/ci-github-nodejs/.github/workflows/continuous-integration.yml@1d00c9eb280acbee5df4b4a2087f786e66b13d87 # 0.14.1
     permissions:
       id-token: write
       security-events: write
