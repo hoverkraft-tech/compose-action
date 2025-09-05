@@ -10321,9 +10321,12 @@ const restartOne = function (service, options) {
 };
 exports.restartOne = restartOne;
 const logs = function (services, options = {}) {
-    let args = Array.isArray(services) ? services : [services];
+    const args = Array.isArray(services) ? services : [services];
     if (options.follow) {
-        args = ['--follow', ...args];
+        args.unshift('--follow');
+    }
+    if (options.timestamps) {
+        args.unshift('--timestamps');
     }
     return (0, exports.execCompose)('logs', args, options);
 };
