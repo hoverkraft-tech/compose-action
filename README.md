@@ -208,9 +208,7 @@ steps:
   - uses: hoverkraft-tech/compose-action@40041ff1b97dbf152cd2361138c2b03fa29139df # v2.3.0
     with:
       compose-file: "./docker/docker-compose.yml"
-      services: |
-        helloworld2
-        helloworld3
+      compose-flags: "--profile profile-1"
 ```
 
 Specify multiple compose files to use with the `docker compose` command.
