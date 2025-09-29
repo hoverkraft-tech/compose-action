@@ -53,7 +53,10 @@ describe("DockerComposeService", () => {
       expect(callback).toBeDefined();
 
       const message = "test log output";
-      callback ? callback(Buffer.from(message)) : null;
+
+      if (callback) {
+        callback(Buffer.from(message));
+      }
 
       expect(upInputs.serviceLogger).toHaveBeenCalledWith("test log output");
     });
