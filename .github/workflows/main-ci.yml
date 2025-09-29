@@ -39,13 +39,13 @@ jobs:
           owner: ${{ github.repository_owner }}
           repo: ${{ github.event.repository.name }}
 
-      - uses: actions/create-github-app-token@a8d616148505b5069dccd32f177bb87d7f39123b # v2.1.1
+      - uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
         id: generate-token
         with:
           app-id: ${{ vars.CI_BOT_APP_ID }}
           private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
 
-      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@b4883995e100e291a1fed68678d47a560328ed08 # 0.24.0
+      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@d324c777132734fc988c79a74dff3ee0248835fc # 0.25.0
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update
