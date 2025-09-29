@@ -1,34 +1,30 @@
-<!-- markdownlint-disable-next-line first-line-heading -->
-<div align="center" width="100%">
-<!-- start branding -->
+<!-- header:start -->
 
-<img src=".github/ghadocs/branding.svg" width="15%" align="center" alt="branding<icon:anchor color:blue>" />
+# ![Icon](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJmZWF0aGVyIGZlYXRoZXItYW5jaG9yIiBjb2xvcj0iYmx1ZSI+PGNpcmNsZSBjeD0iMTIiIGN5PSI1IiByPSIzIj48L2NpcmNsZT48bGluZSB4MT0iMTIiIHkxPSIyMiIgeDI9IjEyIiB5Mj0iOCI+PC9saW5lPjxwYXRoIGQ9Ik01IDEySDJhMTAgMTAgMCAwIDAgMjAgMGgtMyI+PC9wYXRoPjwvc3ZnPg==) GitHub Action: Docker Compose Action
 
-<!-- end branding -->
-<!-- start title -->
-
-# <img src=".github/ghadocs/branding.svg" width="60px" align="center" alt="branding<icon:anchor color:blue>" /> GitHub Action: Docker Compose Action
-
-<!-- end title -->
-<!-- markdownlint-disable MD013 -->
-<!-- start badges -->
-
-<a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Freleases%2Flatest"><img src="https://img.shields.io/github/v/release/hoverkraft-tech/compose-action?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20tag" /></a><a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Freleases%2Flatest"><img src="https://img.shields.io/github/release-date/hoverkraft-tech/compose-action?display_name=tag&sort=semver&logo=github&style=flat-square" alt="Release%20by%20date" /></a><img src="https://img.shields.io/github/last-commit/hoverkraft-tech/compose-action?logo=github&style=flat-square" alt="Commit" /><a href="https%3A%2F%2Fgithub.com%2Fhoverkraft-tech%2Fcompose-action%2Fissues"><img src="https://img.shields.io/github/issues/hoverkraft-tech/compose-action?logo=github&style=flat-square" alt="Open%20Issues" /></a><img src="https://img.shields.io/github/downloads/hoverkraft-tech/compose-action/total?logo=github&style=flat-square" alt="Downloads" />
-
-<!-- end badges -->
-<!-- markdownlint-enable MD013 -->
-
+<div align="center">
+  <img src=".github/logo.svg" width="60px" align="center" alt="Docker Compose Action" />
 </div>
-<!-- start description -->
+
+---
+
+<!-- header:end -->
+
+<!-- badges:start -->
+
+[![Marketplace](https://img.shields.io/badge/Marketplace-docker--compose--action-blue?logo=github-actions)](https://github.com/marketplace/actions/docker-compose-action)
+[![Release](https://img.shields.io/github/v/release/hoverkraft-tech/compose-action)](https://github.com/hoverkraft-tech/compose-action/releases)
+[![License](https://img.shields.io/github/license/hoverkraft-tech/compose-action)](http://choosealicense.com/licenses/mit/)
+[![Stars](https://img.shields.io/github/stars/hoverkraft-tech/compose-action?style=social)](https://img.shields.io/github/stars/hoverkraft-tech/compose-action?style=social)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/hoverkraft-tech/compose-action/blob/main/CONTRIBUTING.md)
+
+<!-- badges:end -->
+
+<!-- overview:start -->
+
+## Overview
 
 This action runs your compose file(s) and clean up before action finished
-
-<!-- end description -->
-
-<!-- start contents -->
-<!-- end contents -->
-
-## Usage
 
 ### Action
 
@@ -41,90 +37,89 @@ Some extra options can be passed to the `docker compose up` command using the `u
 On post hook, the action will run `docker compose down` to clean up the services.
 
 Logs of the Docker Compose services are logged using GitHub `core.ts` API before the cleanup.
-The log level can be set using the `services-log-level` input. The default is `debug`, which will
-only print logs if [debug mode](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/troubleshooting-workflows/enabling-debug-logging) is switched on.
+The log level can be set using the `services-log-level` input.
+The default is `debug`, which will only print logs if [debug mode](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/troubleshooting-workflows/enabling-debug-logging) is switched on.
 
 Some extra options can be passed to the `docker compose down` command using the `down-flags` input.
 
-<!-- start usage -->
+<!-- overview:end -->
+<!-- usage:start -->
+
+## Usage
 
 ```yaml
-- uses: hoverkraft-tech/compose-action@v0.0.0
+- uses: hoverkraft-tech/compose-action@40041ff1b97dbf152cd2361138c2b03fa29139df # v2.3.0
   with:
-    # Description: Additional options to pass to `docker` command.
-    #
+    # Additional options to pass to `docker` command.
     docker-flags: ""
 
-    # Description: Path to compose file(s). It can be a list of files. It can be
-    # absolute or relative to the current working directory (cwd).
-    #
-    # Default: ./docker-compose.yml
-    compose-file: ""
+    # Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd).
+    # Default: `./docker-compose.yml`
+    compose-file: ./docker-compose.yml
 
-    # Description: Services to perform docker compose up.
-    #
+    # Services to perform `docker compose up`.
     services: ""
 
-    # Description: Additional options to pass to `docker compose up` command.
-    #
-    # Default:
+    # Additional options to pass to `docker compose up` command.
     up-flags: ""
 
-    # Description: Additional options to pass to `docker compose down` command.
-    #
-    # Default:
+    # Additional options to pass to `docker compose down` command.
     down-flags: ""
 
-    # Description: Additional options to pass to `docker compose` command.
-    #
-    # Default:
+    # Additional options to pass to `docker compose` command.
     compose-flags: ""
 
-    # Description: Current working directory
-    #
-    # Default: ${{ github.workspace }}
-    cwd: ""
+    # Current working directory
+    # Default: `${{ github.workspace }}`
+    cwd: ${{ github.workspace }}
 
-    # Description: Compose version to use. If null (default), it will use the current
-    # installed version. If "latest", it will install the latest version.
-    #
+    # Compose version to use.
+    # If null (default), it will use the current installed version.
+    # If "latest", it will install the latest version.
     compose-version: ""
 
-    # Description: The log level used for Docker Compose service logs. Can be one of
-    # "debug", "info".
+    # The log level used for Docker Compose service logs.
+    # Can be one of "debug", "info".
     #
-    # Default: debug
-    services-log-level: ""
+    # Default: `debug`
+    services-log-level: debug
 
-    # Description: The GitHub token used to create an authenticated client (to fetch
-    # the latest version of docker compose).
-    #
-    # Default: ${{ github.token }}
-    github-token: ""
+    # The GitHub token used to create an authenticated client (to fetch the latest version of Docker Compose).
+    # Default: `${{ github.token }}`
+    github-token: ${{ github.token }}
 ```
 
-<!-- end usage -->
+<!-- usage:end -->
+
+<!-- inputs:start -->
 
 ## Inputs
 
-<!-- start inputs -->
+| **Input**                | **Description**                                                                                                            | **Required** | **Default**               |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------- |
+| **`docker-flags`**       | Additional options to pass to `docker` command.                                                                            | **false**    | -                         |
+| **`compose-file`**       | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd). | **false**    | `./docker-compose.yml`    |
+| **`services`**           | Services to perform `docker compose up`.                                                                                   | **false**    | -                         |
+| **`up-flags`**           | Additional options to pass to `docker compose up` command.                                                                 | **false**    | -                         |
+| **`down-flags`**         | Additional options to pass to `docker compose down` command.                                                               | **false**    | -                         |
+| **`compose-flags`**      | Additional options to pass to `docker compose` command.                                                                    | **false**    | -                         |
+| **`cwd`**                | Current working directory                                                                                                  | **false**    | `${{ github.workspace }}` |
+| **`compose-version`**    | Compose version to use.                                                                                                    | **false**    | -                         |
+|                          | If null (default), it will use the current installed version.                                                              |              |                           |
+|                          | If "latest", it will install the latest version.                                                                           |              |                           |
+| **`services-log-level`** | The log level used for Docker Compose service logs.                                                                        | **false**    | `debug`                   |
+|                          | Can be one of "debug", "info".                                                                                             |              |                           |
+| **`github-token`**       | The GitHub token used to create an authenticated client (to fetch the latest version of Docker Compose).                   | **false**    | `${{ github.token }}`     |
 
-| **Input**                       | **Description**                                                                                                                                  | **Default**                          | **Required** |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ | ------------ |
-| <code>docker-flags</code>       | Additional options to pass to <code>Docker</code> command.                                                                                       |                                      | **false**    |
-| <code>compose-file</code>       | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd).                       | <code>./docker-compose.yml</code>    | **false**    |
-| <code>services</code>           | Services to perform Docker compose up.                                                                                                           |                                      | **false**    |
-| <code>up-flags</code>           | Additional options to pass to <code>Docker compose up</code> command.                                                                            |                                      | **false**    |
-| <code>down-flags</code>         | Additional options to pass to <code>Docker compose down</code> command.                                                                          |                                      | **false**    |
-| <code>compose-flags</code>      | Additional options to pass to <code>Docker compose</code> command.                                                                               |                                      | **false**    |
-| <code>cwd</code>                | Current working directory                                                                                                                        | <code>${{ github.workspace }}</code> | **false**    |
-| <code>compose-version</code>    | Compose version to use.<br />If null (default), it will use the current installed version.<br />If "latest", it will install the latest version. |                                      | **false**    |
-| <code>services-log-level</code> | The log level used for Docker Compose service logs.<br />Can be one of "debug", "info".                                                          | <code>debug</code>                   | **false**    |
-| <code>github-token</code>       | The GitHub token used to create an authenticated client (to fetch the latest version of Docker compose).                                         | <code>${{ github.token }}</code>     | **false**    |
+<!-- inputs:end -->
 
-<!-- end inputs -->
-<!-- start outputs -->
-<!-- end outputs -->
+<!-- secrets:start -->
+<!-- secrets:end -->
+
+<!-- outputs:start -->
+<!-- outputs:end -->
+
+<!-- examples:start -->
 
 ## Examples
 
@@ -143,7 +138,7 @@ jobs:
       - uses: actions/checkout@v4.2.2
 
       - name: Run docker compose
-        uses: hoverkraft-tech/compose-action@v2.0.1
+        uses: hoverkraft-tech/compose-action@40041ff1b97dbf152cd2361138c2b03fa29139df # v2.3.0
         with:
           compose-file: "./docker/docker-compose.yml"
 
@@ -152,15 +147,12 @@ jobs:
           docker compose exec test-app pytest
 ```
 
-<!-- start [.github/ghadocs/examples/] -->
-<!-- end [.github/ghadocs/examples/] -->
-
 ### Example Using environment variables
 
 ```yaml
 steps:
   - uses: actions/checkout@v4.2.2
-  - uses: hoverkraft-tech/compose-action@v2.0.1
+  - uses: hoverkraft-tech/compose-action@40041ff1b97dbf152cd2361138c2b03fa29139df # v2.3.0
     with:
       compose-file: "./docker/docker-compose.yml"
     env:
@@ -175,7 +167,7 @@ Perform `docker compose up` to some given service instead of all of them
 steps:
   # need checkout before using compose-action
   - uses: actions/checkout@v3
-  - uses: hoverkraft-tech/compose-action@v2.0.1
+  - uses: hoverkraft-tech/compose-action@40041ff1b97dbf152cd2361138c2b03fa29139df # v2.3.0
     with:
       compose-file: "./docker/docker-compose.yml"
       services: |
@@ -185,30 +177,35 @@ steps:
 
 ### Example using `up-flags`
 
-Specify flags to pass to the `docker compose up`. Default is none. Can be used
-to pass the `--build` flag, for example, if you want persistent volumes to be
-deleted as well during cleanup. A full list of flags can be found in the
-[Docker compose up documentation](https://docs.docker.com/compose/reference/up/).
+Specify flags to pass to the `docker compose up`.
+
+Default is none.
+
+Can be used to pass the `--build` flag, for example, if you want persistent volumes to be deleted as well during cleanup.
+
+A full list of flags can be found in the [Docker compose up documentation](https://docs.docker.com/compose/reference/up/).
 
 ### Example using `down-flags`
 
 Specify flags to pass to the `docker compose down` command during cleanup.
-Default is none. Can be used to pass the `--volumes` flag, for example, if you
-want persistent volumes to be deleted as well during cleanup. A full list of
-flags can be found in the
-[Docker compose down documentation](https://docs.docker.com/compose/reference/down/).
+
+Default is none.
+
+Can be used to pass the want persistent volumes to be deleted as well during cleanup.
+
+A full list of flags can be found in the [Docker compose down documentation](https://docs.docker.com/compose/reference/down/).
 
 ### Example using `compose-flags`
 
-Specify flags to pass to the `docker compose` command. Default is none. A full
-list of flags can be found in the
-[Docker compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
+Specify flags to pass to the `docker compose` command. Default is none.
+
+A full list of flags can be found in the [Docker compose documentation](https://docs.docker.com/compose/reference/#command-options-overview-and-help).
 
 ```yaml
 steps:
   # need checkout before using compose-action
   - uses: actions/checkout@v3
-  - uses: hoverkraft-tech/compose-action@v2.0.1
+  - uses: hoverkraft-tech/compose-action@40041ff1b97dbf152cd2361138c2b03fa29139df # v2.3.0
     with:
       compose-file: "./docker/docker-compose.yml"
       services: |
@@ -216,19 +213,52 @@ steps:
         helloworld3
 ```
 
-### Example with multiple compose files
+Specify multiple compose files to use with the `docker compose` command.
 
-Specify multiple compose files to use with the `docker compose` command. This is
-useful when you have a base compose file and additional files for different
-environments or configurations.
+This is useful when you have a base compose file and additional files for different environments or configurations.
 
 ```yaml
 steps:
   # need checkout before using compose-action
   - uses: actions/checkout@v3
-  - uses: hoverkraft-tech/compose-action@v1.5.1
+  - uses: hoverkraft-tech/compose-action@40041ff1b97dbf152cd2361138c2b03fa29139df # v2.3.0
     with:
       compose-file: |
         ./docker/docker-compose.yml
         ./docker/docker-compose.ci.yml
 ```
+
+<!-- examples:end -->
+
+<!-- contributing:start -->
+
+## Contributing
+
+Contributions are welcome! Please see the [contributing guidelines](https://github.com/hoverkraft-tech/compose-action/blob/main/CONTRIBUTING.md) for more details.
+
+<!-- contributing:end -->
+
+<!-- security:start -->
+<!-- security:end -->
+
+<!-- license:start -->
+
+## License
+
+This project is licensed under the MIT License.
+
+SPDX-License-Identifier: MIT
+
+Copyright © 2025 hoverkraft
+
+For more details, see the [license](http://choosealicense.com/licenses/mit/).
+
+<!-- license:end -->
+
+<!-- generated:start -->
+
+---
+
+This documentation was automatically generated by [CI Dokumentor](https://github.com/hoverkraft-tech/ci-dokumentor).
+
+<!-- generated:end -->

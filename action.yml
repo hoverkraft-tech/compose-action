@@ -1,5 +1,23 @@
 name: "Docker Compose Action"
-description: "This action runs your compose file(s) and clean up before action finished"
+description: |
+  This action runs your compose file(s) and clean up before action finished
+
+  ### Action
+
+  The action will run `docker compose up` to start the services defined in the given compose file(s).
+  The compose file(s) can be specified using the `compose-file` input.
+  Some extra options can be passed to the `docker compose up` command using the `up-flags` input.
+
+  ### Post hook
+
+  On post hook, the action will run `docker compose down` to clean up the services.
+
+  Logs of the Docker Compose services are logged using GitHub `core.ts` API before the cleanup.
+  The log level can be set using the `services-log-level` input. 
+  The default is `debug`, which will only print logs if [debug mode](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/troubleshooting-workflows/enabling-debug-logging) is switched on.
+
+  Some extra options can be passed to the `docker compose down` command using the `down-flags` input.
+
 author: "hoverkraft"
 branding:
   icon: anchor
@@ -14,7 +32,7 @@ inputs:
     required: false
     default: "./docker-compose.yml"
   services:
-    description: "Services to perform docker compose up."
+    description: "Services to perform `docker compose up`."
     required: false
   up-flags:
     description: "Additional options to pass to `docker compose up` command."
@@ -45,7 +63,7 @@ inputs:
     required: false
     default: "debug"
   github-token:
-    description: The GitHub token used to create an authenticated client (to fetch the latest version of docker compose).
+    description: The GitHub token used to create an authenticated client (to fetch the latest version of Docker Compose).
     default: ${{ github.token }}
     required: false
 

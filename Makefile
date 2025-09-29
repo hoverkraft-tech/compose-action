@@ -15,7 +15,8 @@ lint-fix: ## Execute linting and fix
 		-e FIX_MARKDOWN_PRETTIER=true \
 		-e FIX_NATURAL_LANGUAGE=true)
 
-all: ## Execute all formats and checks
+ci: ## Execute all formats and checks
+	@npm install
 	@npm audit fix
 	@npm run all
 	$(MAKE) lint-fix
