@@ -13,7 +13,7 @@ description: |
   On post hook, the action will run `docker compose down` to clean up the services.
 
   Logs of the Docker Compose services are logged using GitHub `core.ts` API before the cleanup.
-  The log level can be set using the `services-log-level` input. 
+  The log level can be set using the `services-log-level` input.
   The default is `debug`, which will only print logs if [debug mode](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/troubleshooting-workflows/enabling-debug-logging) is switched on.
 
   Some extra options can be passed to the `docker compose down` command using the `down-flags` input.

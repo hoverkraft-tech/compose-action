@@ -37,7 +37,7 @@ Some extra options can be passed to the `docker compose up` command using the `u
 On post hook, the action will run `docker compose down` to clean up the services.
 
 Logs of the Docker Compose services are logged using GitHub `core.ts` API before the cleanup.
-The log level can be set using the `services-log-level` input. 
+The log level can be set using the `services-log-level` input.
 The default is `debug`, which will only print logs if [debug mode](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/troubleshooting-workflows/enabling-debug-logging) is switched on.
 
 Some extra options can be passed to the `docker compose down` command using the `down-flags` input.
@@ -123,6 +123,8 @@ Some extra options can be passed to the `docker compose down` command using the 
 
 ## Examples
 
+### Example using in a full workflow
+
 ```yaml
 name: Docker Compose Action
 
@@ -145,6 +147,8 @@ jobs:
           docker compose exec test-app pytest
 ```
 
+### Example Using environment variables
+
 ```yaml
 steps:
   - uses: actions/checkout@v4.2.2
@@ -154,6 +158,8 @@ steps:
     env:
       CUSTOM_VARIABLE: "test"
 ```
+
+### Example using `services`
 
 Perform `docker compose up` to some given service instead of all of them
 
@@ -169,6 +175,8 @@ steps:
         helloworld3
 ```
 
+### Example using `up-flags`
+
 Specify flags to pass to the `docker compose up`.
 
 Default is none.
@@ -177,6 +185,8 @@ Can be used to pass the `--build` flag, for example, if you want persistent volu
 
 A full list of flags can be found in the [Docker compose up documentation](https://docs.docker.com/compose/reference/up/).
 
+### Example using `down-flags`
+
 Specify flags to pass to the `docker compose down` command during cleanup.
 
 Default is none.
@@ -184,6 +194,8 @@ Default is none.
 Can be used to pass the want persistent volumes to be deleted as well during cleanup.
 
 A full list of flags can be found in the [Docker compose down documentation](https://docs.docker.com/compose/reference/down/).
+
+### Example using `compose-flags`
 
 Specify flags to pass to the `docker compose` command. Default is none.
 
