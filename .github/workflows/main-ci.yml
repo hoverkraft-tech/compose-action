@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: 📖 Generate documentation
-        uses: hoverkraft-tech/ci-dokumentor@4ad2ab669afb9516c4b9d026f093d23350132589 # 0.1.1
+        uses: hoverkraft-tech/ci-dokumentor@fe7b78e19572b70e2a5db7f2a61b99c70358061a # 0.1.2
         with:
           source: action.yml
 
