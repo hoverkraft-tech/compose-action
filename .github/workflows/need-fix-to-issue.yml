@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   main:
-    uses: hoverkraft-tech/ci-github-common/.github/workflows/need-fix-to-issue.yml@b4883995e100e291a1fed68678d47a560328ed08 # 0.24.0
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/need-fix-to-issue.yml@d324c777132734fc988c79a74dff3ee0248835fc # 0.25.0
     with:
       manual-commit-ref: ${{ inputs.manual-commit-ref }}
       manual-base-ref: ${{ inputs.manual-base-ref }}
