@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: 📖 Generate documentation
-        uses: hoverkraft-tech/ci-dokumentor@fe7b78e19572b70e2a5db7f2a61b99c70358061a # 0.1.2
+        uses: hoverkraft-tech/ci-dokumentor@270cb52cbf43c7135bdad1ffb65cb5a33be2fb43 # 0.2.0
         with:
           source: action.yml
 
@@ -46,7 +46,7 @@ jobs:
           app-id: ${{ vars.CI_BOT_APP_ID }}
           private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
 
-      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@d324c777132734fc988c79a74dff3ee0248835fc # 0.25.0
+      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@1c379f7f6e0fc850fe5a7111f74d54e159b4dcd2 # 0.26.0
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update
