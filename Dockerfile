@@ -1,6 +1,6 @@
-#checkov:skip=CKV_DOCKER_2: required
-FROM ghcr.io/super-linter/super-linter:slim-v8
+FROM ghcr.io/super-linter/super-linter:slim-v8.0.0
 
+HEALTHCHECK --interval=5m --timeout=10s --start-period=30s --retries=3 CMD ["/bin/sh","-c","test -d /github/home"]
 ARG UID=1000
 ARG GID=1000
 RUN chown -R ${UID}:${GID} /github/home
