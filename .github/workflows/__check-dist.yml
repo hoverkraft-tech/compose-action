@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@6809332ced7647b3d52300a47d65657283f3395e # 0.16.0
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@4d7c1ed87c18493fc4c2dbae4dbde46cf251c9a7 # 0.16.1
 
       - name: Build dist/ Directory
         id: package
@@ -33,7 +33,7 @@ jobs:
       - if: ${{ failure() && steps.diff.outcome == 'failure' }}
         name: Upload Artifact
         id: upload
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: dist
           path: dist/
