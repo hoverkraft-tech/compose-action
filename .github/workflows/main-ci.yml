@@ -10,32 +10,37 @@ on:
   schedule:
     - cron: "25 8 * * 1"
 
-permissions:
-  actions: read
-  contents: read
-  packages: read
-  security-events: write
-  statuses: write
-  # FIXME: This is a workaround for having workflow ref. See https://github.com/orgs/community/discussions/38659
-  id-token: write
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   ci:
     uses: ./.github/workflows/__shared-ci.yml
+    permissions:
+      actions: read
+      contents: read
+      packages: read
+      security-events: write
+      statuses: write
+      id-token: write
     secrets: inherit
 
   release:
     needs: ci
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      artifact-id: ${{ steps.upload-artifact.outputs.artifact-id }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: 📖 Generate documentation
+        id: generate-documentation
         uses: hoverkraft-tech/ci-dokumentor@c46a1a108957237cf485103a80b060c35c7dba33 # 0.2.2
         with:
           source: action.yml
@@ -46,7 +51,7 @@ jobs:
           app-id: ${{ vars.CI_BOT_APP_ID }}
           private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
 
-      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@b7dd413209df265bef8d7eb0efb117eaabc684c4 # 0.27.0
+      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@5f11437c716059f30c635f90055060e4ef8b31a0 # 0.28.0
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update
@@ -56,3 +61,23 @@ jobs:
             docs: update actions and workflows documentation
 
             [skip ci]
+
+      - id: upload-artifact
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: documentation-files-${{ github.run_id }}
+          path: |
+            ${{ steps.generate-documentation.outputs.destination }}
+            .github/logo.svg
+
+  sync-docs:
+    needs: release
+    if: needs.release.outputs.artifact-id
+    uses: hoverkraft-tech/public-docs/.github/workflows/sync-docs-dispatcher.yml@c40c17f7d6a8090950b3ef4bfc70502707a6bb9f # 0.3.0
+    permissions:
+      contents: read
+    with:
+      artifact-id: ${{ needs.release.outputs.artifact-id }}
+      github-app-id: ${{ vars.CI_BOT_APP_ID }}
+    secrets:
+      github-app-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
