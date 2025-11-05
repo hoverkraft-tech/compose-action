@@ -13,7 +13,8 @@ lint-fix: ## Execute linting and fix
 		-e FIX_YAML_PRETTIER=true \
 		-e FIX_MARKDOWN=true \
 		-e FIX_MARKDOWN_PRETTIER=true \
-		-e FIX_NATURAL_LANGUAGE=true)
+		-e FIX_NATURAL_LANGUAGE=true \
+	)
 
 ci: ## Execute all formats and checks
 	@npm install
