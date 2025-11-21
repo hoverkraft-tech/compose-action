@@ -11,8 +11,8 @@ jobs:
     name: Check dist
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@0264395060bbde4ec3276b6dca84f0db828070f3 # 0.17.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@ce2bb8274a37c1219be2bcae2a1b2528c2c72957 # 0.19.0
 
       - name: Build dist/ Directory
         id: package
