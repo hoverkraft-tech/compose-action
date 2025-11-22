@@ -22,10 +22,11 @@ jobs:
     permissions:
       actions: read
       contents: read
+      id-token: write
       packages: read
+      pull-requests: write
       security-events: write
       statuses: write
-      id-token: write
     secrets: inherit
 
   release:
@@ -37,7 +38,9 @@ jobs:
     outputs:
       artifact-id: ${{ steps.upload-artifact.outputs.artifact-id }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          persist-credentials: false
 
       - name: 📖 Generate documentation
         id: generate-documentation
@@ -45,13 +48,13 @@ jobs:
         with:
           source: action.yml
 
-      - uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
+      - uses: actions/create-github-app-token@7e473efe3cb98aa54f8d4bac15400b15fad77d94 # v2.2.0
         id: generate-token
         with:
           app-id: ${{ vars.CI_BOT_APP_ID }}
           private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
 
-      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@5f11437c716059f30c635f90055060e4ef8b31a0 # 0.28.0
+      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@c314229c3ca6914f7023ffca7afc26753ab99b41 # 0.30.1
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update

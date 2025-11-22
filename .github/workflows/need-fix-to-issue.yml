@@ -15,13 +15,14 @@ on:
           before it; to go back further, enter an earlier SHA here"
         required: false
 
-permissions:
-  contents: read
-  issues: write
+permissions: {}
 
 jobs:
   main:
-    uses: hoverkraft-tech/ci-github-common/.github/workflows/need-fix-to-issue.yml@5f11437c716059f30c635f90055060e4ef8b31a0 # 0.28.0
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/need-fix-to-issue.yml@c314229c3ca6914f7023ffca7afc26753ab99b41 # 0.30.1
+    permissions:
+      contents: read
+      issues: write
     with:
       manual-commit-ref: ${{ inputs.manual-commit-ref }}
       manual-base-ref: ${{ inputs.manual-base-ref }}

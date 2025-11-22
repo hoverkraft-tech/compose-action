@@ -13,15 +13,16 @@ on:
 env:
   TAG_NAME: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
 
-permissions:
-  contents: write
+permissions: {}
 
 jobs:
   update_tag:
     name: Update the major tag to include the ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }} changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     environment:
       name: releaseNewActionVersion
-    runs-on: ubuntu-latest
     steps:
       - name: Update the ${{ env.TAG_NAME }} tag
         uses: actions/publish-action@23f4c6f12633a2da8f44938b71fde9afec138fb4 # v0.4.0

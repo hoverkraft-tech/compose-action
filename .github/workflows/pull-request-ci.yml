@@ -5,13 +5,7 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  actions: read
-  contents: read
-  packages: read
-  statuses: write
-  security-events: write
-  id-token: write
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,4 +14,12 @@ concurrency:
 jobs:
   ci:
     uses: ./.github/workflows/__shared-ci.yml
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: write
+      security-events: write
+      statuses: write
     secrets: inherit
