@@ -3,222 +3,193 @@ name: Internal - Tests for action
 on:
   workflow_call:
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
-  test-action-with-services:
+  test-action:
     runs-on: ubuntu-latest
-    name: Test with services
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+    name: ${{ matrix.name }} - ${{ matrix.assertion-name }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Given multiple services when filtering services
+            assertion-name: "Then only expected services run"
+            compose-file: ./test/docker-compose.yml
+            services: |
+              service-b
+              service-c
+            assertion: |
+              docker compose -f ./test/docker-compose.yml ps
 
-      - name: Act
-        uses: ./
-        with:
-          compose-file: "./test/docker-compose.yml"
-          services: |
-            service-b
-            service-c
+              docker compose -f ./test/docker-compose.yml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
+              docker compose -f ./test/docker-compose.yml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
+              (docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
 
-      - name: "Assert: only expected services are running"
-        run: |
-          docker compose -f ./test/docker-compose.yml ps
+          - name: Given compose file when applying down flags
+            assertion-name: "Then teardown honors down flags"
+            compose-file: ./test/docker-compose.yml
+            down-flags: "--volumes"
+            assertion: |
+              docker compose -f ./test/docker-compose.yml ps
 
-          docker compose -f ./test/docker-compose.yml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
-          docker compose -f ./test/docker-compose.yml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
-          (docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
+              docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 || (echo "Service service-a is not running" && exit 1)
+              (docker compose -f ./test/docker-compose.yml ps | grep test-service-b-1 && echo "Service service-b should not be running without profile" && exit 1) || true
+              (docker compose -f ./test/docker-compose.yml ps | grep test-service-c-1 && echo "Service service-c should not be running without profile" && exit 1) || true
 
-  test-action-with-down-flags:
-    runs-on: ubuntu-latest
-    name: Test compose action
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+          - name: Given compose profile when passing compose flags
+            assertion-name: "Then the requested profile is active"
+            compose-file: ./test/docker-compose.yml
+            compose-flags: "--profile profile-1"
+            down-flags: "--volumes"
+            assertion: |
+              docker compose -f ./test/docker-compose.yml -p profile-1 ps || (echo "Profile not used" && exit 1)
 
-      - name: Act
-        uses: ./
-        with:
-          compose-file: "./test/docker-compose.yml"
-          down-flags: "--volumes"
+          - name: Given image supplied via env when running action
+            assertion-name: "Then compose uses the provided env"
+            compose-file: ./test/docker-compose-with-env.yml
+            image-name: busybox
+            assertion: |
+              docker compose -f ./test/docker-compose-with-env.yml ps
 
-  test-action-with-compose-flags:
-    runs-on: ubuntu-latest
-    name: Test with compose flags
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              docker compose -f ./test/docker-compose-with-env.yml ps | grep test-service-a-1 || (echo "Service service-a is not running" && exit 1)
 
-      - name: Act
-        uses: ./
-        with:
-          compose-file: "./test/docker-compose.yml"
-          compose-flags: "--profile profile-1"
-          down-flags: "--volumes"
+          - name: Given multiple compose files when selecting services
+            assertion-name: "Then only services from selection run"
+            compose-file: |
+              ./test/docker-compose.yml
+              ./test/docker-compose.ci.yml
+            services: |
+              service-b
+              service-d
+            assertion: |
+              docker compose -f ./test/docker-compose.yml -f ./test/docker-compose.ci.yml ps
 
-      - name: "Assert: profile is used"
-        run: |
-          docker compose -f ./test/docker-compose.yml -p profile-1 ps || (echo "Profile not used" && exit 1)
+              docker compose -f ./test/docker-compose.yml -f ./test/docker-compose.ci.yml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
+              docker compose -f ./test/docker-compose.yml -f ./test/docker-compose.ci.yml ps | grep test-service-d-1 || (echo "Service service-d is not running" && exit 1)
+              (docker compose -f ./test/docker-compose.yml -f ./test/docker-compose.ci.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
+              (docker compose -f ./test/docker-compose.yml -f ./test/docker-compose.ci.yml ps | grep test-service-c-1 && echo "Unexpected service service-c is running" && exit 1) || true
 
-  test-action-with-env:
-    runs-on: ubuntu-latest
-    name: Test with env
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+          - name: Given compose file in subdirectory when setting cwd
+            assertion-name: "Then only expected services run"
+            compose-file: docker-compose.yml
+            cwd: ./test
+            services: |
+              service-b
+              service-c
+            assertion: |
+              docker compose -f ./test/docker-compose.yml ps
 
-      - name: Act
-        uses: ./
-        with:
-          compose-file: "./test/docker-compose-with-env.yml"
-        env:
-          IMAGE_NAME: busybox
+              docker compose -f ./test/docker-compose.yml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
+              docker compose -f ./test/docker-compose.yml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
+              (docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
 
-      - name: "Assert: env is used"
-        env:
-          IMAGE_NAME: busybox
-        run: |
-          docker compose -f ./test/docker-compose-with-env.yml ps
+          - name: Given absolute compose path when running action
+            assertion-name: "Then only expected services run"
+            compose-file: test/docker-compose.yml
+            use-absolute-path: true
+            services: |
+              service-b
+              service-c
+            assertion: |
+              docker compose -f ./test/docker-compose.yml ps
 
-          docker compose -f ./test/docker-compose-with-env.yml ps | grep test-service-a-1 || (echo "Service service-a is not running" && exit 1)
+              docker compose -f ./test/docker-compose.yml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
+              docker compose -f ./test/docker-compose.yml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
+              (docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
 
-  test-action-with-multiple-compose-files:
-    runs-on: ubuntu-latest
-    name: Test with multiple compose files
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+          - name: Given compose with multiple services when using abort-on-container-exit
+            assertion-name: "Then execution stops on container exit"
+            compose-file: test/docker-compose-web-mysql.yml
+            up-flags: "--build --abort-on-container-exit --exit-code-from=web"
+            assertion: |
+              WEB_EXIT_CODE=$(docker compose -f ./test/docker-compose-web-mysql.yml ps web --all --format json | jq ".ExitCode")
+              [ "$WEB_EXIT_CODE" == "0" ] || (echo "Web service did not exit successfully" && exit 1)
 
-      - name: Act
-        uses: ./
-        with:
-          compose-file: |
-            ./test/docker-compose.yml
-            ./test/docker-compose.ci.yml
-          services: |
-            service-b
-            service-d
+              MYSQL_STATE=$(docker compose -f ./test/docker-compose-web-mysql.yml ps mysql --all --format json | jq -r ".State")
+              if [ "$MYSQL_STATE" = "running" ]; then
+                echo "MySQL service is still running"
+                exit 1
+              fi
 
-      - name: "Assert: only expected services are running"
-        run: |
-          docker compose -f ./test/docker-compose.yml -f ./test/docker-compose.ci.yml ps
+          - name: Given failing dependency when attaching dependencies
+            assertion-name: "Then failing service exits with code 1"
+            compose-file: test/docker-compose-fail.yml
+            up-flags: "--attach-dependencies"
+            assertion: |
+              EXIT_CODE=$(docker compose -f ./test/docker-compose-fail.yml ps service-a --all --format json | jq ".ExitCode")
+              [ "$EXIT_CODE" == "1" ] || (echo "Service service-a did not exit with code 1" && exit 1)
 
-          docker compose -f ./test/docker-compose.yml -f ./test/docker-compose.ci.yml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
-          docker compose -f ./test/docker-compose.yml -f ./test/docker-compose.ci.yml ps | grep test-service-d-1 || (echo "Service service-d is not running" && exit 1)
-          (docker compose -f ./test/docker-compose.yml -f ./test/docker-compose.ci.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
-          (docker compose -f ./test/docker-compose.yml -f ./test/docker-compose.ci.yml ps | grep test-service-c-1 && echo "Unexpected service service-c is running" && exit 1) || true
+          - name: Given compose version mismatch when requesting explicit version
+            assertion-name: "Then docker compose reports the requested version"
+            compose-file: ./test/docker-compose.yml
+            compose-version: "2.29.0"
+            expected-compose-version: "2.29.0"
+            ensure-version-mismatch: true
+            assertion: |
+              CURRENT_DOCKER_COMPOSE_VERSION=$(docker compose version --short)
+              echo "Current docker compose version: $CURRENT_DOCKER_COMPOSE_VERSION"
 
-  test-action-with-cwd:
-    runs-on: ubuntu-latest
-    name: Test with cwd
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              if [ "$CURRENT_DOCKER_COMPOSE_VERSION" != "$DOCKER_COMPOSE_VERSION" ]; then
+                echo "Docker compose version is not in $DOCKER_COMPOSE_VERSION version"
+                exit 1
+              fi
 
-      - name: Act
-        uses: ./
-        with:
-          compose-file: "docker-compose.yml"
-          cwd: "./test"
-          services: |
-            service-b
-            service-c
+          - name: Given compose version mismatch when requesting latest version
+            assertion-name: "Then docker compose reports the requested version"
+            compose-file: ./test/docker-compose.yml
+            compose-version: latest
+            fetch-latest-compose: true
+            ensure-version-mismatch: true
+            assertion: |
+              CURRENT_DOCKER_COMPOSE_VERSION=$(docker compose version --short)
+              echo "Current docker compose version: $CURRENT_DOCKER_COMPOSE_VERSION"
 
-      - name: "Assert: only expected services are running"
-        run: |
-          docker compose -f ./test/docker-compose.yml ps
+              if [ "$CURRENT_DOCKER_COMPOSE_VERSION" != "$DOCKER_COMPOSE_VERSION" ]; then
+                echo "Docker compose version is not in $DOCKER_COMPOSE_VERSION version"
+                exit 1
+              fi
 
-          docker compose -f ./test/docker-compose.yml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
-          docker compose -f ./test/docker-compose.yml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
-          (docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
+          - name: Given custom docker context when providing docker flags
+            assertion-name: "Then docker compose uses that context"
+            compose-file: ./test/docker-compose.yml
+            compose-version: latest
+            docker-flags: "--context test-context"
+            docker-context: test-context
+            assertion: |
+              CURRENT_CONTEXT=$(docker context show)
+              if [ "$CURRENT_CONTEXT" != "test-context" ]; then
+                echo "Docker context is '$CURRENT_CONTEXT' instead of 'test-context'"
+                exit 1
+              fi
 
-  test-action-with-absolute-path:
-    runs-on: ubuntu-latest
-    name: Test with absolute path
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              docker compose -f ./test/docker-compose.yml ps
 
-      - name: Act
-        uses: ./
-        with:
-          compose-file: "${{ github.workspace }}/test/docker-compose.yml"
-          services: |
-            service-b
-            service-c
+              docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 || (echo "Service service-a is not running under custom context" && exit 1)
+              (docker compose -f ./test/docker-compose.yml ps | grep test-service-b-1 && echo "Service service-b should not be running without profile" && exit 1) || true
 
-      - name: "Assert: only expected services are running"
-        run: |
-          docker compose -f ./test/docker-compose.yml ps
-
-          docker compose -f ./test/docker-compose.yml ps | grep test-service-b-1 || (echo "Service service-b is not running" && exit 1)
-          docker compose -f ./test/docker-compose.yml ps | grep test-service-c-1 || (echo "Service service-c is not running" && exit 1)
-          (docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 && echo "Unexpected service service-a is running" && exit 1) || true
-
-  test-abort-on-container-exit:
-    runs-on: ubuntu-latest
-    name: Test with --abort-on-container-exit
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-      - name: Act
-        uses: ./
-        with:
-          compose-file: "test/docker-compose-web-mysql.yml"
-          up-flags: "--build --abort-on-container-exit --exit-code-from=web"
-
-  test-attach-dependencies-failure:
-    runs-on: ubuntu-latest
-    name: Test with --attach-dependencies and service failure
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-      - name: Act
-        uses: ./
-        with:
-          compose-file: "test/docker-compose-fail.yml"
-          up-flags: "--attach-dependencies"
-
-      - name: Assert
-        run: |
-          EXIT_CODE=$(docker compose -f ./test/docker-compose-fail.yml ps service-a --all --format json | jq ".ExitCode")
-          [ "$EXIT_CODE" == "1" ] || (echo "Service service-a did not exit with code 1" && exit 1)
-
-  test-action-with-compose-version:
-    runs-on: ubuntu-latest
-    name: Test with compose version
     env:
-      DOCKER_COMPOSE_VERSION: "2.29.0"
+      DOCKER_COMPOSE_VERSION: ${{ matrix.expected-compose-version || '' }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-      - name: "Arrange: ensure original docker compose version is not the expected one"
-        run: |
-          CURRENT_DOCKER_COMPOSE_VERSION=$(docker compose version --short)
-          echo "Current docker compose version: $CURRENT_DOCKER_COMPOSE_VERSION"
-
-          if [ "$CURRENT_DOCKER_COMPOSE_VERSION" == "$DOCKER_COMPOSE_VERSION" ]; then
-            echo "Docker compose version is already in $DOCKER_COMPOSE_VERSION version"
-            exit 1
-          fi
-
-      - name: Act
-        uses: ./
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
-          compose-file: "./test/docker-compose.yml"
-          compose-version: "2.29.0"
+          persist-credentials: false
 
-      - name: "Assert: compose version is used"
-        run: |
-          CURRENT_DOCKER_COMPOSE_VERSION=$(docker compose version --short)
-          echo "Current docker compose version: $CURRENT_DOCKER_COMPOSE_VERSION"
+      - name: Set up Docker context
+        if: ${{ matrix.docker-context }}
+        uses: docker/setup-docker-action@efe9e3891a4f7307e689f2100b33a155b900a608 # v4.5.0
+        with:
+          context: ${{ matrix.docker-context }}
 
-          if [ "$CURRENT_DOCKER_COMPOSE_VERSION" != "$DOCKER_COMPOSE_VERSION" ]; then
-            echo "Docker compose version is not in $DOCKER_COMPOSE_VERSION version"
-            exit 1
-          fi
-
-  test-action-with-compose-version-latest:
-    runs-on: ubuntu-latest
-    name: Test with compose version latest
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Resolve absolute compose path
+        if: ${{ matrix.use-absolute-path }}
+        id: compose-path
+        run: echo "absolute=${GITHUB_WORKSPACE}/${{ matrix.compose-file }}" >> "$GITHUB_OUTPUT"
 
       - name: "Arrange: retrieve latest version of docker compose"
+        if: ${{ matrix.fetch-latest-compose }}
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
@@ -230,6 +201,7 @@ jobs:
             core.exportVariable('DOCKER_COMPOSE_VERSION', dockerComposeVersion);
 
       - name: "Arrange: ensure original docker compose version is not the expected one"
+        if: ${{ matrix.ensure-version-mismatch }}
         run: |
           CURRENT_DOCKER_COMPOSE_VERSION=$(docker compose version --short)
           echo "Current docker compose version: $CURRENT_DOCKER_COMPOSE_VERSION"
@@ -242,33 +214,19 @@ jobs:
       - name: Act
         uses: ./
         with:
-          compose-file: "./test/docker-compose.yml"
-          compose-version: "latest"
+          compose-file: ${{ matrix.use-absolute-path && steps.compose-path.outputs.absolute || matrix.compose-file }}
+          services: ${{ matrix.services || '' }}
+          down-flags: ${{ matrix.down-flags || '' }}
+          compose-flags: ${{ matrix.compose-flags || '' }}
+          compose-version: ${{ matrix.compose-version || '' }}
+          cwd: ${{ matrix.cwd || '' }}
+          up-flags: ${{ matrix.up-flags || '' }}
+          docker-flags: ${{ matrix.docker-flags || '' }}
+        env:
+          IMAGE_NAME: ${{ matrix.image-name || '' }}
 
-      - name: "Assert: compose version is used"
-        run: |
-          CURRENT_DOCKER_COMPOSE_VERSION=$(docker compose version --short)
-          echo "Current docker compose version: $CURRENT_DOCKER_COMPOSE_VERSION"
-
-          if [ "$CURRENT_DOCKER_COMPOSE_VERSION" != "$DOCKER_COMPOSE_VERSION" ]; then
-            echo "Docker compose version is not in $DOCKER_COMPOSE_VERSION version"
-            exit 1
-          fi
-
-  test-action-with-docker-context:
-    runs-on: ubuntu-latest
-    name: Test with docker context
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-      - name: Set up Docker
-        uses: docker/setup-docker-action@efe9e3891a4f7307e689f2100b33a155b900a608 # v4.5.0
-        with:
-          context: test-context
-
-      - name: Act
-        uses: ./
-        with:
-          docker-flags: "--context test-context"
-          compose-file: "./test/docker-compose.yml"
-          compose-version: "latest"
+      - name: ${{ matrix.assertion-name }}
+        if: ${{ matrix.assertion }}
+        run: ${{ matrix.assertion }}
+        env:
+          IMAGE_NAME: ${{ matrix.image-name || '' }}

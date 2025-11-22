@@ -3,17 +3,16 @@ name: Common Continuous Integration tasks
 on:
   workflow_call:
 
-permissions:
-  actions: read
-  contents: read
-  packages: read
-  security-events: write
-  statuses: write
-  id-token: write
+permissions: {}
 
 jobs:
   linter:
-    uses: hoverkraft-tech/ci-github-common/.github/workflows/linter.yml@5f11437c716059f30c635f90055060e4ef8b31a0 # 0.28.0
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/linter.yml@c314229c3ca6914f7023ffca7afc26753ab99b41 # 0.30.1
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      statuses: write
     with:
       linter-env: |
         FILTER_REGEX_EXCLUDE=dist/**/*
@@ -28,14 +27,24 @@ jobs:
     name: Test nodejs
     needs: linter
     uses: ./.github/workflows/__check-nodejs.yml
+    permissions:
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: write
+      security-events: write
     secrets: inherit
 
   check-dist:
     name: Test nodejs
     needs: linter
     uses: ./.github/workflows/__check-dist.yml
+    permissions:
+      contents: read
 
   check-action:
     name: Test action
     needs: [check-nodejs, check-dist]
     uses: ./.github/workflows/__check-action.yml
+    permissions:
+      contents: read
