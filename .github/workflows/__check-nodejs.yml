@@ -16,3 +16,5 @@ jobs:
       security-events: write
     with:
       build: ""
+      test: |
+        {"coverage":"codecov"}

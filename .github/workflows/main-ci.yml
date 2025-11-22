@@ -47,6 +47,14 @@ jobs:
         uses: hoverkraft-tech/ci-dokumentor@c46a1a108957237cf485103a80b060c35c7dba33 # 0.2.2
         with:
           source: action.yml
+          extra-badges: |
+            [
+              {
+                "label":"codecov",
+                "url":"https://codecov.io/gh/hoverkraft-tech/compose-action/graph/badge.svg?token=90JXB7EIMA",
+                "linkUrl":"https://codecov.io/gh/hoverkraft-tech/compose-action"
+              }
+            ]
 
       - uses: actions/create-github-app-token@7e473efe3cb98aa54f8d4bac15400b15fad77d94 # v2.2.0
         id: generate-token
