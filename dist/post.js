@@ -26253,18 +26253,28 @@ class DockerComposeService {
             ...this.getCommonOptions(optionsInputs),
             commandOptions: upFlags,
         };
-        if (services.length > 0) {
-            await (0, docker_compose_1.upMany)(services, options);
-            return;
+        try {
+            if (services.length > 0) {
+                await (0, docker_compose_1.upMany)(services, options);
+                return;
+            }
+            await (0, docker_compose_1.upAll)(options);
         }
-        await (0, docker_compose_1.upAll)(options);
+        catch (error) {
+            throw this.formatDockerComposeError(error);
+        }
     }
     async down({ downFlags, ...optionsInputs }) {
         const options = {
             ...this.getCommonOptions(optionsInputs),
             commandOptions: downFlags,
         };
-        await (0, docker_compose_1.down)(options);
+        try {
+            await (0, docker_compose_1.down)(options);
+        }
+        catch (error) {
+            throw this.formatDockerComposeError(error);
+        }
     }
     async logs({ services, ...optionsInputs }) {
         const options = {
@@ -26288,6 +26298,53 @@ class DockerComposeService {
                 options: dockerFlags,
             },
         };
+    }
+    /**
+     * Formats docker-compose errors into proper Error objects with readable messages
+     */
+    formatDockerComposeError(error) {
+        // If it's already an Error, return it
+        if (error instanceof Error) {
+            return error;
+        }
+        // Handle docker-compose result objects
+        if (this.isDockerComposeResult(error)) {
+            const parts = [];
+            // Add exit code information
+            if (error.exitCode !== null) {
+                parts.push(`Docker Compose command failed with exit code ${error.exitCode}`);
+            }
+            else {
+                parts.push("Docker Compose command failed");
+            }
+            // Add error stream output if available
+            if (error.err && error.err.trim()) {
+                parts.push("\nError output:");
+                parts.push(error.err.trim());
+            }
+            // Add standard output if available and different from error output
+            if (error.out && error.out.trim() && error.out !== error.err) {
+                parts.push("\nStandard output:");
+                parts.push(error.out.trim());
+            }
+            return new Error(parts.join("\n"));
+        }
+        // Handle string errors
+        if (typeof error === "string") {
+            return new Error(error);
+        }
+        // Fallback for unknown error types
+        return new Error(JSON.stringify(error));
+    }
+    /**
+     * Type guard to check if an object is a docker-compose result
+     */
+    isDockerComposeResult(error) {
+        return (typeof error === "object" &&
+            error !== null &&
+            "exitCode" in error &&
+            "err" in error &&
+            "out" in error);
     }
 }
 exports.DockerComposeService = DockerComposeService;
