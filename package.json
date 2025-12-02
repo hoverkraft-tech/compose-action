@@ -85,43 +85,13 @@
       "**/src/**/*.[jt]s?(x)"
     ]
   },
-  "eslintConfig": {
-    "root": true,
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint",
-      "jest"
-    ],
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:jest/recommended",
-      "prettier"
-    ],
-    "env": {
-      "es2021": true
-    },
-    "parserOptions": {
-      "ecmaFeatures": {
-        "jsx": true
-      },
-      "ecmaVersion": 12,
-      "sourceType": "module"
-    },
-    "settings": {
-      "jest": {
-        "version": "detect"
-      }
-    },
-    "ignorePatterns": [
-      "dist",
-      "node_modules"
-    ]
-  },
   "prettier": {
     "semi": true,
     "printWidth": 100,
-    "trailingComma": "es5"
+    "trailingComma": "es5",
+    "plugins": [
+      "@prettier/plugin-oxc"
+    ]
   },
   "commitlint": {
     "extends": [
@@ -140,6 +110,6 @@
     }
   },
   "tsDevTools": {
-    "version": "20220617100200-prettier-cache"
+    "version": "20250623095500-add-prettier-oxc"
   }
 }

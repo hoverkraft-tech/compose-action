@@ -112,6 +112,130 @@ describe("DockerComposeService", () => {
         },
       });
     });
+
+    it("should throw formatted error when upAll fails with docker-compose result", async () => {
+      const upInputs: UpInputs = {
+        dockerFlags: [],
+        composeFiles: ["docker-compose.yml"],
+        services: [],
+        composeFlags: [],
+        upFlags: [],
+        cwd: "/current/working/dir",
+        serviceLogger: jest.fn(),
+      };
+
+      const dockerComposeError = {
+        exitCode: 1,
+        err: "Error: unable to pull image\nfailed to resolve reference",
+        out: "",
+      };
+
+      upAllMock.mockRejectedValue(dockerComposeError);
+
+      await expect(service.up(upInputs)).rejects.toThrow(
+        "Docker Compose command failed with exit code 1"
+      );
+      await expect(service.up(upInputs)).rejects.toThrow("unable to pull image");
+    });
+
+    it("should throw formatted error when upMany fails with docker-compose result", async () => {
+      const upInputs: UpInputs = {
+        dockerFlags: [],
+        composeFiles: ["docker-compose.yml"],
+        services: ["web"],
+        composeFlags: [],
+        upFlags: [],
+        cwd: "/current/working/dir",
+        serviceLogger: jest.fn(),
+      };
+
+      const dockerComposeError = {
+        exitCode: 1,
+        err: "Service 'web' failed to start",
+        out: "Starting web...",
+      };
+
+      upManyMock.mockRejectedValue(dockerComposeError);
+
+      await expect(service.up(upInputs)).rejects.toThrow(
+        "Docker Compose command failed with exit code 1"
+      );
+      await expect(service.up(upInputs)).rejects.toThrow("Service 'web' failed to start");
+      await expect(service.up(upInputs)).rejects.toThrow("Starting web...");
+    });
+
+    it("should pass through docker-compose result without exit code", async () => {
+      const upInputs: UpInputs = {
+        dockerFlags: [],
+        composeFiles: ["docker-compose.yml"],
+        services: [],
+        composeFlags: [],
+        upFlags: [],
+        cwd: "/current/working/dir",
+        serviceLogger: jest.fn(),
+      };
+
+      const dockerComposeError = {
+        exitCode: null,
+        err: "Some error without exit code",
+        out: "",
+      };
+
+      upAllMock.mockRejectedValue(dockerComposeError);
+
+      await expect(service.up(upInputs)).rejects.toThrow("Some error without exit code");
+    });
+
+    it("should pass through standard Error objects", async () => {
+      const upInputs: UpInputs = {
+        dockerFlags: [],
+        composeFiles: ["docker-compose.yml"],
+        services: [],
+        composeFlags: [],
+        upFlags: [],
+        cwd: "/current/working/dir",
+        serviceLogger: jest.fn(),
+      };
+
+      const standardError = new Error("Standard error message");
+      upAllMock.mockRejectedValue(standardError);
+
+      await expect(service.up(upInputs)).rejects.toThrow("Standard error message");
+    });
+
+    it("should pass through error strings", async () => {
+      const upInputs: UpInputs = {
+        dockerFlags: [],
+        composeFiles: ["docker-compose.yml"],
+        services: [],
+        composeFlags: [],
+        upFlags: [],
+        cwd: "/current/working/dir",
+        serviceLogger: jest.fn(),
+      };
+
+      const unknownError = "Some unknown error";
+      upAllMock.mockRejectedValue(unknownError);
+
+      await expect(service.up(upInputs)).rejects.toThrow("Some unknown error");
+    });
+
+    it("should handle unknown error types gracefully", async () => {
+      const upInputs: UpInputs = {
+        dockerFlags: [],
+        composeFiles: ["docker-compose.yml"],
+        services: [],
+        composeFlags: [],
+        upFlags: [],
+        cwd: "/current/working/dir",
+        serviceLogger: jest.fn(),
+      };
+
+      const unknownError = { unexpected: "error format" };
+      upAllMock.mockRejectedValue(unknownError);
+
+      await expect(service.up(upInputs)).rejects.toThrow(JSON.stringify(unknownError));
+    });
   });
 
   describe("down", () => {
@@ -138,6 +262,30 @@ describe("DockerComposeService", () => {
         cwd: "/current/working/dir",
         callback: expect.any(Function),
       });
+    });
+
+    it("should throw formatted error when down fails with docker-compose result", async () => {
+      const downInputs: DownInputs = {
+        dockerFlags: [],
+        composeFiles: [],
+        composeFlags: [],
+        downFlags: [],
+        cwd: "/current/working/dir",
+        serviceLogger: jest.fn(),
+      };
+
+      const dockerComposeError = {
+        exitCode: 1,
+        err: "Error stopping containers",
+        out: "",
+      };
+
+      downMock.mockRejectedValue(dockerComposeError);
+
+      await expect(service.down(downInputs)).rejects.toThrow(
+        "Docker Compose command failed with exit code 1"
+      );
+      await expect(service.down(downInputs)).rejects.toThrow("Error stopping containers");
     });
   });
 
