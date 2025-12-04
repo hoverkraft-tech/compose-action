@@ -12,12 +12,12 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
 
       - id: setup-node
-        uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@a9809af04394e66675b8644865be1ddcec02cdcd # 0.20.0
+        uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@338755b95043af1f8aa17409529fd20a9d2ef659 # 0.20.6
 
       - name: Build dist/ Directory
         id: package
