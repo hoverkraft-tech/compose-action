@@ -30,7 +30,7 @@ describe("DockerComposeInstallerService", () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   describe("install", () => {
@@ -232,6 +232,140 @@ describe("DockerComposeInstallerService", () => {
         })
       ).rejects.toThrow(`Unsupported platform: win32`);
 
+      expect(manualInstallerAdapterMock.install).not.toHaveBeenCalled();
+    });
+
+    it("should install when version check fails", async () => {
+      // Arrange: first call to version() doesn't find
+      versionMock.mockRejectedValueOnce(new Error("version not installed"));
+
+      const installedVersion = "2.0.0";
+
+      // After installation, version() returns the new version
+      versionMock.mockResolvedValueOnce({
+        exitCode: 0,
+        out: "",
+        err: "",
+        data: {
+          version: installedVersion,
+        },
+      });
+
+      Object.defineProperty(process, "platform", {
+        value: "linux",
+      });
+
+      // Act
+      const result = await service.install({
+        composeVersion: installedVersion,
+        cwd: "/path/to/cwd",
+        githubToken: "token",
+      });
+
+      // Assert
+      expect(result).toBe(installedVersion);
+      expect(manualInstallerAdapterMock.install).toHaveBeenCalledWith(installedVersion);
+    });
+
+    it("should install latest version when missing or unspecified", async () => {
+      // Arrange: first call to version() doesn't find
+      versionMock.mockRejectedValueOnce(new Error("version check failed"));
+      // second call finds newly installed version
+      versionMock.mockResolvedValueOnce({
+        exitCode: 0,
+        out: "",
+        err: "",
+        data: {
+          version: "v1.4.0",
+        },
+      });
+
+      const latestVersion = "v1.4.0";
+
+      const mockClient = mockAgent.get("https://api.github.com");
+      mockClient
+        .intercept({
+          path: "/repos/docker/compose/releases/latest",
+          method: "GET",
+        })
+        .reply(
+          200,
+          {
+            tag_name: latestVersion,
+          },
+          {
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+      setGlobalDispatcher(mockClient);
+
+      versionMock.mockResolvedValueOnce({
+        exitCode: 0,
+        out: "",
+        err: "",
+        data: {
+          version: latestVersion,
+        },
+      });
+
+      Object.defineProperty(process, "platform", {
+        value: "linux",
+      });
+      Object.defineProperty(globalThis, "fetch", {
+        value: jest.fn(),
+      });
+
+      // Act
+      const result = await service.install({
+        composeVersion: "latest",
+        cwd: "/path/to/cwd",
+        githubToken: "token",
+      });
+
+      // Assert
+      expect(result).toBe(latestVersion);
+      expect(manualInstallerAdapterMock.install).toHaveBeenCalledWith(latestVersion);
+    });
+
+    it("should throw if Compose is missing and no GitHub token is provided", async () => {
+      // Arrange: first call to version() doesn't find
+      versionMock.mockRejectedValueOnce(new Error("version check failed"));
+
+      Object.defineProperty(process, "platform", {
+        value: "linux",
+      });
+
+      await expect(
+        service.install({
+          composeVersion: "latest",
+          cwd: "/path/to/cwd",
+          githubToken: null,
+        })
+      ).rejects.toThrow("GitHub token is required to install the latest version");
+    });
+
+    it("should not install when the version is already installed and no version is specified", async () => {
+      // Arrange
+      versionMock.mockResolvedValue({
+        exitCode: 0,
+        out: "",
+        err: "",
+        data: {
+          version: "1.2.3",
+        },
+      });
+
+      // Act
+      const result = await service.install({
+        composeVersion: "",
+        cwd: "/path/to/cwd",
+        githubToken: null,
+      });
+
+      // Assert
+      expect(result).toBe("1.2.3");
       expect(manualInstallerAdapterMock.install).not.toHaveBeenCalled();
     });
   });

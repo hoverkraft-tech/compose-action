@@ -17,26 +17,33 @@ export class DockerComposeInstallerService {
   constructor(private readonly manualInstallerAdapter: ManualInstallerAdapter) {}
 
   async install({ composeVersion, cwd, githubToken }: InstallInputs): Promise<string> {
-    const currentVersion = await this.version({ cwd });
+    const currentVersion = await this.getInstalledVersion(cwd);
 
-    if (!composeVersion) {
+    const needsInstall = !currentVersion || (composeVersion && composeVersion !== currentVersion);
+    if (!needsInstall) {
       return currentVersion;
     }
 
-    if (currentVersion === composeVersion) {
-      return currentVersion;
-    }
+    let targetVersion = composeVersion || COMPOSE_VERSION_LATEST;
 
-    if (composeVersion === COMPOSE_VERSION_LATEST) {
+    if (targetVersion === COMPOSE_VERSION_LATEST) {
       if (!githubToken) {
         throw new Error("GitHub token is required to install the latest version");
       }
-      composeVersion = await this.getLatestVersion(githubToken);
+      targetVersion = await this.getLatestVersion(githubToken);
     }
 
-    await this.installVersion(composeVersion);
+    await this.installVersion(targetVersion);
 
     return this.version({ cwd });
+  }
+
+  private async getInstalledVersion(cwd: string): Promise<string | null> {
+    try {
+      return await this.version({ cwd });
+    } catch {
+      return null;
+    }
   }
 
   private async version({ cwd }: VersionInputs): Promise<string> {
