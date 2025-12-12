@@ -24,7 +24,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@actions/core": "^1.11.1",
+    "@actions/core": "^2.0.1",
     "@actions/github": "^6.0.1",
     "@actions/tool-cache": "^2.0.2",
     "@octokit/action": "^8.0.4",
@@ -47,10 +47,10 @@
     "build": "tsc --noEmit",
     "format": "prettier --cache --write .",
     "jest": "jest --detectOpenHandles --forceExit",
-    "test": "npm run jest --maxWorkers=50%",
-    "test:watch": "npm run jest --watch --maxWorkers=25%",
-    "test:cov": "npm run test --coverage",
-    "test:ci": "npm run test:cov --runInBand",
+    "test": "npm run jest -- --maxWorkers=50%",
+    "test:watch": "npm run jest --watch -- --maxWorkers=25%",
+    "test:cov": "npm run test -- --coverage",
+    "test:ci": "npm run jest -- --coverage --runInBand",
     "prepare": "ts-dev-tools install"
   },
   "jest": {
