@@ -29,7 +29,7 @@ jobs:
       statuses: write
     secrets: inherit
 
-  release:
+  prepare-docs:
     needs: ci
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
@@ -56,13 +56,13 @@ jobs:
               }
             ]
 
-      - uses: actions/create-github-app-token@7e473efe3cb98aa54f8d4bac15400b15fad77d94 # v2.2.0
+      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         id: generate-token
         with:
           app-id: ${{ vars.CI_BOT_APP_ID }}
           private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
 
-      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@5ac504609f6ef35c5ac94bd8199063aa32104721 # 0.31.3
+      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@666b7b6eb000db3e8614647871fa60c9f1eb7179 # 0.31.4
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update
@@ -74,7 +74,7 @@ jobs:
             [skip ci]
 
       - id: upload-artifact
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: documentation-files-${{ github.run_id }}
           path: |
@@ -82,13 +82,13 @@ jobs:
             .github/logo.svg
 
   sync-docs:
-    needs: release
-    if: needs.release.outputs.artifact-id
+    needs: prepare-docs
+    if: needs.prepare-docs.outputs.artifact-id
     uses: hoverkraft-tech/public-docs/.github/workflows/sync-docs-dispatcher.yml@c40c17f7d6a8090950b3ef4bfc70502707a6bb9f # 0.3.0
     permissions:
       contents: read
     with:
-      artifact-id: ${{ needs.release.outputs.artifact-id }}
+      artifact-id: ${{ needs.prepare-docs.outputs.artifact-id }}
       github-app-id: ${{ vars.CI_BOT_APP_ID }}
     secrets:
       github-app-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
