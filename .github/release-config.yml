@@ -1,0 +1,30 @@
+---
+template: |
+  # What's Changed
+  $CHANGES
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_VERSION
+name-template: "Version $RESOLVED_VERSION"
+tag-template: "$RESOLVED_VERSION"
+tag-prefix: ""
+prerelease-identifier: "rc"
+version-resolver:
+  major:
+    labels:
+      - "release-major"
+  minor:
+    labels:
+      - "release-minor"
+  patch:
+    labels:
+      - "release-patch"
+  default: patch
+autolabeler:
+  - label: "release-major"
+    title:
+      - "/^BREAKING CHANGE:/"
+      - "/^\\w+!:/"
+      - "/^\\w+\\(.+\\)!:/"
+  - label: "release-minor"
+    title:
+      - "/^feat:/"
+      - "/^feat\\(.+\\):/"
