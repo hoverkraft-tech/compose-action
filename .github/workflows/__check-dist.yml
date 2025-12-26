@@ -17,7 +17,7 @@ jobs:
           persist-credentials: false
 
       - id: setup-node
-        uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@25ef8d971c0a866fb9e5d90130c7aaa084619df6 # 0.21.0
+        uses: hoverkraft-tech/ci-github-nodejs/actions/setup-node@c9d9d041ba4ef35695ee469c4782fa6a8bbebbcc # 0.21.2
 
       - name: Build dist/ Directory
         id: package
