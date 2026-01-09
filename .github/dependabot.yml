@@ -49,7 +49,7 @@ updates:
     groups:
       npm-dev-dependencies:
         dependency-type: development
-      actions-dependencies:
+      npm-actions-dependencies:
         patterns:
           - "@actions/*"
 
