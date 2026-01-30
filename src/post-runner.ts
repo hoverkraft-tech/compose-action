@@ -1,7 +1,7 @@
 import { setFailed } from "@actions/core";
-import { InputService } from "./services/input.service";
-import { LoggerService } from "./services/logger.service";
-import { DockerComposeService } from "./services/docker-compose.service";
+import { InputService } from "./services/input.service.js";
+import { LoggerService } from "./services/logger.service.js";
+import { DockerComposeService } from "./services/docker-compose.service.js";
 
 /**
  * The run function for the action.

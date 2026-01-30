@@ -1,7 +1,7 @@
 import { getInput, getMultilineInput } from "@actions/core";
-import { existsSync } from "fs";
-import { join } from "path";
-import { LogLevel } from "./logger.service";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { LogLevel } from "./logger.service.js";
 
 export type Inputs = {
   dockerFlags: string[];

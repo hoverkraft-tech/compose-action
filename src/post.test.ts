@@ -1,25 +1,54 @@
-import * as core from "@actions/core";
-import { DockerComposeService } from "./services/docker-compose.service";
-import { InputService } from "./services/input.service";
-import { LoggerService, LogLevel } from "./services/logger.service";
+import { jest, describe, it, expect, beforeEach } from "@jest/globals";
 
-let setFailedMock: jest.SpiedFunction<typeof core.setFailed>;
+// Mock @actions/core
+const setFailedMock = jest.fn();
+
+jest.unstable_mockModule("@actions/core", () => ({
+  setFailed: setFailedMock,
+  getInput: jest.fn().mockReturnValue(""),
+  getMultilineInput: jest.fn().mockReturnValue([]),
+  debug: jest.fn(),
+  info: jest.fn(),
+  warning: jest.fn(),
+}));
+
+// Mock docker-compose
+const logsMock = jest.fn();
+const downMock = jest.fn();
+
+jest.unstable_mockModule("docker-compose", () => ({
+  logs: logsMock,
+  down: downMock,
+  upAll: jest.fn(),
+  upMany: jest.fn(),
+}));
+
+// Mock node:fs
+jest.unstable_mockModule("node:fs", () => ({
+  existsSync: jest.fn().mockReturnValue(true),
+  default: { existsSync: jest.fn().mockReturnValue(true) },
+}));
+
+// Dynamic imports after mock setup
+const { InputService } = await import("./services/input.service.js");
+const { LoggerService, LogLevel } = await import("./services/logger.service.js");
+const { DockerComposeService } = await import("./services/docker-compose.service.js");
+
 let getInputsMock: jest.SpiedFunction<typeof InputService.prototype.getInputs>;
 let debugMock: jest.SpiedFunction<typeof LoggerService.prototype.debug>;
 let infoMock: jest.SpiedFunction<typeof LoggerService.prototype.info>;
-let logsMock: jest.SpiedFunction<typeof DockerComposeService.prototype.logs>;
-let downMock: jest.SpiedFunction<typeof DockerComposeService.prototype.down>;
+let serviceLogsMock: jest.SpiedFunction<typeof DockerComposeService.prototype.logs>;
+let serviceDownMock: jest.SpiedFunction<typeof DockerComposeService.prototype.down>;
 
 describe("post", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    setFailedMock = jest.spyOn(core, "setFailed").mockImplementation();
-    infoMock = jest.spyOn(LoggerService.prototype, "info").mockImplementation();
-    debugMock = jest.spyOn(LoggerService.prototype, "debug").mockImplementation();
+    infoMock = jest.spyOn(LoggerService.prototype, "info").mockImplementation(() => {});
+    debugMock = jest.spyOn(LoggerService.prototype, "debug").mockImplementation(() => {});
     getInputsMock = jest.spyOn(InputService.prototype, "getInputs");
-    logsMock = jest.spyOn(DockerComposeService.prototype, "logs");
-    downMock = jest.spyOn(DockerComposeService.prototype, "down");
+    serviceLogsMock = jest.spyOn(DockerComposeService.prototype, "logs");
+    serviceDownMock = jest.spyOn(DockerComposeService.prototype, "down");
   });
 
   it("calls run when imported", async () => {
@@ -36,14 +65,13 @@ describe("post", () => {
       serviceLogLevel: LogLevel.Debug,
     }));
 
-    logsMock.mockResolvedValue({ error: "", output: "test logs" });
-    downMock.mockResolvedValueOnce();
+    serviceLogsMock.mockResolvedValue({ error: "", output: "test logs" });
+    serviceDownMock.mockResolvedValueOnce();
 
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    await require("../src/post");
+    await import("./post.js");
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(logsMock).toHaveBeenCalledWith({
+    expect(serviceLogsMock).toHaveBeenCalledWith({
       dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],
@@ -52,7 +80,7 @@ describe("post", () => {
       serviceLogger: debugMock,
     });
 
-    expect(downMock).toHaveBeenCalledWith({
+    expect(serviceDownMock).toHaveBeenCalledWith({
       dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],

@@ -1,31 +1,40 @@
-import { ManualInstallerAdapter } from "./manual-installer-adapter";
-import * as exec from "@actions/exec";
-import * as io from "@actions/io";
-import * as toolCache from "@actions/tool-cache";
+import { jest, describe, it, expect, beforeEach } from "@jest/globals";
+import type { ExecOptions } from "@actions/exec";
 
-jest.mock("@actions/exec");
-jest.mock("@actions/io");
-jest.mock("@actions/tool-cache");
+// Mock @actions/exec
+const execMock =
+  jest.fn<(command: string, args?: string[], options?: ExecOptions) => Promise<number>>();
+
+jest.unstable_mockModule("@actions/exec", () => ({
+  exec: execMock,
+}));
+
+// Mock @actions/io
+const mkdirPMock = jest.fn<(fsPath: string) => Promise<void>>();
+
+jest.unstable_mockModule("@actions/io", () => ({
+  mkdirP: mkdirPMock,
+}));
+
+// Mock @actions/tool-cache
+const cacheFileMock = jest.fn<() => Promise<string>>();
+const downloadToolMock = jest.fn<() => Promise<string>>();
+
+jest.unstable_mockModule("@actions/tool-cache", () => ({
+  cacheFile: cacheFileMock,
+  downloadTool: downloadToolMock,
+}));
+
+// Dynamic import after mock setup
+const { ManualInstallerAdapter } = await import("./manual-installer-adapter.js");
 
 describe("ManualInstallerAdapter", () => {
-  let mkdirPMock: jest.SpiedFunction<typeof io.mkdirP>;
-  let execMock: jest.SpiedFunction<typeof exec.exec>;
-  let cacheFileMock: jest.SpiedFunction<typeof toolCache.cacheFile>;
-  let downloadToolMock: jest.SpiedFunction<typeof toolCache.downloadTool>;
-
-  let adapter: ManualInstallerAdapter;
+  let adapter: InstanceType<typeof ManualInstallerAdapter>;
 
   beforeEach(() => {
-    mkdirPMock = jest.spyOn(io, "mkdirP").mockImplementation();
-    execMock = jest.spyOn(exec, "exec").mockImplementation();
-    cacheFileMock = jest.spyOn(toolCache, "cacheFile").mockImplementation();
-    downloadToolMock = jest.spyOn(toolCache, "downloadTool").mockImplementation();
-
-    adapter = new ManualInstallerAdapter();
-  });
-
-  afterEach(() => {
     jest.clearAllMocks();
+    delete process.env.DOCKER_CONFIG;
+    adapter = new ManualInstallerAdapter();
   });
 
   describe("install", () => {
@@ -68,6 +77,32 @@ describe("ManualInstallerAdapter", () => {
       );
     });
 
+    it("should use DOCKER_CONFIG when set", async () => {
+      // Arrange
+      const version = "v2.29.0";
+
+      execMock.mockImplementationOnce(async (_command, _args, options) => {
+        options?.listeners?.stdout?.(Buffer.from("Linux\n"));
+        return 0;
+      });
+
+      execMock.mockImplementationOnce(async (_command, _args, options) => {
+        options?.listeners?.stdout?.(Buffer.from("x86_64\n"));
+        return 0;
+      });
+
+      process.env.DOCKER_CONFIG = "/custom/docker";
+
+      // Act
+      await adapter.install(version);
+
+      // Assert
+      expect(downloadToolMock).toHaveBeenCalledWith(
+        "https://github.com/docker/compose/releases/download/v2.29.0/docker-compose-Linux-x86_64",
+        "/custom/docker/cli-plugins/docker-compose"
+      );
+    });
+
     it("should handle version without 'v' prefix", async () => {
       // Arrange
       const version = "2.29.0";
@@ -96,6 +131,35 @@ describe("ManualInstallerAdapter", () => {
 
       expect(downloadToolMock).toHaveBeenCalledWith(
         "https://github.com/docker/compose/releases/download/v2.29.0/docker-compose--",
+        "/home/test/.docker/cli-plugins/docker-compose"
+      );
+    });
+
+    it("should not add 'v' prefix for 1.x versions", async () => {
+      // Arrange
+      const version = "1.29.0";
+
+      execMock.mockImplementationOnce(async (_command, _args, options) => {
+        options?.listeners?.stdout?.(Buffer.from("Linux\n"));
+        return 0;
+      });
+
+      execMock.mockImplementationOnce(async (_command, _args, options) => {
+        options?.listeners?.stdout?.(Buffer.from("x86_64\n"));
+        return 0;
+      });
+
+      delete process.env.DOCKER_CONFIG;
+      Object.defineProperty(process.env, "HOME", {
+        value: "/home/test",
+      });
+
+      // Act
+      await adapter.install(version);
+
+      // Assert
+      expect(downloadToolMock).toHaveBeenCalledWith(
+        "https://github.com/docker/compose/releases/download/1.29.0/docker-compose-Linux-x86_64",
         "/home/test/.docker/cli-plugins/docker-compose"
       );
     });

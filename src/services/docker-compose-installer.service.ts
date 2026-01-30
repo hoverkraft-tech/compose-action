@@ -1,7 +1,7 @@
 import * as github from "@actions/github";
 import { version } from "docker-compose";
-import { COMPOSE_VERSION_LATEST, Inputs } from "./input.service";
-import { ManualInstallerAdapter } from "./installer-adapter/manual-installer-adapter";
+import { COMPOSE_VERSION_LATEST, Inputs } from "./input.service.js";
+import { ManualInstallerAdapter } from "./installer-adapter/manual-installer-adapter.js";
 
 export type InstallInputs = {
   composeVersion: Inputs["composeVersion"];

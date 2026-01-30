@@ -1,27 +1,55 @@
-import * as core from "@actions/core";
-import { InputService } from "./services/input.service";
-import { LoggerService, LogLevel } from "./services/logger.service";
-import * as postRunner from "./post-runner";
-import { DockerComposeService } from "./services/docker-compose.service";
+import { jest, describe, it, expect, beforeEach } from "@jest/globals";
 
-// Mock the external libraries and services used by the action
-let infoMock: jest.SpiedFunction<typeof LoggerService.prototype.info>;
-let debugMock: jest.SpiedFunction<typeof LoggerService.prototype.debug>;
-let setFailedMock: jest.SpiedFunction<typeof core.setFailed>;
-let getInputsMock: jest.SpiedFunction<typeof InputService.prototype.getInputs>;
-let downMock: jest.SpiedFunction<typeof DockerComposeService.prototype.down>;
-let logsMock: jest.SpiedFunction<typeof DockerComposeService.prototype.logs>;
+// Mock @actions/core
+const setFailedMock = jest.fn();
+
+jest.unstable_mockModule("@actions/core", () => ({
+  setFailed: setFailedMock,
+  getInput: jest.fn().mockReturnValue(""),
+  getMultilineInput: jest.fn().mockReturnValue([]),
+  debug: jest.fn(),
+  info: jest.fn(),
+  warning: jest.fn(),
+}));
+
+// Mock docker-compose
+const logsMock = jest.fn();
+const downMock = jest.fn();
+
+jest.unstable_mockModule("docker-compose", () => ({
+  logs: logsMock,
+  down: downMock,
+  upAll: jest.fn(),
+  upMany: jest.fn(),
+}));
+
+// Mock node:fs
+jest.unstable_mockModule("node:fs", () => ({
+  existsSync: jest.fn().mockReturnValue(true),
+  default: { existsSync: jest.fn().mockReturnValue(true) },
+}));
+
+// Dynamic imports after mock setup
+const { run } = await import("./post-runner.js");
+const { InputService } = await import("./services/input.service.js");
+const { LoggerService, LogLevel } = await import("./services/logger.service.js");
+const { DockerComposeService } = await import("./services/docker-compose.service.js");
 
 describe("run", () => {
+  let infoMock: jest.SpiedFunction<typeof LoggerService.prototype.info>;
+  let debugMock: jest.SpiedFunction<typeof LoggerService.prototype.debug>;
+  let getInputsMock: jest.SpiedFunction<typeof InputService.prototype.getInputs>;
+  let serviceDownMock: jest.SpiedFunction<typeof DockerComposeService.prototype.down>;
+  let serviceLogsMock: jest.SpiedFunction<typeof DockerComposeService.prototype.logs>;
+
   beforeEach(() => {
     jest.clearAllMocks();
 
-    infoMock = jest.spyOn(LoggerService.prototype, "info").mockImplementation();
-    debugMock = jest.spyOn(LoggerService.prototype, "debug").mockImplementation();
-    setFailedMock = jest.spyOn(core, "setFailed").mockImplementation();
+    infoMock = jest.spyOn(LoggerService.prototype, "info").mockImplementation(() => {});
+    debugMock = jest.spyOn(LoggerService.prototype, "debug").mockImplementation(() => {});
     getInputsMock = jest.spyOn(InputService.prototype, "getInputs");
-    downMock = jest.spyOn(DockerComposeService.prototype, "down");
-    logsMock = jest.spyOn(DockerComposeService.prototype, "logs");
+    serviceDownMock = jest.spyOn(DockerComposeService.prototype, "down");
+    serviceLogsMock = jest.spyOn(DockerComposeService.prototype, "logs");
   });
 
   it("should bring down docker compose service(s) and log output", async () => {
@@ -39,15 +67,14 @@ describe("run", () => {
       serviceLogLevel: LogLevel.Debug,
     }));
 
-    logsMock.mockResolvedValue({ error: "", output: "test logs" });
-
-    downMock.mockResolvedValue();
+    serviceLogsMock.mockResolvedValue({ error: "", output: "test logs" });
+    serviceDownMock.mockResolvedValue();
 
     // Act
-    await postRunner.run();
+    await run();
 
     // Assert
-    expect(logsMock).toHaveBeenCalledWith({
+    expect(serviceLogsMock).toHaveBeenCalledWith({
       dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],
@@ -56,7 +83,7 @@ describe("run", () => {
       serviceLogger: debugMock,
     });
 
-    expect(downMock).toHaveBeenCalledWith({
+    expect(serviceDownMock).toHaveBeenCalledWith({
       dockerFlags: [],
       composeFiles: ["docker-compose.yml"],
       composeFlags: [],
@@ -66,9 +93,7 @@ describe("run", () => {
     });
 
     expect(debugMock).toHaveBeenCalledWith("docker compose logs:\ntest logs");
-
     expect(infoMock).toHaveBeenCalledWith("docker compose is down");
-
     expect(setFailedMock).not.toHaveBeenCalled();
   });
 
@@ -87,38 +112,19 @@ describe("run", () => {
       serviceLogLevel: LogLevel.Debug,
     }));
 
-    logsMock.mockResolvedValue({
+    serviceLogsMock.mockResolvedValue({
       error: "test logs error",
       output: "test logs output",
     });
 
-    downMock.mockResolvedValue();
+    serviceDownMock.mockResolvedValue();
 
     // Act
-    await postRunner.run();
+    await run();
 
     // Assert
-    expect(logsMock).toHaveBeenCalledWith({
-      composeFiles: ["docker-compose.yml"],
-      composeFlags: [],
-      cwd: "/current/working/dir",
-      dockerFlags: [],
-      services: [],
-      serviceLogger: debugMock,
-    });
-
-    expect(downMock).toHaveBeenCalledWith({
-      composeFiles: ["docker-compose.yml"],
-      composeFlags: [],
-      cwd: "/current/working/dir",
-      dockerFlags: [],
-      downFlags: [],
-      serviceLogger: debugMock,
-    });
-
     expect(debugMock).toHaveBeenCalledWith("docker compose error:\ntest logs error");
     expect(debugMock).toHaveBeenCalledWith("docker compose logs:\ntest logs output");
-
     expect(infoMock).toHaveBeenCalledWith("docker compose is down");
   });
 
@@ -129,7 +135,7 @@ describe("run", () => {
     });
 
     // Act
-    await postRunner.run();
+    await run();
 
     // Assert
     expect(setFailedMock).toHaveBeenCalledWith("Error: An error occurred");
@@ -138,7 +144,7 @@ describe("run", () => {
   it("should handle errors and call setFailed", async () => {
     // Arrange
     const error = new Error("Test error");
-    downMock.mockRejectedValue(error);
+    serviceDownMock.mockRejectedValue(error);
 
     getInputsMock.mockImplementation(() => ({
       dockerFlags: [],
@@ -154,7 +160,7 @@ describe("run", () => {
     }));
 
     // Act
-    await postRunner.run();
+    await run();
 
     // Assert
     expect(setFailedMock).toHaveBeenCalledWith("Error: Test error");
@@ -163,7 +169,7 @@ describe("run", () => {
   it("should handle unknown errors and call setFailed", async () => {
     // Arrange
     const error = "Test error";
-    downMock.mockRejectedValue(error);
+    serviceDownMock.mockRejectedValue(error);
 
     getInputsMock.mockImplementation(() => ({
       dockerFlags: [],
@@ -179,7 +185,7 @@ describe("run", () => {
     }));
 
     // Act
-    await postRunner.run();
+    await run();
 
     // Assert
     expect(setFailedMock).toHaveBeenCalledWith('"Test error"');

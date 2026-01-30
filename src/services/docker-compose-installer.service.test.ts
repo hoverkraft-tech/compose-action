@@ -1,27 +1,32 @@
-import * as dockerCompose from "docker-compose";
-import { DockerComposeInstallerService } from "./docker-compose-installer.service";
-import { ManualInstallerAdapter } from "./installer-adapter/manual-installer-adapter";
+import { jest, describe, it, expect, beforeEach, afterEach } from "@jest/globals";
+import type { IDockerComposeResult } from "docker-compose";
 import { MockAgent, setGlobalDispatcher } from "undici";
 
-jest.mock("docker-compose");
+// Mock docker-compose before importing the module under test
+const versionMock = jest.fn<() => Promise<IDockerComposeResult & { data: { version: string } }>>();
+
+jest.unstable_mockModule("docker-compose", () => ({
+  version: versionMock,
+}));
+
+// Create manual installer adapter mock
+const manualInstallerAdapterMock = {
+  install: jest.fn<(version: string) => Promise<void>>(),
+};
+
+// Dynamic import after mock setup
+const { DockerComposeInstallerService } = await import("./docker-compose-installer.service.js");
 
 describe("DockerComposeInstallerService", () => {
   let mockAgent: MockAgent;
-  let versionMock: jest.SpiedFunction<typeof dockerCompose.version>;
-  let manualInstallerAdapterMock: jest.Mocked<ManualInstallerAdapter>;
-  let service: DockerComposeInstallerService;
+  let service: InstanceType<typeof DockerComposeInstallerService>;
 
   beforeEach(() => {
+    jest.clearAllMocks();
     mockAgent = new MockAgent();
     mockAgent.disableNetConnect();
 
-    versionMock = jest.spyOn(dockerCompose, "version").mockImplementation();
-
-    manualInstallerAdapterMock = {
-      install: jest.fn(),
-    } as unknown as jest.Mocked<ManualInstallerAdapter>;
-
-    service = new DockerComposeInstallerService(manualInstallerAdapterMock);
+    service = new DockerComposeInstallerService(manualInstallerAdapterMock as never);
   });
 
   afterEach(() => {
@@ -29,6 +34,29 @@ describe("DockerComposeInstallerService", () => {
   });
 
   describe("install", () => {
+    it("should return current version when no version is provided", async () => {
+      // Arrange
+      versionMock.mockResolvedValue({
+        exitCode: 0,
+        out: "",
+        err: "",
+        data: {
+          version: "2.0.0",
+        },
+      });
+
+      // Act
+      const result = await service.install({
+        composeVersion: null,
+        cwd: "/path/to/cwd",
+        githubToken: null,
+      });
+
+      // Assert
+      expect(result).toBe("2.0.0");
+      expect(manualInstallerAdapterMock.install).not.toHaveBeenCalled();
+    });
+
     it("should not install anything when expected version is already installed", async () => {
       // Arrange
       versionMock.mockResolvedValue({

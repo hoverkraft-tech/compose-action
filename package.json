@@ -6,6 +6,7 @@
   "license": "MIT",
   "homepage": "https://github.com/hoverkraft-tech/compose-action",
   "private": true,
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hoverkraft-tech/compose-action.git"
@@ -24,9 +25,9 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@actions/core": "^2.0.2",
-    "@actions/github": "^7.0.0",
-    "@actions/tool-cache": "^3.0.0",
+    "@actions/core": "^3.0.0",
+    "@actions/github": "^9.0.0",
+    "@actions/tool-cache": "^4.0.0",
     "@octokit/action": "^8.0.4",
     "docker-compose": "^1.3.0"
   },
@@ -46,18 +47,20 @@
     "all": "npm run format && npm run lint:ci && npm run test:ci && npm run package",
     "build": "tsc --noEmit",
     "format": "prettier --cache --write .",
-    "jest": "jest --detectOpenHandles --forceExit",
-    "test": "npm run jest -- --maxWorkers=50%",
-    "test:watch": "npm run jest --watch -- --maxWorkers=25%",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --forceExit --maxWorkers=50%",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --maxWorkers=25%",
     "test:cov": "npm run test -- --coverage",
-    "test:ci": "npm run jest -- --coverage --runInBand",
+    "test:ci": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --runInBand --detectOpenHandles --forceExit",
     "prepare": "ts-dev-tools install"
   },
   "jest": {
-    "preset": "ts-jest",
+    "preset": "ts-jest/presets/default-esm",
     "verbose": true,
     "clearMocks": true,
     "testEnvironment": "node",
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
     "moduleFileExtensions": [
       "js",
       "ts"
@@ -71,9 +74,19 @@
       "/node_modules/",
       "/dist/"
     ],
-    "transform": {
-      "^.+\\.ts$": "ts-jest"
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
     },
+    "transform": {
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          "useESM": true,
+          "tsconfig": "tsconfig.json"
+        }
+      ]
+    },
+    "injectGlobals": true,
     "coverageReporters": [
       "json-summary",
       "text",

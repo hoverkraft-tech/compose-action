@@ -1,20 +1,35 @@
-import * as core from "@actions/core";
-import fs from "fs";
-import { InputService, InputNames } from "./input.service";
-import { LogLevel } from "./logger.service";
+import { jest, describe, it, expect, beforeEach } from "@jest/globals";
+
+// Mock @actions/core before importing the module under test
+const getInputMock = jest.fn<(name: string, options?: { required?: boolean }) => string>();
+const getMultilineInputMock =
+  jest.fn<(name: string, options?: { required?: boolean }) => string[]>();
+
+jest.unstable_mockModule("@actions/core", () => ({
+  getInput: getInputMock,
+  getMultilineInput: getMultilineInputMock,
+  debug: jest.fn(),
+  info: jest.fn(),
+  warning: jest.fn(),
+}));
+
+// Mock node:fs
+const existsSyncMock = jest.fn<(path: string) => boolean>();
+
+jest.unstable_mockModule("node:fs", () => ({
+  existsSync: existsSyncMock,
+  default: { existsSync: existsSyncMock },
+}));
+
+// Dynamic imports after mock setup
+const { InputService, InputNames } = await import("./input.service.js");
+const { LogLevel } = await import("./logger.service.js");
 
 describe("InputService", () => {
-  let service: InputService;
-  let getInputMock: jest.SpiedFunction<typeof core.getInput>;
-  let getMultilineInputMock: jest.SpiedFunction<typeof core.getMultilineInput>;
-  let existsSyncMock: jest.SpiedFunction<typeof fs.existsSync>;
+  let service: InstanceType<typeof InputService>;
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    existsSyncMock = jest.spyOn(fs, "existsSync").mockImplementation();
-    getInputMock = jest.spyOn(core, "getInput").mockImplementation();
-    getMultilineInputMock = jest.spyOn(core, "getMultilineInput").mockImplementation();
 
     getMultilineInputMock.mockImplementation((inputName) => {
       switch (inputName) {
@@ -25,11 +40,9 @@ describe("InputService", () => {
       }
     });
 
-    service = new InputService();
-  });
+    getInputMock.mockReturnValue("");
 
-  afterEach(() => {
-    jest.clearAllMocks();
+    service = new InputService();
   });
 
   describe("getInputs", () => {
@@ -80,6 +93,50 @@ describe("InputService", () => {
         const inputs = service.getInputs();
 
         expect(inputs.composeFiles).toEqual(["file1", "file2"]);
+      });
+
+      it("should ignore empty compose file entries", () => {
+        getMultilineInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.ComposeFile:
+              return ["  ", "file1"];
+            default:
+              return [];
+          }
+        });
+
+        getInputMock.mockReturnValue("");
+        existsSyncMock.mockReturnValue(true);
+
+        const inputs = service.getInputs();
+
+        expect(inputs.composeFiles).toEqual(["file1"]);
+      });
+
+      it("should accept compose file when it exists at the original path", () => {
+        getMultilineInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.ComposeFile:
+              return ["./compose.yml"];
+            default:
+              return [];
+          }
+        });
+
+        getInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.Cwd:
+              return "/current/working/directory";
+            default:
+              return "";
+          }
+        });
+
+        existsSyncMock.mockImplementation((file) => file === "./compose.yml");
+
+        const inputs = service.getInputs();
+
+        expect(inputs.composeFiles).toEqual(["./compose.yml"]);
       });
 
       it("should throws an error when a compose file does not exist", () => {
