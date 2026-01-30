@@ -7,7 +7,7 @@ import {
   upAll,
   upMany,
 } from "docker-compose";
-import { Inputs } from "./input.service";
+import { Inputs } from "./input.service.js";
 
 type OptionsInputs = {
   dockerFlags: Inputs["dockerFlags"];

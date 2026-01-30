@@ -1,9 +1,9 @@
 import { setFailed } from "@actions/core";
-import { InputService } from "./services/input.service";
-import { LoggerService } from "./services/logger.service";
-import { DockerComposeService } from "./services/docker-compose.service";
-import { DockerComposeInstallerService } from "./services/docker-compose-installer.service";
-import { ManualInstallerAdapter } from "./services/installer-adapter/manual-installer-adapter";
+import { InputService } from "./services/input.service.js";
+import { LoggerService } from "./services/logger.service.js";
+import { DockerComposeService } from "./services/docker-compose.service.js";
+import { DockerComposeInstallerService } from "./services/docker-compose-installer.service.js";
+import { ManualInstallerAdapter } from "./services/installer-adapter/manual-installer-adapter.js";
 
 /**
  * The run function for the action.

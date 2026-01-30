@@ -1,8 +1,8 @@
 import { exec } from "@actions/exec";
 import { mkdirP } from "@actions/io";
-import { basename } from "path";
+import { basename } from "node:path";
 import { cacheFile, downloadTool } from "@actions/tool-cache";
-import { DockerComposeInstallerAdapter } from "./docker-compose-installer-adapter";
+import { DockerComposeInstallerAdapter } from "./docker-compose-installer-adapter.js";
 
 export class ManualInstallerAdapter implements DockerComposeInstallerAdapter {
   async install(version: string): Promise<void> {

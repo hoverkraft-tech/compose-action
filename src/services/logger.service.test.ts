@@ -1,46 +1,51 @@
-import { LoggerService, LogLevel } from "./logger.service";
-import { debug, info, warning } from "@actions/core";
+import { jest, describe, it, expect, beforeEach } from "@jest/globals";
 
-jest.mock("@actions/core", () => ({
-  warning: jest.fn(),
-  info: jest.fn(),
-  debug: jest.fn(),
+// Import types directly from the module
+import type { LogLevel as LogLevelType } from "./logger.service.js";
+
+// Mock @actions/core before importing the module under test
+const warningMock = jest.fn();
+const infoMock = jest.fn();
+const debugMock = jest.fn();
+
+jest.unstable_mockModule("@actions/core", () => ({
+  warning: warningMock,
+  info: infoMock,
+  debug: debugMock,
 }));
 
+// Dynamic import after mock setup
+const { LoggerService, LogLevel } = await import("./logger.service.js");
+
 describe("LoggerService", () => {
-  let loggerService: LoggerService;
+  let loggerService: InstanceType<typeof LoggerService>;
 
   beforeEach(() => {
-    loggerService = new LoggerService();
-  });
-
-  afterEach(() => {
     jest.clearAllMocks();
+    loggerService = new LoggerService();
   });
 
   describe("warn", () => {
     it("should call warning with the correct message", () => {
       const message = "This is a warning message";
       loggerService.warn(message);
-      expect(warning).toHaveBeenCalledWith(message);
+      expect(warningMock).toHaveBeenCalledWith(message);
     });
   });
 
   describe("info", () => {
     it("should call info with the correct message", () => {
       const message = "This is an info message";
-
       loggerService.info(message);
-      expect(info).toHaveBeenCalledWith(message);
+      expect(infoMock).toHaveBeenCalledWith(message);
     });
   });
 
   describe("debug", () => {
     it("should call debug with the correct message", () => {
       const message = "This is a debug message";
-
       loggerService.debug(message);
-      expect(debug).toHaveBeenCalledWith(message);
+      expect(debugMock).toHaveBeenCalledWith(message);
     });
   });
 
@@ -56,7 +61,7 @@ describe("LoggerService", () => {
     });
 
     it("should default to info level if an unknown level is provided", () => {
-      const logger = loggerService.getServiceLogger("unknown" as LogLevel);
+      const logger = loggerService.getServiceLogger("unknown" as LogLevelType);
       expect(logger).toBe(loggerService.info);
     });
   });
