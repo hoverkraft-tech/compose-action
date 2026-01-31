@@ -931,6 +931,7 @@ const mapImListOutput = (output, options) => {
                 container: serviceLine.ContainerName,
                 repository: serviceLine.Repository,
                 tag: serviceLine.Tag,
+                platform: serviceLine.Platform || '',
                 id: idFragment
             };
         });
@@ -943,6 +944,7 @@ const mapImListOutput = (output, options) => {
         .map((line) => {
         // the line has the columns in the following order:
         // CONTAINER   REPOSITORY   TAG   IMAGE ID   SIZE
+        // Note: newer docker compose versions may include PLATFORM column
         const lineColumns = line.split(/\s{3,}/);
         const containerFragment = lineColumns[0] || line;
         const repositoryFragment = lineColumns[1] || '';
@@ -952,6 +954,7 @@ const mapImListOutput = (output, options) => {
             container: containerFragment.trim(),
             repository: repositoryFragment.trim(),
             tag: tagFragment.trim(),
+            platform: '',
             id: idFragment.trim()
         };
     });
@@ -1238,8 +1241,13 @@ const ps = async function (options) {
 exports.ps = ps;
 const images = async function (options) {
     try {
-        const result = await (0, exports.execCompose)('images', [], options);
-        const data = (0, exports.mapImListOutput)(result.out, options);
+        // Always use JSON format for robust parsing across docker compose versions
+        const jsonOptions = {
+            ...options,
+            commandOptions: [...(options?.commandOptions || []), ['--format', 'json']]
+        };
+        const result = await (0, exports.execCompose)('images', [], jsonOptions);
+        const data = (0, exports.mapImListOutput)(result.out, jsonOptions);
         return {
             ...result,
             data
