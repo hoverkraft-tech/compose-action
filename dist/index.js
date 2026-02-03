@@ -47949,8 +47949,13 @@ class DockerComposeInstallerService {
         this.manualInstallerAdapter = manualInstallerAdapter;
     }
     async install({ composeVersion, cwd, githubToken }) {
-        const currentVersion = await this.getInstalledVersion(cwd);
-        const needsInstall = !currentVersion || (composeVersion && composeVersion !== currentVersion);
+        const currentVersion = await this.version({ cwd });
+        const normalizedCurrentVersion = currentVersion ? this.normalizeVersion(currentVersion) : null;
+        const normalizedRequestedVersion = composeVersion
+            ? this.normalizeVersion(composeVersion)
+            : null;
+        const needsInstall = !currentVersion ||
+            (composeVersion && normalizedRequestedVersion !== normalizedCurrentVersion);
         if (!needsInstall) {
             return currentVersion;
         }
@@ -47962,21 +47967,24 @@ class DockerComposeInstallerService {
             targetVersion = await this.getLatestVersion(githubToken);
         }
         await this.installVersion(targetVersion);
-        return this.version({ cwd });
-    }
-    async getInstalledVersion(cwd) {
-        try {
-            return await this.version({ cwd });
+        const installedVersion = await this.version({ cwd });
+        if (!installedVersion ||
+            this.normalizeVersion(installedVersion) !== this.normalizeVersion(targetVersion)) {
+            throw new Error(`Failed to install Docker Compose version "${targetVersion}", installed version is "${installedVersion ?? "unknown"}"`);
         }
-        catch {
-            return null;
-        }
+        return installedVersion;
     }
     async version({ cwd }) {
-        const result = await (0,dist.version)({
-            cwd,
-        });
-        return result.data.version;
+        try {
+            const result = await (0,dist.version)({
+                cwd,
+            });
+            return result.data.version;
+        }
+        catch {
+            // If version check fails (e.g., Docker Compose not installed), return null
+            return null;
+        }
     }
     async getLatestVersion(githubToken) {
         const octokit = getOctokit(githubToken);
@@ -47985,6 +47993,9 @@ class DockerComposeInstallerService {
             repo: "compose",
         });
         return response.data.tag_name;
+    }
+    normalizeVersion(version) {
+        return version.replace(/^v/i, "");
     }
     async installVersion(version) {
         switch (process.platform) {
