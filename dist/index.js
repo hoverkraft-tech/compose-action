@@ -47951,6 +47951,10 @@ class DockerComposeInstallerService {
     async install({ composeVersion, cwd, githubToken }) {
         const currentVersion = await this.version({ cwd });
         if (!composeVersion) {
+            // If no version is specified and Docker Compose is not installed, throw an error
+            if (!currentVersion) {
+                throw new Error("Docker Compose is not installed and no compose-version was specified. Please specify a compose-version to install.");
+            }
             return currentVersion;
         }
         if (currentVersion === composeVersion) {
@@ -47963,13 +47967,23 @@ class DockerComposeInstallerService {
             composeVersion = await this.getLatestVersion(githubToken);
         }
         await this.installVersion(composeVersion);
-        return this.version({ cwd });
+        const installedVersion = await this.version({ cwd });
+        if (!installedVersion) {
+            throw new Error("Failed to verify Docker Compose installation");
+        }
+        return installedVersion;
     }
     async version({ cwd }) {
-        const result = await (0,dist.version)({
-            cwd,
-        });
-        return result.data.version;
+        try {
+            const result = await (0,dist.version)({
+                cwd,
+            });
+            return result.data.version;
+        }
+        catch {
+            // If version check fails (e.g., Docker Compose not installed), return null
+            return null;
+        }
     }
     async getLatestVersion(githubToken) {
         const octokit = getOctokit(githubToken);

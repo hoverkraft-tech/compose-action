@@ -57,6 +57,107 @@ describe("DockerComposeInstallerService", () => {
       expect(manualInstallerAdapterMock.install).not.toHaveBeenCalled();
     });
 
+    it("should throw an error when Docker Compose is not installed and no version is provided", async () => {
+      // Arrange
+      versionMock.mockRejectedValue(new Error("Docker Compose not found"));
+
+      // Act & Assert
+      await expect(
+        service.install({
+          composeVersion: null,
+          cwd: "/path/to/cwd",
+          githubToken: null,
+        })
+      ).rejects.toThrow(
+        "Docker Compose is not installed and no compose-version was specified. Please specify a compose-version to install."
+      );
+
+      expect(manualInstallerAdapterMock.install).not.toHaveBeenCalled();
+    });
+
+    it("should install Docker Compose when it is not installed and a version is specified", async () => {
+      // Arrange
+      versionMock.mockRejectedValueOnce(new Error("Docker Compose not found"));
+
+      const expectedVersion = "v2.20.0";
+      versionMock.mockResolvedValueOnce({
+        exitCode: 0,
+        out: "",
+        err: "",
+        data: {
+          version: expectedVersion,
+        },
+      });
+
+      Object.defineProperty(process, "platform", {
+        value: "linux",
+      });
+
+      // Act
+      const result = await service.install({
+        composeVersion: expectedVersion,
+        cwd: "/path/to/cwd",
+        githubToken: null,
+      });
+
+      // Assert
+      expect(result).toBe(expectedVersion);
+      expect(manualInstallerAdapterMock.install).toHaveBeenCalledWith(expectedVersion);
+    });
+
+    it("should install Docker Compose when it is not installed and latest version is requested", async () => {
+      // Arrange
+      versionMock.mockRejectedValueOnce(new Error("Docker Compose not found"));
+
+      const latestVersion = "v2.30.0";
+
+      const mockClient = mockAgent.get("https://api.github.com");
+      mockClient
+        .intercept({
+          path: "/repos/docker/compose/releases/latest",
+          method: "GET",
+        })
+        .reply(
+          200,
+          {
+            tag_name: latestVersion,
+          },
+          {
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+      setGlobalDispatcher(mockClient);
+
+      versionMock.mockResolvedValueOnce({
+        exitCode: 0,
+        out: "",
+        err: "",
+        data: {
+          version: latestVersion,
+        },
+      });
+
+      Object.defineProperty(process, "platform", {
+        value: "linux",
+      });
+      Object.defineProperty(globalThis, "fetch", {
+        value: jest.fn(),
+      });
+
+      // Act
+      const result = await service.install({
+        composeVersion: "latest",
+        cwd: "/path/to/cwd",
+        githubToken: "token",
+      });
+
+      // Assert
+      expect(result).toBe(latestVersion);
+      expect(manualInstallerAdapterMock.install).toHaveBeenCalledWith(latestVersion);
+    });
+
     it("should not install anything when expected version is already installed", async () => {
       // Arrange
       versionMock.mockResolvedValue({
