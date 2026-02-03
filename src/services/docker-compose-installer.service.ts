@@ -17,9 +17,16 @@ export class DockerComposeInstallerService {
   constructor(private readonly manualInstallerAdapter: ManualInstallerAdapter) {}
 
   async install({ composeVersion, cwd, githubToken }: InstallInputs): Promise<string> {
-    const currentVersion = await this.getInstalledVersion(cwd);
+    const currentVersion = await this.version({ cwd });
 
-    const needsInstall = !currentVersion || (composeVersion && composeVersion !== currentVersion);
+    const normalizedCurrentVersion = currentVersion ? this.normalizeVersion(currentVersion) : null;
+    const normalizedRequestedVersion = composeVersion
+      ? this.normalizeVersion(composeVersion)
+      : null;
+
+    const needsInstall =
+      !currentVersion ||
+      (composeVersion && normalizedRequestedVersion !== normalizedCurrentVersion);
     if (!needsInstall) {
       return currentVersion;
     }
@@ -35,22 +42,30 @@ export class DockerComposeInstallerService {
 
     await this.installVersion(targetVersion);
 
-    return this.version({ cwd });
+    const installedVersion = await this.version({ cwd });
+
+    if (
+      !installedVersion ||
+      this.normalizeVersion(installedVersion) !== this.normalizeVersion(targetVersion)
+    ) {
+      throw new Error(
+        `Failed to install Docker Compose version "${targetVersion}", installed version is "${installedVersion ?? "unknown"}"`
+      );
+    }
+
+    return installedVersion;
   }
 
-  private async getInstalledVersion(cwd: string): Promise<string | null> {
+  private async version({ cwd }: VersionInputs): Promise<string | null> {
     try {
-      return await this.version({ cwd });
+      const result = await version({
+        cwd,
+      });
+      return result.data.version;
     } catch {
+      // If version check fails (e.g., Docker Compose not installed), return null
       return null;
     }
-  }
-
-  private async version({ cwd }: VersionInputs): Promise<string> {
-    const result = await version({
-      cwd,
-    });
-    return result.data.version;
   }
 
   private async getLatestVersion(githubToken: string): Promise<string> {
@@ -62,6 +77,10 @@ export class DockerComposeInstallerService {
     });
 
     return response.data.tag_name;
+  }
+
+  private normalizeVersion(version: string): string {
+    return version.replace(/^v/i, "");
   }
 
   private async installVersion(version: string): Promise<void> {
