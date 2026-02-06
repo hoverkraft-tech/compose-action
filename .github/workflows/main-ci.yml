@@ -62,7 +62,7 @@ jobs:
           app-id: ${{ vars.CI_BOT_APP_ID }}
           private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
 
-      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@b17226e57c8ef31f860719766656ebb6df017218 # 0.31.6
+      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@f24ce3360a8abf9bf386a62ab13d0ae5de5f9d13 # 0.31.7
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update
