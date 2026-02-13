@@ -47,11 +47,17 @@ updates:
       day: friday
       time: "04:00"
     groups:
-      npm-dev-dependencies:
-        dependency-type: development
       npm-actions-dependencies:
         patterns:
           - "@actions/*"
+      npm-development-dependencies:
+        dependency-type: development
+        patterns:
+          - "*"
+      npm-production-dependencies:
+        dependency-type: production
+        patterns:
+          - "*"
 
   - package-ecosystem: "devcontainers"
     open-pull-requests-limit: 20
