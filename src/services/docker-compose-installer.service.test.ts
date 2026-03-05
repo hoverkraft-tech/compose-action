@@ -80,6 +80,23 @@ describe("DockerComposeInstallerService", () => {
   });
 
   describe("install", () => {
+    it("should install latest when compose version is not specified and Compose is missing", async () => {
+      // Arrange: first call to version() fails (Compose missing)
+      versionMock.mockRejectedValueOnce(new Error("version not installed"));
+
+      const latestVersion = "v2.0.0";
+      mockLatestRelease(latestVersion);
+      versionMock.mockResolvedValueOnce(composeVersionResponse(latestVersion));
+      setPlatform("linux");
+
+      // Act
+      const result = await installCompose(null, "token");
+
+      // Assert
+      expect(result).toBe(latestVersion);
+      expect(manualInstallerAdapterMock.install).toHaveBeenCalledWith(latestVersion);
+    });
+
     it("should return current version when no version is provided", async () => {
       // Arrange
       versionMock.mockResolvedValue(composeVersionResponse("2.0.0"));
@@ -233,6 +250,21 @@ describe("DockerComposeInstallerService", () => {
       // Act & Assert
       await expect(installCompose(targetVersion, "token")).rejects.toThrow(
         `Failed to install Docker Compose version "${targetVersion}", installed version is "1.3.0"`
+      );
+      expect(manualInstallerAdapterMock.install).toHaveBeenCalledWith(targetVersion);
+    });
+
+    it("should throw with unknown installed version when post-install version check fails", async () => {
+      // Arrange
+      versionMock.mockResolvedValueOnce(composeVersionResponse("1.2.3"));
+
+      const targetVersion = "v1.4.0";
+      versionMock.mockRejectedValueOnce(new Error("version check failed after install"));
+      setPlatform("linux");
+
+      // Act & Assert
+      await expect(installCompose(targetVersion, "token")).rejects.toThrow(
+        `Failed to install Docker Compose version "${targetVersion}", installed version is "unknown"`
       );
       expect(manualInstallerAdapterMock.install).toHaveBeenCalledWith(targetVersion);
     });

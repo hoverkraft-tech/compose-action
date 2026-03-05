@@ -1,5 +1,6 @@
 import { jest, describe, it, expect, beforeEach } from "@jest/globals";
 import type { ExecOptions } from "@actions/exec";
+import type { OutgoingHttpHeaders } from "node:http";
 
 // Mock @actions/exec
 const execMock =
@@ -17,8 +18,20 @@ jest.unstable_mockModule("@actions/io", () => ({
 }));
 
 // Mock @actions/tool-cache
-const cacheFileMock = jest.fn<() => Promise<string>>();
-const downloadToolMock = jest.fn<() => Promise<string>>();
+const cacheFileMock =
+  jest.fn<
+    (
+      sourceFile: string,
+      targetFile: string,
+      tool: string,
+      version: string,
+      arch?: string
+    ) => Promise<string>
+  >();
+const downloadToolMock =
+  jest.fn<
+    (url: string, dest?: string, auth?: string, headers?: OutgoingHttpHeaders) => Promise<string>
+  >();
 
 jest.unstable_mockModule("@actions/tool-cache", () => ({
   cacheFile: cacheFileMock,

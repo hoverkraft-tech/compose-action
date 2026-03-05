@@ -1,5 +1,9 @@
 import { jest, describe, it, expect, beforeEach } from "@jest/globals";
-import type { IDockerComposeOptions, IDockerComposeResult } from "docker-compose";
+import type {
+  IDockerComposeLogOptions,
+  IDockerComposeOptions,
+  IDockerComposeResult,
+} from "docker-compose";
 
 // Mock docker-compose before importing the module under test
 const upAllMock = jest.fn<(options: IDockerComposeOptions) => Promise<IDockerComposeResult>>();
@@ -7,7 +11,9 @@ const upManyMock =
   jest.fn<(services: string[], options: IDockerComposeOptions) => Promise<IDockerComposeResult>>();
 const downMock = jest.fn<(options: IDockerComposeOptions) => Promise<IDockerComposeResult>>();
 const logsMock =
-  jest.fn<(services: string[], options: IDockerComposeOptions) => Promise<IDockerComposeResult>>();
+  jest.fn<
+    (services: string[], options: IDockerComposeLogOptions) => Promise<IDockerComposeResult>
+  >();
 
 jest.unstable_mockModule("docker-compose", () => ({
   upAll: upAllMock,
