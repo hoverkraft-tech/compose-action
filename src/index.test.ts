@@ -24,17 +24,24 @@ jest.unstable_mockModule("docker-compose", () => ({
 }));
 
 // Mock node:fs
-jest.unstable_mockModule("node:fs", () => ({
-  existsSync: jest.fn().mockReturnValue(true),
-  default: { existsSync: jest.fn().mockReturnValue(true) },
-}));
+jest.unstable_mockModule("node:fs", async () => {
+  const actualFs = await jest.requireActual<typeof import("node:fs")>("node:fs");
+
+  return {
+    ...actualFs,
+    existsSync: jest.fn().mockReturnValue(true),
+    default: {
+      ...actualFs,
+      existsSync: jest.fn().mockReturnValue(true),
+    },
+  };
+});
 
 // Dynamic imports after mock setup
 const { InputService } = await import("./services/input.service.js");
 const { LoggerService, LogLevel } = await import("./services/logger.service.js");
-const { DockerComposeInstallerService } = await import(
-  "./services/docker-compose-installer.service.js"
-);
+const { DockerComposeInstallerService } =
+  await import("./services/docker-compose-installer.service.js");
 const { DockerComposeService } = await import("./services/docker-compose.service.js");
 
 let getInputsMock: jest.SpiedFunction<typeof InputService.prototype.getInputs>;
