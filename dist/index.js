@@ -1009,8 +1009,8 @@ const execCompose = (command, args, options = {}) => new Promise((resolve, rejec
     const executable = options.executable;
     let executablePath;
     let executableArgs = [];
-    if (executable?.standalone && !executable.executablePath) {
-        executablePath = 'docker-compose';
+    if (executable?.standalone) {
+        executablePath = executable.executablePath || 'docker-compose';
     }
     else {
         executablePath = executable?.executablePath || 'docker';
