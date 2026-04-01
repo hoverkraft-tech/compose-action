@@ -996,6 +996,9 @@ const composeOptionsToArgs = (composeOptions) => {
  * Executes docker compose command with common options
  */
 const execCompose = (command, args, options = {}) => new Promise((resolve, reject) => {
+    if (options.compose) {
+        options.configAsString = yaml_1.default.stringify(options.compose);
+    }
     const composeOptions = options.composeOptions || [];
     const commandOptions = options.commandOptions || [];
     let composeArgs = composeOptionsToArgs(composeOptions);
