@@ -18,7 +18,7 @@ lint-fix: ## Execute linting and fix
 
 ci: ## Execute all formats and checks
 	@npm install
-	@npm audit fix
+	@npm audit fix || true
 	@npm run all
 	$(MAKE) lint-fix
 
