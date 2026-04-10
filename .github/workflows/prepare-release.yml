@@ -15,12 +15,8 @@ permissions: {}
 
 jobs:
   release:
-    uses: hoverkraft-tech/ci-github-publish/.github/workflows/prepare-release.yml@5ff7d4c3910971ed53834becd5967271b4e228cf # 0.21.1
+    uses: hoverkraft-tech/ci-github-publish/.github/workflows/prepare-release.yml@b56be562f38e0e3e712f09691a8fe930aae9db1b # 0.22.0
     permissions:
-      contents: write
+      contents: read
       id-token: write
       pull-requests: write
-    with:
-      github-app-id: ${{ vars.CI_BOT_APP_ID }}
-    secrets:
-      github-app-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
