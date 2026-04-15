@@ -54,7 +54,7 @@ Some extra options can be passed to the `docker compose down` command using the 
     # Additional options to pass to `docker` command.
     docker-flags: ""
 
-    # Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd).
+    # Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd), or an OCI artifact reference starting with `oci://`.
     # Default: `./docker-compose.yml`
     compose-file: ./docker-compose.yml
 
@@ -96,21 +96,21 @@ Some extra options can be passed to the `docker compose down` command using the 
 
 ## Inputs
 
-| **Input**                | **Description**                                                                                                            | **Required** | **Default**               |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------- |
-| **`docker-flags`**       | Additional options to pass to `docker` command.                                                                            | **false**    | -                         |
-| **`compose-file`**       | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd). | **false**    | `./docker-compose.yml`    |
-| **`services`**           | Services to perform `docker compose up`.                                                                                   | **false**    | -                         |
-| **`up-flags`**           | Additional options to pass to `docker compose up` command.                                                                 | **false**    | -                         |
-| **`down-flags`**         | Additional options to pass to `docker compose down` command.                                                               | **false**    | -                         |
-| **`compose-flags`**      | Additional options to pass to `docker compose` command.                                                                    | **false**    | -                         |
-| **`cwd`**                | Current working directory                                                                                                  | **false**    | `${{ github.workspace }}` |
-| **`compose-version`**    | Compose version to use.                                                                                                    | **false**    | -                         |
-|                          | If null (default), it will use the current installed version.                                                              |              |                           |
-|                          | If "latest", it will install the latest version.                                                                           |              |                           |
-| **`services-log-level`** | The log level used for Docker Compose service logs.                                                                        | **false**    | `debug`                   |
-|                          | Can be one of "debug", "info".                                                                                             |              |                           |
-| **`github-token`**       | The GitHub token used to create an authenticated client (to fetch the latest version of Docker Compose).                   | **false**    | `${{ github.token }}`     |
+| **Input**                | **Description**                                                                                                                                                                 | **Required** | **Default**               |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------- |
+| **`docker-flags`**       | Additional options to pass to `docker` command.                                                                                                                                 | **false**    | -                         |
+| **`compose-file`**       | Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd), or an OCI artifact reference starting with `oci://`. | **false**    | `./docker-compose.yml`    |
+| **`services`**           | Services to perform `docker compose up`.                                                                                                                                        | **false**    | -                         |
+| **`up-flags`**           | Additional options to pass to `docker compose up` command.                                                                                                                      | **false**    | -                         |
+| **`down-flags`**         | Additional options to pass to `docker compose down` command.                                                                                                                    | **false**    | -                         |
+| **`compose-flags`**      | Additional options to pass to `docker compose` command.                                                                                                                         | **false**    | -                         |
+| **`cwd`**                | Current working directory                                                                                                                                                       | **false**    | `${{ github.workspace }}` |
+| **`compose-version`**    | Compose version to use.                                                                                                                                                         | **false**    | -                         |
+|                          | If null (default), it will use the current installed version.                                                                                                                   |              |                           |
+|                          | If "latest", it will install the latest version.                                                                                                                                |              |                           |
+| **`services-log-level`** | The log level used for Docker Compose service logs.                                                                                                                             | **false**    | `debug`                   |
+|                          | Can be one of "debug", "info".                                                                                                                                                  |              |                           |
+| **`github-token`**       | The GitHub token used to create an authenticated client (to fetch the latest version of Docker Compose).                                                                        | **false**    | `${{ github.token }}`     |
 
 <!-- inputs:end -->
 

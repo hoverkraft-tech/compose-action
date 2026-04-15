@@ -139,6 +139,31 @@ describe("InputService", () => {
         expect(inputs.composeFiles).toEqual(["./compose.yml"]);
       });
 
+      it("should accept OCI compose files without checking the file system", () => {
+        getMultilineInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.ComposeFile:
+              return ["oci://docker.io/hoverkraft/compose-app:latest"];
+            default:
+              return [];
+          }
+        });
+
+        getInputMock.mockImplementation((inputName) => {
+          switch (inputName) {
+            case InputNames.Cwd:
+              return "/current/working/directory";
+            default:
+              return "";
+          }
+        });
+
+        const inputs = service.getInputs();
+
+        expect(inputs.composeFiles).toEqual(["oci://docker.io/hoverkraft/compose-app:latest"]);
+        expect(existsSyncMock).not.toHaveBeenCalled();
+      });
+
       it("should throws an error when a compose file does not exist", () => {
         getMultilineInputMock.mockImplementation((inputName) => {
           switch (inputName) {

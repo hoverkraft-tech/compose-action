@@ -54,8 +54,14 @@ export class InputService {
   private getComposeFiles(): string[] {
     const cwd = this.getCwd();
     const composeFiles = getMultilineInput(InputNames.ComposeFile).filter((composeFile: string) => {
-      if (!composeFile.trim().length) {
+      const trimmedComposeFile = composeFile.trim();
+
+      if (!trimmedComposeFile.length) {
         return false;
+      }
+
+      if (trimmedComposeFile.startsWith("oci://")) {
+        return true;
       }
 
       const possiblePaths = [join(cwd, composeFile), composeFile];

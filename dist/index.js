@@ -43808,8 +43808,12 @@ class InputService {
     getComposeFiles() {
         const cwd = this.getCwd();
         const composeFiles = getMultilineInput(InputNames.ComposeFile).filter((composeFile) => {
-            if (!composeFile.trim().length) {
+            const trimmedComposeFile = composeFile.trim();
+            if (!trimmedComposeFile.length) {
                 return false;
+            }
+            if (trimmedComposeFile.startsWith("oci://")) {
+                return true;
             }
             const possiblePaths = [(0,external_node_path_namespaceObject.join)(cwd, composeFile), composeFile];
             for (const path of possiblePaths) {
