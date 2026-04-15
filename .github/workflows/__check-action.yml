@@ -170,6 +170,14 @@ jobs:
               docker compose -f ./test/docker-compose.yml ps | grep test-service-a-1 || (echo "Service service-a is not running under custom context" && exit 1)
               (docker compose -f ./test/docker-compose.yml ps | grep test-service-b-1 && echo "Service service-b should not be running without profile" && exit 1) || true
 
+          - name: Given OCI compose artifact when running action
+            assertion-name: "Then the OCI compose application runs"
+            compose-file: oci://localhost:5000/compose-action-test:latest
+            publish-oci-artifact: true
+            source-compose-file: ./test/docker-compose.yml
+            assertion: |
+              docker compose -f "$OCI_COMPOSE_FILE" ps service-a | grep service-a | grep "Up" || (echo "Service service-a is not running from the OCI artifact" && exit 1)
+
     env:
       DOCKER_COMPOSE_VERSION: ${{ matrix.expected-compose-version || '' }}
     steps:
@@ -199,6 +207,39 @@ jobs:
               })).data.tag_name.replace("v", "");
 
             core.exportVariable('DOCKER_COMPOSE_VERSION', dockerComposeVersion);
+
+      - name: "Arrange: start local OCI registry"
+        if: ${{ matrix.publish-oci-artifact }}
+        # Keep the registry alive until the job ends because the action post hook
+        # reuses the OCI reference for docker compose logs and down.
+        run: |
+          OCI_REGISTRY_IMAGE=registry:2.8.3
+          OCI_REGISTRY_MAX_RETRIES=10
+          OCI_REGISTRY_RETRY_DELAY_SECONDS=1
+
+          # Keep the registry on port 5000 so it matches the OCI reference configured in the test matrix.
+          OCI_REGISTRY_CONTAINER_ID=$(docker run -d -p 5000:5000 "$OCI_REGISTRY_IMAGE")
+          echo "OCI_REGISTRY_CONTAINER_ID=$OCI_REGISTRY_CONTAINER_ID" >> "$GITHUB_ENV"
+
+          retry_count=0
+          while [ "$retry_count" -lt "$OCI_REGISTRY_MAX_RETRIES" ]; do
+            if curl --fail --silent http://localhost:5000/v2/ >/dev/null; then
+              exit 0
+            fi
+
+            retry_count=$((retry_count + 1))
+            sleep "$OCI_REGISTRY_RETRY_DELAY_SECONDS"
+          done
+
+          echo "Local OCI registry did not become ready on localhost:5000"
+          exit 1
+
+      - name: "Arrange: publish compose application as OCI artifact"
+        if: ${{ matrix.publish-oci-artifact }}
+        run: |
+          OCI_REPOSITORY="${{ matrix.compose-file }}"
+          OCI_PUBLISH_TARGET="${OCI_REPOSITORY#oci://}"
+          docker compose -f "${{ matrix.source-compose-file }}" publish "$OCI_PUBLISH_TARGET"
 
       - name: "Arrange: ensure original docker compose version is not the expected one"
         if: ${{ matrix.ensure-version-mismatch }}
@@ -230,3 +271,4 @@ jobs:
         run: ${{ matrix.assertion }}
         env:
           IMAGE_NAME: ${{ matrix.image-name || '' }}
+          OCI_COMPOSE_FILE: ${{ matrix.compose-file || '' }}

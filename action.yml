@@ -25,7 +25,7 @@ inputs:
     description: "Additional options to pass to `docker` command."
     required: false
   compose-file:
-    description: "Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd)."
+    description: "Path to compose file(s). It can be a list of files. It can be absolute or relative to the current working directory (cwd), or an OCI artifact reference starting with `oci://`."
     required: false
     default: "./docker-compose.yml"
   services:
