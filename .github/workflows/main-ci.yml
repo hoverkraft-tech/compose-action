@@ -38,13 +38,13 @@ jobs:
     outputs:
       artifact-id: ${{ steps.upload-artifact.outputs.artifact-id }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
 
       - name: 📖 Generate documentation
         id: generate-documentation
-        uses: hoverkraft-tech/ci-dokumentor@c46a1a108957237cf485103a80b060c35c7dba33 # 0.2.2
+        uses: hoverkraft-tech/ci-dokumentor@3258ef0de948ec25e5939618d5ef510445aed869 # 0.3.1
         with:
           source: action.yml
           # yamllint disable rule:line-length
@@ -61,13 +61,13 @@ jobs:
               }
             ]
 
-      - uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: generate-token
         with:
-          app-id: ${{ vars.CI_BOT_APP_ID }}
+          client-id: ${{ vars.CI_BOT_APP_CLIENT_ID }}
           private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
 
-      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@4b53189212d5810f710bed89711002626977215b # 0.33.0
+      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@66578f5b9aec4ac5558b5dad750c4c74dfcb65c5 # 0.35.5
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update
@@ -79,7 +79,7 @@ jobs:
             [skip ci]
 
       - id: upload-artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: documentation-files-${{ github.run_id }}
           path: |
@@ -89,11 +89,11 @@ jobs:
   sync-docs:
     needs: prepare-docs
     if: needs.prepare-docs.outputs.artifact-id
-    uses: hoverkraft-tech/public-docs/.github/workflows/sync-docs-dispatcher.yml@c40c17f7d6a8090950b3ef4bfc70502707a6bb9f # 0.3.0
+    uses: hoverkraft-tech/public-docs/.github/workflows/sync-docs-dispatcher.yml@f3c9291760d927e6214e8d5f0a376af2d537c369 # 0.4.0
     permissions:
       contents: read
     with:
       artifact-id: ${{ needs.prepare-docs.outputs.artifact-id }}
-      github-app-id: ${{ vars.CI_BOT_APP_ID }}
+      github-app-client-id: ${{ vars.CI_BOT_APP_CLIENT_ID }}
     secrets:
       github-app-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
