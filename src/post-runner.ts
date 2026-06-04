@@ -8,39 +8,39 @@ import { DockerComposeService } from "./services/docker-compose.service.js";
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 export async function run(): Promise<void> {
-  try {
-    const loggerService = new LoggerService();
-    const inputService = new InputService();
-    const dockerComposeService = new DockerComposeService();
+	try {
+		const loggerService = new LoggerService();
+		const inputService = new InputService();
+		const dockerComposeService = new DockerComposeService();
 
-    const inputs = inputService.getInputs();
+		const inputs = inputService.getInputs();
 
-    const { error, output } = await dockerComposeService.logs({
-      dockerFlags: inputs.dockerFlags,
-      composeFiles: inputs.composeFiles,
-      composeFlags: inputs.composeFlags,
-      cwd: inputs.cwd,
-      services: inputs.services,
-      serviceLogger: loggerService.getServiceLogger(inputs.serviceLogLevel),
-    });
+		const { error, output } = await dockerComposeService.logs({
+			dockerFlags: inputs.dockerFlags,
+			composeFiles: inputs.composeFiles,
+			composeFlags: inputs.composeFlags,
+			cwd: inputs.cwd,
+			services: inputs.services,
+			serviceLogger: loggerService.getServiceLogger(inputs.serviceLogLevel),
+		});
 
-    if (error) {
-      loggerService.debug("docker compose error:\n" + error);
-    }
+		if (error) {
+			loggerService.debug("docker compose error:\n" + error);
+		}
 
-    loggerService.debug("docker compose logs:\n" + output);
+		loggerService.debug("docker compose logs:\n" + output);
 
-    await dockerComposeService.down({
-      dockerFlags: inputs.dockerFlags,
-      composeFiles: inputs.composeFiles,
-      composeFlags: inputs.composeFlags,
-      cwd: inputs.cwd,
-      downFlags: inputs.downFlags,
-      serviceLogger: loggerService.getServiceLogger(inputs.serviceLogLevel),
-    });
+		await dockerComposeService.down({
+			dockerFlags: inputs.dockerFlags,
+			composeFiles: inputs.composeFiles,
+			composeFlags: inputs.composeFlags,
+			cwd: inputs.cwd,
+			downFlags: inputs.downFlags,
+			serviceLogger: loggerService.getServiceLogger(inputs.serviceLogLevel),
+		});
 
-    loggerService.info("docker compose is down");
-  } catch (error) {
-    setFailed(`${error instanceof Error ? error : JSON.stringify(error)}`);
-  }
+		loggerService.info("docker compose is down");
+	} catch (error) {
+		setFailed(`${error instanceof Error ? error : JSON.stringify(error)}`);
+	}
 }

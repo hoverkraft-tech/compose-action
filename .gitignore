@@ -12,7 +12,6 @@ lerna-debug.log*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-eslint-report.json
 
 # Runtime data
 pids
@@ -53,9 +52,6 @@ typings/
 
 # Optional npm cache directory
 .npm
-
-# Optional eslint cache
-.eslintcache
 
 # Optional REPL history
 .node_repl_history
@@ -102,3 +98,6 @@ __tests__/runner/*
 .idea
 .vscode
 *.code-workspace
+lint.sarif
+biome-report.sarif
+junit.xml

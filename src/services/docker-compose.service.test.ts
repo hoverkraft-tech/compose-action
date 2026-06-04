@@ -1,340 +1,391 @@
-import { jest, describe, it, expect, beforeEach } from "@jest/globals";
+import { describe, expect, it, beforeEach, vi } from "vitest";
 import type {
-  IDockerComposeLogOptions,
-  IDockerComposeOptions,
-  IDockerComposeResult,
+	IDockerComposeLogOptions,
+	IDockerComposeOptions,
+	IDockerComposeResult,
 } from "docker-compose";
 
 // Mock docker-compose before importing the module under test
-const upAllMock = jest.fn<(options: IDockerComposeOptions) => Promise<IDockerComposeResult>>();
+const upAllMock =
+	vi.fn<(options: IDockerComposeOptions) => Promise<IDockerComposeResult>>();
 const upManyMock =
-  jest.fn<(services: string[], options: IDockerComposeOptions) => Promise<IDockerComposeResult>>();
-const downMock = jest.fn<(options: IDockerComposeOptions) => Promise<IDockerComposeResult>>();
+	vi.fn<
+		(
+			services: string[],
+			options: IDockerComposeOptions,
+		) => Promise<IDockerComposeResult>
+	>();
+const downMock =
+	vi.fn<(options: IDockerComposeOptions) => Promise<IDockerComposeResult>>();
 const logsMock =
-  jest.fn<
-    (services: string[], options: IDockerComposeLogOptions) => Promise<IDockerComposeResult>
-  >();
+	vi.fn<
+		(
+			services: string[],
+			options: IDockerComposeLogOptions,
+		) => Promise<IDockerComposeResult>
+	>();
 
-jest.unstable_mockModule("docker-compose", () => ({
-  upAll: upAllMock,
-  upMany: upManyMock,
-  down: downMock,
-  logs: logsMock,
+vi.doMock("docker-compose", () => ({
+	upAll: upAllMock,
+	upMany: upManyMock,
+	down: downMock,
+	logs: logsMock,
 }));
 
 // Dynamic import after mock setup
 const { DockerComposeService } = await import("./docker-compose.service.js");
 
 describe("DockerComposeService", () => {
-  let service: InstanceType<typeof DockerComposeService>;
+	let service: InstanceType<typeof DockerComposeService>;
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    service = new DockerComposeService();
-  });
+	beforeEach(() => {
+		vi.clearAllMocks();
+		service = new DockerComposeService();
+	});
 
-  describe("up", () => {
-    it("should call up with correct options", async () => {
-      const upInputs = {
-        dockerFlags: [] as string[],
-        composeFiles: ["docker-compose.yml"],
-        services: [] as string[],
-        composeFlags: [] as string[],
-        upFlags: [] as string[],
-        cwd: "/current/working/dir",
-        serviceLogger: jest.fn(),
-      };
+	describe("up", () => {
+		it("should call up with correct options", async () => {
+			const upInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: ["docker-compose.yml"],
+				services: [] as string[],
+				composeFlags: [] as string[],
+				upFlags: [] as string[],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      upAllMock.mockResolvedValue({ exitCode: 0, err: "", out: "" });
+			upAllMock.mockResolvedValue({ exitCode: 0, err: "", out: "" });
 
-      await service.up(upInputs);
+			await service.up(upInputs);
 
-      expect(upAllMock).toHaveBeenCalledWith({
-        composeOptions: [],
-        commandOptions: [],
-        config: ["docker-compose.yml"],
-        executable: {
-          executablePath: "docker",
-          options: [],
-        },
-        cwd: "/current/working/dir",
-        callback: expect.any(Function),
-      });
+			expect(upAllMock).toHaveBeenCalledWith({
+				composeOptions: [],
+				commandOptions: [],
+				config: ["docker-compose.yml"],
+				executable: {
+					executablePath: "docker",
+					options: [],
+				},
+				cwd: "/current/working/dir",
+				callback: expect.any(Function),
+			});
 
-      // Ensure callback is calling the service logger
-      const callback = (upAllMock.mock.calls[0][0] as IDockerComposeOptions)?.callback;
-      expect(callback).toBeDefined();
+			// Ensure callback is calling the service logger
+			const callback = (upAllMock.mock.calls[0][0] as IDockerComposeOptions)
+				?.callback;
+			expect(callback).toBeDefined();
 
-      const message = "test log output";
+			const message = "test log output";
 
-      if (callback) {
-        callback(Buffer.from(message));
-      }
+			if (callback) {
+				callback(Buffer.from(message));
+			}
 
-      expect(upInputs.serviceLogger).toHaveBeenCalledWith("test log output");
-    });
+			expect(upInputs.serviceLogger).toHaveBeenCalledWith("test log output");
+		});
 
-    it("should call up with specific docker flags", async () => {
-      const upInputs = {
-        dockerFlags: ["--context", "dev"],
-        composeFiles: ["docker-compose.yml"],
-        services: [] as string[],
-        composeFlags: [] as string[],
-        upFlags: [] as string[],
-        cwd: "/current/working/dir",
-        serviceLogger: jest.fn(),
-      };
+		it("should call up with specific docker flags", async () => {
+			const upInputs = {
+				dockerFlags: ["--context", "dev"],
+				composeFiles: ["docker-compose.yml"],
+				services: [] as string[],
+				composeFlags: [] as string[],
+				upFlags: [] as string[],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      upAllMock.mockResolvedValue({ exitCode: 0, err: "", out: "" });
+			upAllMock.mockResolvedValue({ exitCode: 0, err: "", out: "" });
 
-      await service.up(upInputs);
+			await service.up(upInputs);
 
-      expect(upAllMock).toHaveBeenCalledWith({
-        composeOptions: [],
-        commandOptions: [],
-        config: ["docker-compose.yml"],
-        executable: {
-          executablePath: "docker",
-          options: ["--context", "dev"],
-        },
-        cwd: "/current/working/dir",
-        callback: expect.any(Function),
-      });
-    });
+			expect(upAllMock).toHaveBeenCalledWith({
+				composeOptions: [],
+				commandOptions: [],
+				config: ["docker-compose.yml"],
+				executable: {
+					executablePath: "docker",
+					options: ["--context", "dev"],
+				},
+				cwd: "/current/working/dir",
+				callback: expect.any(Function),
+			});
+		});
 
-    it("should call up with specific services", async () => {
-      const upInputs = {
-        dockerFlags: [] as string[],
-        composeFiles: ["docker-compose.yml"],
-        services: ["helloworld2", "helloworld3"],
-        composeFlags: [] as string[],
-        upFlags: ["--build"],
-        cwd: "/current/working/dir",
-        serviceLogger: jest.fn(),
-      };
+		it("should call up with specific services", async () => {
+			const upInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: ["docker-compose.yml"],
+				services: ["helloworld2", "helloworld3"],
+				composeFlags: [] as string[],
+				upFlags: ["--build"],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      upManyMock.mockResolvedValue({ exitCode: 0, err: "", out: "" });
+			upManyMock.mockResolvedValue({ exitCode: 0, err: "", out: "" });
 
-      await service.up(upInputs);
+			await service.up(upInputs);
 
-      expect(upManyMock).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
-        composeOptions: [],
-        commandOptions: ["--build"],
-        config: ["docker-compose.yml"],
-        cwd: "/current/working/dir",
-        callback: expect.any(Function),
-        executable: {
-          executablePath: "docker",
-          options: [],
-        },
-      });
-    });
+			expect(upManyMock).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
+				composeOptions: [],
+				commandOptions: ["--build"],
+				config: ["docker-compose.yml"],
+				cwd: "/current/working/dir",
+				callback: expect.any(Function),
+				executable: {
+					executablePath: "docker",
+					options: [],
+				},
+			});
+		});
 
-    it("should throw formatted error when upAll fails with docker-compose result", async () => {
-      const upInputs = {
-        dockerFlags: [] as string[],
-        composeFiles: ["docker-compose.yml"],
-        services: [] as string[],
-        composeFlags: [] as string[],
-        upFlags: [] as string[],
-        cwd: "/current/working/dir",
-        serviceLogger: jest.fn(),
-      };
+		it("should throw formatted error when upAll fails with docker-compose result", async () => {
+			const upInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: ["docker-compose.yml"],
+				services: [] as string[],
+				composeFlags: [] as string[],
+				upFlags: [] as string[],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      const dockerComposeError = {
-        exitCode: 1,
-        err: "Error: unable to pull image\nfailed to resolve reference",
-        out: "",
-      };
+			const dockerComposeError = {
+				exitCode: 1,
+				err: "Error: unable to pull image\nfailed to resolve reference",
+				out: "",
+			};
 
-      upAllMock.mockRejectedValue(dockerComposeError);
+			upAllMock.mockRejectedValue(dockerComposeError);
 
-      await expect(service.up(upInputs)).rejects.toThrow(
-        "Docker Compose command failed with exit code 1"
-      );
-      await expect(service.up(upInputs)).rejects.toThrow("unable to pull image");
-    });
+			await expect(service.up(upInputs)).rejects.toThrow(
+				"Docker Compose command failed with exit code 1",
+			);
+			await expect(service.up(upInputs)).rejects.toThrow(
+				"unable to pull image",
+			);
+		});
 
-    it("should throw formatted error when upMany fails with docker-compose result", async () => {
-      const upInputs = {
-        dockerFlags: [] as string[],
-        composeFiles: ["docker-compose.yml"],
-        services: ["web"],
-        composeFlags: [] as string[],
-        upFlags: [] as string[],
-        cwd: "/current/working/dir",
-        serviceLogger: jest.fn(),
-      };
+		it("should throw formatted error when upMany fails with docker-compose result", async () => {
+			const upInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: ["docker-compose.yml"],
+				services: ["web"],
+				composeFlags: [] as string[],
+				upFlags: [] as string[],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      const dockerComposeError = {
-        exitCode: 1,
-        err: "Service 'web' failed to start",
-        out: "Starting web...",
-      };
+			const dockerComposeError = {
+				exitCode: 1,
+				err: "Service 'web' failed to start",
+				out: "Starting web...",
+			};
 
-      upManyMock.mockRejectedValue(dockerComposeError);
+			upManyMock.mockRejectedValue(dockerComposeError);
 
-      await expect(service.up(upInputs)).rejects.toThrow(
-        "Docker Compose command failed with exit code 1"
-      );
-      await expect(service.up(upInputs)).rejects.toThrow("Service 'web' failed to start");
-      await expect(service.up(upInputs)).rejects.toThrow("Starting web...");
-    });
+			await expect(service.up(upInputs)).rejects.toThrow(
+				"Docker Compose command failed with exit code 1",
+			);
+			await expect(service.up(upInputs)).rejects.toThrow(
+				"Service 'web' failed to start",
+			);
+			await expect(service.up(upInputs)).rejects.toThrow("Starting web...");
+		});
 
-    it("should pass through docker-compose result without exit code", async () => {
-      const upInputs = {
-        dockerFlags: [] as string[],
-        composeFiles: ["docker-compose.yml"],
-        services: [] as string[],
-        composeFlags: [] as string[],
-        upFlags: [] as string[],
-        cwd: "/current/working/dir",
-        serviceLogger: jest.fn(),
-      };
+		it("should pass through docker-compose result without exit code", async () => {
+			const upInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: ["docker-compose.yml"],
+				services: [] as string[],
+				composeFlags: [] as string[],
+				upFlags: [] as string[],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      const dockerComposeError = {
-        exitCode: null,
-        err: "Some error without exit code",
-        out: "",
-      };
+			const dockerComposeError = {
+				exitCode: null,
+				err: "Some error without exit code",
+				out: "",
+			};
 
-      upAllMock.mockRejectedValue(dockerComposeError);
+			upAllMock.mockRejectedValue(dockerComposeError);
 
-      await expect(service.up(upInputs)).rejects.toThrow("Some error without exit code");
-    });
+			await expect(service.up(upInputs)).rejects.toThrow(
+				"Some error without exit code",
+			);
+		});
 
-    it("should pass through standard Error objects", async () => {
-      const upInputs = {
-        dockerFlags: [] as string[],
-        composeFiles: ["docker-compose.yml"],
-        services: [] as string[],
-        composeFlags: [] as string[],
-        upFlags: [] as string[],
-        cwd: "/current/working/dir",
-        serviceLogger: jest.fn(),
-      };
+		it("should format docker-compose result when streams are undefined", async () => {
+			const upInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: ["docker-compose.yml"],
+				services: [] as string[],
+				composeFlags: [] as string[],
+				upFlags: [] as string[],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      const standardError = new Error("Standard error message");
-      upAllMock.mockRejectedValue(standardError);
+			const dockerComposeError = {
+				exitCode: 1,
+				err: undefined,
+				out: undefined,
+			};
 
-      await expect(service.up(upInputs)).rejects.toThrow("Standard error message");
-    });
+			upAllMock.mockRejectedValue(dockerComposeError);
 
-    it("should pass through error strings", async () => {
-      const upInputs = {
-        dockerFlags: [] as string[],
-        composeFiles: ["docker-compose.yml"],
-        services: [] as string[],
-        composeFlags: [] as string[],
-        upFlags: [] as string[],
-        cwd: "/current/working/dir",
-        serviceLogger: jest.fn(),
-      };
+			await expect(service.up(upInputs)).rejects.toThrow(
+				"Docker Compose command failed with exit code 1",
+			);
+			await expect(service.up(upInputs)).rejects.not.toThrow("Error output:");
+			await expect(service.up(upInputs)).rejects.not.toThrow(
+				"Standard output:",
+			);
+		});
 
-      const unknownError = "Some unknown error";
-      upAllMock.mockRejectedValue(unknownError);
+		it("should pass through standard Error objects", async () => {
+			const upInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: ["docker-compose.yml"],
+				services: [] as string[],
+				composeFlags: [] as string[],
+				upFlags: [] as string[],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      await expect(service.up(upInputs)).rejects.toThrow("Some unknown error");
-    });
+			const standardError = new Error("Standard error message");
+			upAllMock.mockRejectedValue(standardError);
 
-    it("should handle unknown error types gracefully", async () => {
-      const upInputs = {
-        dockerFlags: [] as string[],
-        composeFiles: ["docker-compose.yml"],
-        services: [] as string[],
-        composeFlags: [] as string[],
-        upFlags: [] as string[],
-        cwd: "/current/working/dir",
-        serviceLogger: jest.fn(),
-      };
+			await expect(service.up(upInputs)).rejects.toThrow(
+				"Standard error message",
+			);
+		});
 
-      const unknownError = { unexpected: "error format" };
-      upAllMock.mockRejectedValue(unknownError);
+		it("should pass through error strings", async () => {
+			const upInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: ["docker-compose.yml"],
+				services: [] as string[],
+				composeFlags: [] as string[],
+				upFlags: [] as string[],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      await expect(service.up(upInputs)).rejects.toThrow(JSON.stringify(unknownError));
-    });
-  });
+			const unknownError = "Some unknown error";
+			upAllMock.mockRejectedValue(unknownError);
 
-  describe("down", () => {
-    it("should call down with correct options", async () => {
-      const downInputs = {
-        dockerFlags: [] as string[],
-        composeFiles: [] as string[],
-        composeFlags: [] as string[],
-        downFlags: ["--volumes", "--remove-orphans"],
-        cwd: "/current/working/dir",
-        serviceLogger: jest.fn(),
-      };
+			await expect(service.up(upInputs)).rejects.toThrow("Some unknown error");
+		});
 
-      downMock.mockResolvedValue({ exitCode: 0, err: "", out: "" });
+		it("should handle unknown error types gracefully", async () => {
+			const upInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: ["docker-compose.yml"],
+				services: [] as string[],
+				composeFlags: [] as string[],
+				upFlags: [] as string[],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      await service.down(downInputs);
+			const unknownError = { unexpected: "error format" };
+			upAllMock.mockRejectedValue(unknownError);
 
-      expect(downMock).toHaveBeenCalledWith({
-        composeOptions: [],
-        commandOptions: ["--volumes", "--remove-orphans"],
-        config: [],
-        executable: {
-          executablePath: "docker",
-          options: [],
-        },
-        cwd: "/current/working/dir",
-        callback: expect.any(Function),
-      });
-    });
+			await expect(service.up(upInputs)).rejects.toThrow(
+				JSON.stringify(unknownError),
+			);
+		});
+	});
 
-    it("should throw formatted error when down fails with docker-compose result", async () => {
-      const downInputs = {
-        dockerFlags: [] as string[],
-        composeFiles: [] as string[],
-        composeFlags: [] as string[],
-        downFlags: [] as string[],
-        cwd: "/current/working/dir",
-        serviceLogger: jest.fn(),
-      };
+	describe("down", () => {
+		it("should call down with correct options", async () => {
+			const downInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: [] as string[],
+				composeFlags: [] as string[],
+				downFlags: ["--volumes", "--remove-orphans"],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      const dockerComposeError = {
-        exitCode: 1,
-        err: "Error stopping containers",
-        out: "",
-      };
+			downMock.mockResolvedValue({ exitCode: 0, err: "", out: "" });
 
-      downMock.mockRejectedValue(dockerComposeError);
+			await service.down(downInputs);
 
-      await expect(service.down(downInputs)).rejects.toThrow(
-        "Docker Compose command failed with exit code 1"
-      );
-      await expect(service.down(downInputs)).rejects.toThrow("Error stopping containers");
-    });
-  });
+			expect(downMock).toHaveBeenCalledWith({
+				composeOptions: [],
+				commandOptions: ["--volumes", "--remove-orphans"],
+				config: [],
+				executable: {
+					executablePath: "docker",
+					options: [],
+				},
+				cwd: "/current/working/dir",
+				callback: expect.any(Function),
+			});
+		});
 
-  describe("logs", () => {
-    it("should call logs with correct options", async () => {
-      const debugMock = jest.fn();
-      const logsInputs = {
-        dockerFlags: [] as string[],
-        composeFiles: ["docker-compose.yml"],
-        services: ["helloworld2", "helloworld3"],
-        composeFlags: [] as string[],
-        cwd: "/current/working/dir",
-        serviceLogger: debugMock,
-      };
+		it("should throw formatted error when down fails with docker-compose result", async () => {
+			const downInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: [] as string[],
+				composeFlags: [] as string[],
+				downFlags: [] as string[],
+				cwd: "/current/working/dir",
+				serviceLogger: vi.fn(),
+			};
 
-      logsMock.mockResolvedValue({ exitCode: 0, err: "", out: "logs" });
+			const dockerComposeError = {
+				exitCode: 1,
+				err: "Error stopping containers",
+				out: "",
+			};
 
-      await service.logs(logsInputs);
+			downMock.mockRejectedValue(dockerComposeError);
 
-      expect(logsMock).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
-        composeOptions: [],
-        config: ["docker-compose.yml"],
-        cwd: "/current/working/dir",
-        executable: {
-          executablePath: "docker",
-          options: [],
-        },
-        follow: false,
-        callback: expect.any(Function),
-      });
-    });
-  });
+			await expect(service.down(downInputs)).rejects.toThrow(
+				"Docker Compose command failed with exit code 1",
+			);
+			await expect(service.down(downInputs)).rejects.toThrow(
+				"Error stopping containers",
+			);
+		});
+	});
+
+	describe("logs", () => {
+		it("should call logs with correct options", async () => {
+			const debugMock = vi.fn();
+			const logsInputs = {
+				dockerFlags: [] as string[],
+				composeFiles: ["docker-compose.yml"],
+				services: ["helloworld2", "helloworld3"],
+				composeFlags: [] as string[],
+				cwd: "/current/working/dir",
+				serviceLogger: debugMock,
+			};
+
+			logsMock.mockResolvedValue({ exitCode: 0, err: "", out: "logs" });
+
+			await service.logs(logsInputs);
+
+			expect(logsMock).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
+				composeOptions: [],
+				config: ["docker-compose.yml"],
+				cwd: "/current/working/dir",
+				executable: {
+					executablePath: "docker",
+					options: [],
+				},
+				follow: false,
+				callback: expect.any(Function),
+			});
+		});
+	});
 });

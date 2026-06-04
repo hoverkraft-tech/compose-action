@@ -1,29 +1,30 @@
 {
-  "name": "Debian",
-  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
-  "features": {
-    "ghcr.io/devcontainers/features/node:2": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:3": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
-  },
-  "remoteEnv": {
-    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
-  },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "eamodio.gitlens",
-        "github.copilot",
-        "github.copilot-chat",
-        "github.vscode-github-actions",
-        "ms-vscode.makefile-tools",
-        "bierner.markdown-preview-github-styles",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode"
-      ],
-      "settings": {
-        "terminal.integrated.defaultProfile.linux": "zsh"
-      }
-    }
-  }
+	"name": "Debian",
+	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
+	"features": {
+		"ghcr.io/devcontainers/features/node:2": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:3": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+	"remoteEnv": {
+		"GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"eamodio.gitlens",
+				"github.copilot",
+				"github.copilot-chat",
+				"github.vscode-github-actions",
+				"ms-vscode.makefile-tools",
+				"bierner.markdown-preview-github-styles",
+				"esbenp.prettier-vscode",
+				"biomejs.biome",
+				"vitest.explorer"
+			],
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "zsh"
+			}
+		}
+	}
 }

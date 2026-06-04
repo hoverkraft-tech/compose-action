@@ -40112,8 +40112,11 @@ class InputService {
         }) || null);
     }
     getServiceLogLevel() {
-        const configuredLevel = getInput(InputNames.ServiceLogLevel, { required: false });
-        if (configuredLevel && !Object.values(LogLevel).includes(configuredLevel)) {
+        const configuredLevel = getInput(InputNames.ServiceLogLevel, {
+            required: false,
+        });
+        if (configuredLevel &&
+            !Object.values(LogLevel).includes(configuredLevel)) {
             throw new Error(`Invalid service log level "${configuredLevel}". Valid values are: ${Object.values(LogLevel).join(", ")}`);
         }
         return configuredLevel || LogLevel.Debug;
@@ -40195,12 +40198,12 @@ class DockerComposeService {
                 parts.push("Docker Compose command failed");
             }
             // Add error stream output if available
-            if (error.err && error.err.trim()) {
+            if (error.err?.trim()) {
                 parts.push("\nError output:");
                 parts.push(error.err.trim());
             }
             // Add standard output if available and different from error output
-            if (error.out && error.out.trim() && error.out !== error.err) {
+            if (error.out?.trim() && error.out !== error.err) {
                 parts.push("\nStandard output:");
                 parts.push(error.out.trim());
             }

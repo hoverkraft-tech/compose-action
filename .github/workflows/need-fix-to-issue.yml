@@ -11,15 +11,16 @@ on:
         description: "The SHA of the commit to get the diff for"
         required: true
       manual-base-ref:
-        description: "By default, the commit entered above is compared to the one directly
-          before it; to go back further, enter an earlier SHA here"
+        description: >-
+          By default, the commit entered above is compared to the one directly
+          before it; to go back further, enter an earlier SHA here
         required: false
 
 permissions: {}
 
 jobs:
   main:
-    uses: hoverkraft-tech/ci-github-common/.github/workflows/need-fix-to-issue.yml@66578f5b9aec4ac5558b5dad750c4c74dfcb65c5 # 0.35.5
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/need-fix-to-issue.yml@4bb7594b1bf3696c54b2bbae970376056853f8ea # 0.36.0
     permissions:
       contents: read
       issues: write
