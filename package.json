@@ -1,126 +1,64 @@
 {
-  "name": "compose-action",
-  "description": "Docker Compose Action",
-  "version": "0.0.0",
-  "author": "hoverkraft",
-  "license": "MIT",
-  "homepage": "https://github.com/hoverkraft-tech/compose-action",
-  "private": true,
-  "type": "module",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hoverkraft-tech/compose-action.git"
-  },
-  "bugs": {
-    "url": "https://github.com/hoverkraft-tech/compose-action/issues"
-  },
-  "keywords": [
-    "actions",
-    "docker-compose"
-  ],
-  "exports": {
-    ".": "./dist/index.js"
-  },
-  "engines": {
-    "node": ">=20"
-  },
-  "dependencies": {
-    "@actions/core": "^3.0.1",
-    "@actions/github": "^9.1.1",
-    "@actions/tool-cache": "^4.0.0",
-    "@octokit/action": "^8.0.4",
-    "docker-compose": "^1.4.2"
-  },
-  "devDependencies": {
-    "@ts-dev-tools/core": "^1.12.0",
-    "@vercel/ncc": "^0.38.4",
-    "eslint-plugin-github": "^6.0.0",
-    "eslint-plugin-jsonc": "^3.1.2"
-  },
-  "scripts": {
-    "package": "npm run package:index && npm run package:post",
-    "package:index": "ncc build src/index.ts -o dist --license licenses.txt",
-    "package:post": "ncc build src/post.ts -o dist/post && mv dist/post/index.js dist/post.js && rm -rf dist/post",
-    "package:watch": "npm run package -- --watch",
-    "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "lint:ci": "npm run lint -- --output-file eslint-report.json --format json",
-    "all": "npm run format && npm run lint:ci && npm run test:ci && npm run package",
-    "build": "tsc --noEmit",
-    "format": "prettier --cache --write .",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --forceExit --maxWorkers=50%",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --maxWorkers=25%",
-    "test:cov": "npm run test -- --coverage",
-    "test:ci": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --runInBand --detectOpenHandles --forceExit",
-    "prepare": "ts-dev-tools install"
-  },
-  "jest": {
-    "preset": "ts-jest/presets/default-esm",
-    "verbose": true,
-    "clearMocks": true,
-    "testEnvironment": "node",
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "testMatch": [
-      "**/*.test.ts",
-      "**/__tests__/**/*.[jt]s?(x)",
-      "**/?(*.)+(spec|test)?(.*).+(ts|tsx|js)"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/dist/"
-    ],
-    "moduleNameMapper": {
-      "^(\\.{1,2}/.*)\\.js$": "$1"
-    },
-    "transform": {
-      "^.+\\.ts$": [
-        "ts-jest",
-        {
-          "useESM": true,
-          "tsconfig": "tsconfig.json"
-        }
-      ]
-    },
-    "injectGlobals": true,
-    "coverageReporters": [
-      "json-summary",
-      "text",
-      "lcov"
-    ],
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "./src/**",
-      "**/src/**/*.[jt]s?(x)"
-    ]
-  },
-  "prettier": {
-    "semi": true,
-    "printWidth": 100,
-    "trailingComma": "es5",
-    "plugins": []
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx}": [
-      "eslint --fix"
-    ]
-  },
-  "importSort": {
-    ".js, .jsx, .ts, .tsx": {
-      "style": "module",
-      "parser": "typescript"
-    }
-  },
-  "tsDevTools": {
-    "version": "20250623095600-remove-prettier-oxc"
-  }
+	"name": "compose-action",
+	"description": "Docker Compose Action",
+	"version": "0.0.0",
+	"author": "hoverkraft",
+	"license": "MIT",
+	"homepage": "https://github.com/hoverkraft-tech/compose-action",
+	"private": true,
+	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/hoverkraft-tech/compose-action.git"
+	},
+	"bugs": {
+		"url": "https://github.com/hoverkraft-tech/compose-action/issues"
+	},
+	"keywords": [
+		"actions",
+		"docker-compose"
+	],
+	"exports": {
+		".": "./dist/index.js"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"dependencies": {
+		"@actions/core": "^3.0.1",
+		"@actions/github": "^9.1.1",
+		"@actions/tool-cache": "^4.0.0",
+		"@octokit/action": "^8.0.4",
+		"docker-compose": "^1.4.2"
+	},
+	"devDependencies": {
+		"@ts-dev-tools/core": "^1.12.4",
+		"@vercel/ncc": "^0.38.4"
+	},
+	"scripts": {
+		"package": "npm run package:index && npm run package:post",
+		"package:index": "ncc build src/index.ts -o dist --license licenses.txt",
+		"package:post": "ncc build src/post.ts -o dist/post && mv dist/post/index.js dist/post.js && rm -rf dist/post",
+		"package:watch": "npm run package -- --watch",
+		"lint": "biome lint --error-on-warnings .",
+		"lint:ci": "biome lint --error-on-warnings . --reporter=sarif | tee biome-report.sarif",
+		"all": "npm run format && npm run lint:ci && npm run test:ci && npm run package",
+		"build": "tsc --noEmit",
+		"format": "biome format --write .",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:cov": "vitest run --reporter=default --reporter=junit --outputFile=junit.xml --coverage.enabled --coverage.reporter=lcov --coverage.reporter=text",
+		"test:ci": "npm run test:cov",
+		"prepare": "ts-dev-tools install",
+		"check": "biome check --error-on-warnings --write .",
+		"vitest": "vitest"
+	},
+	"commitlint": {
+		"extends": [
+			"@commitlint/config-conventional"
+		]
+	},
+	"tsDevTools": {
+		"version": "20260604100000-migrate-to-vitest"
+	}
 }
