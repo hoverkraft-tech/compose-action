@@ -33,7 +33,7 @@
 	},
 	"devDependencies": {
 		"@ts-dev-tools/core": "^1.12.4",
-		"@vercel/ncc": "^0.38.4"
+		"@vercel/ncc": "^0.44.0"
 	},
 	"scripts": {
 		"package": "npm run package:index && npm run package:post",
