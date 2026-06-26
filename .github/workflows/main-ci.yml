@@ -38,13 +38,13 @@ jobs:
     outputs:
       artifact-id: ${{ steps.upload-artifact.outputs.artifact-id }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
 
       - name: 📖 Generate documentation
         id: generate-documentation
-        uses: hoverkraft-tech/ci-dokumentor@3258ef0de948ec25e5939618d5ef510445aed869 # 0.3.1
+        uses: hoverkraft-tech/ci-dokumentor@301ef70a95e03b39e07ee0d3dc2da21de82e51ce # 0.4.0
         with:
           source: action.yml
           # yamllint disable rule:line-length
@@ -67,7 +67,7 @@ jobs:
           client-id: ${{ vars.CI_BOT_APP_CLIENT_ID }}
           private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env] repository automation uses a dedicated app secret without untrusted code execution
 
-      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@624be17604ee0a7378488191aacb35851e7cf001 # 0.37.1
+      - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@7034f6ae5bae1ec46a0108e8efb60d102e88961d # 0.37.2
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update
