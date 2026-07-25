@@ -32,8 +32,8 @@
 		"docker-compose": "^1.4.2"
 	},
 	"devDependencies": {
-		"@ts-dev-tools/core": "^1.12.4",
-		"@vercel/ncc": "^0.44.0"
+		"@ts-dev-tools/core": "^1.13.0",
+		"@vercel/ncc": "^0.44.1"
 	},
 	"scripts": {
 		"package": "npm run package:index && npm run package:post",
