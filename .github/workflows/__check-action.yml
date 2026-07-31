@@ -181,13 +181,13 @@ jobs:
     env:
       DOCKER_COMPOSE_VERSION: ${{ matrix.expected-compose-version || '' }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Set up Docker context
         if: ${{ matrix.docker-context }}
-        uses: docker/setup-docker-action@0234bb73ccb40f0c430b795634f9247e2b5c2d23 # v5.2.0
+        uses: docker/setup-docker-action@77e84dbf09b47d1e29270283c22f16145aa85ca1 # v5.4.0
         with:
           context: ${{ matrix.docker-context }}
 
