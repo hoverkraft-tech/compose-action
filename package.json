@@ -1,64 +1,66 @@
 {
-	"name": "compose-action",
-	"description": "Docker Compose Action",
-	"version": "0.0.0",
-	"author": "hoverkraft",
-	"license": "MIT",
-	"homepage": "https://github.com/hoverkraft-tech/compose-action",
-	"private": true,
-	"type": "module",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/hoverkraft-tech/compose-action.git"
-	},
-	"bugs": {
-		"url": "https://github.com/hoverkraft-tech/compose-action/issues"
-	},
-	"keywords": [
-		"actions",
-		"docker-compose"
-	],
-	"exports": {
-		".": "./dist/index.js"
-	},
-	"engines": {
-		"node": ">=24"
-	},
-	"dependencies": {
-		"@actions/core": "^3.0.1",
-		"@actions/github": "^9.1.1",
-		"@actions/tool-cache": "^4.0.0",
-		"@octokit/action": "^8.0.4",
-		"docker-compose": "^1.4.2"
-	},
-	"devDependencies": {
-		"@ts-dev-tools/core": "^1.12.4",
-		"@vercel/ncc": "^0.44.0"
-	},
-	"scripts": {
-		"package": "npm run package:index && npm run package:post",
-		"package:index": "ncc build src/index.ts -o dist --license licenses.txt",
-		"package:post": "ncc build src/post.ts -o dist/post && mv dist/post/index.js dist/post.js && rm -rf dist/post",
-		"package:watch": "npm run package -- --watch",
-		"lint": "biome lint --error-on-warnings .",
-		"lint:ci": "biome lint --error-on-warnings . --reporter=sarif | tee biome-report.sarif",
-		"all": "npm run format && npm run lint:ci && npm run test:ci && npm run package",
-		"build": "tsc --noEmit",
-		"format": "biome format --write .",
-		"test": "vitest run",
-		"test:watch": "vitest",
-		"test:cov": "vitest run --reporter=default --reporter=junit --outputFile=junit.xml --coverage.enabled --coverage.reporter=lcov --coverage.reporter=text",
-		"test:ci": "npm run test:cov",
-		"prepare": "ts-dev-tools install",
-		"check": "biome check --error-on-warnings --write .",
-		"vitest": "vitest"
-	},
-	"commitlint": {
-		"extends": [
-			"@commitlint/config-conventional"
-		]
-	},
-	"tsDevTools": {
-		"version": "20260604100000-migrate-to-vitest"
-	}
+  "name": "compose-action",
+  "description": "Docker Compose Action",
+  "version": "0.0.0",
+  "author": "hoverkraft",
+  "license": "MIT",
+  "homepage": "https://github.com/hoverkraft-tech/compose-action",
+  "private": true,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoverkraft-tech/compose-action.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hoverkraft-tech/compose-action/issues"
+  },
+  "keywords": [
+    "actions",
+    "docker-compose"
+  ],
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/github": "^9.1.1",
+    "@actions/tool-cache": "^4.0.0",
+    "@octokit/action": "^8.0.4",
+    "docker-compose": "^1.4.2"
+  },
+  "devDependencies": {
+    "@ts-dev-tools/core": "^1.13.1",
+    "esbuild": "^0.27.0"
+  },
+  "scripts": {
+    "prepackage": "rm -rf dist",
+    "package": "esbuild src/index.ts src/post.ts --bundle --format=esm --platform=node --target=node24 --outdir=dist --entry-names=[name] --banner:js='import { createRequire } from \"node:module\";const require = createRequire(import.meta.url);'",
+    "package:watch": "npm run package -- --watch",
+    "lint": "biome lint --error-on-warnings .",
+    "lint:ci": "biome lint --error-on-warnings . --reporter=sarif | tee biome-report.sarif",
+    "all": "npm run format && npm run lint:ci && npm run test:ci && npm run package",
+    "build": "tsc --noEmit",
+    "format": "biome format --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --reporter=default --reporter=junit --outputFile=junit.xml --coverage.enabled --coverage.reporter=lcov --coverage.reporter=text",
+    "test:ci": "npm run test:cov",
+    "prepare": "ts-dev-tools install",
+    "check": "biome check --error-on-warnings --write .",
+    "vitest": "vitest"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "tsDevTools": {
+    "version": "20260604100000-migrate-to-vitest"
+  },
+  "allowScripts": {
+    "esbuild@0.27.7": true
+  }
 }
