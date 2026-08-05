@@ -66,6 +66,8 @@ jobs:
         with:
           client-id: ${{ vars.CI_BOT_APP_CLIENT_ID }}
           private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env] repository automation uses a dedicated app secret without untrusted code execution
+          permission-contents: write
+          permission-pull-requests: write
 
       - uses: hoverkraft-tech/ci-github-common/actions/create-and-merge-pull-request@2334d395217f9811699dbd4ace9d8559e4d99e0d # 0.37.3
         with:
