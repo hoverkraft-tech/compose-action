@@ -1,7 +1,7 @@
 name: "Pull Request - Semantic Lint"
 
 on:
-  pull_request_target: # zizmor: ignore[dangerous-triggers] validates PR metadata only through a pinned reusable workflow without checkout
+  pull_request:
     types:
       - opened
       - edited

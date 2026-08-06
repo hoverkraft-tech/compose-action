@@ -16,15 +16,6 @@ jobs:
       pull-requests: write
       security-events: write
       statuses: write
-    with:
-      linter-env: |
-        FILTER_REGEX_EXCLUDE=dist/**/*|.github/social-preview.svg|.github/logo.svg
-        VALIDATE_JSCPD=false
-        VALIDATE_TYPESCRIPT_STANDARD=false
-        VALIDATE_TYPESCRIPT_ES=false
-        VALIDATE_TYPESCRIPT_PRETTIER=false
-        VALIDATE_JAVASCRIPT_ES=false
-        VALIDATE_JAVASCRIPT_STANDARD=false
 
   check-nodejs:
     name: Test nodejs

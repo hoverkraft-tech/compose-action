@@ -3,7 +3,7 @@ name: Greetings
 on:
   issues:
     types: [opened]
-  pull_request_target: # zizmor: ignore[dangerous-triggers] metadata-only reusable workflow with explicit write permissions and no checkout
+  pull_request:
     branches: [main]
 
 permissions: {}

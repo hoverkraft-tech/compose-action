@@ -3,6 +3,9 @@
 help: ## Display help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+setup: ## Install dependencies
+	@npm install
+
 lint: ## Execute linting
 	$(call run_linter,)
 
@@ -17,7 +20,7 @@ lint-fix: ## Execute linting and fix
 	)
 
 ci: ## Execute all formats and checks
-	@npm install
+	$(MAKE) setup
 	@npm audit fix || true
 	@npm run all
 	$(MAKE) lint-fix
@@ -26,14 +29,14 @@ define run_linter
 	DEFAULT_WORKSPACE="$(CURDIR)"; \
 	LINTER_IMAGE="linter:latest"; \
 	VOLUME="$$DEFAULT_WORKSPACE:$$DEFAULT_WORKSPACE"; \
-	docker build --build-arg UID=$(shell id -u) --build-arg GID=$(shell id -g) --tag $$LINTER_IMAGE .; \
+	docker build --platform=linux/amd64 --build-arg UID=$(shell id -u) --build-arg GID=$(shell id -g) --tag $$LINTER_IMAGE .; \
 	docker run \
-		-e DEFAULT_WORKSPACE="$$DEFAULT_WORKSPACE" \
-		-e FILTER_REGEX_EXCLUDE="dist/**/*|.github/social-preview.svg|.github/logo.svg" \
-		-e FILTER_REGEX_INCLUDE="$(filter-out $@,$(MAKECMDGOALS))" \
-		$(1) \
+		--platform=linux/amd64 \
 		-v $$VOLUME \
 		--rm \
+		-e DEFAULT_WORKSPACE="$$DEFAULT_WORKSPACE" \
+		-e FILTER_REGEX_INCLUDE="$(filter-out $@,$(MAKECMDGOALS))" \
+		$(1) \
 		$$LINTER_IMAGE
 endef
 
