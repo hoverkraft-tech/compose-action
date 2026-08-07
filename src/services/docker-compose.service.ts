@@ -66,24 +66,49 @@ export class DockerComposeService {
       commandArgs: services,
     });
 
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
+      let settled = false;
       const childProcess = spawn("docker", commandArgs, {
         cwd: optionsInputs.cwd,
       });
 
-      childProcess.on("error", reject);
-      childProcess.stdout.on("data", (chunk: Buffer) => {
+      childProcess.on("error", (error) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        resolve({
+          error: `Unable to collect docker compose logs: ${error.message}`,
+          output: "",
+        });
+      });
+      if (!childProcess.stdout || !childProcess.stderr) {
+        settled = true;
+        resolve({
+          error: "Unable to collect docker compose logs: stdout/stderr unavailable",
+          output: "",
+        });
+        return;
+      }
+
+      childProcess.stdout.on("data", (chunk: Buffer | string) => {
         optionsInputs.serviceLogger(chunk.toString());
       });
-      childProcess.stderr.on("data", (chunk: Buffer) => {
+      childProcess.stderr.on("data", (chunk: Buffer | string) => {
         optionsInputs.serviceLogger(chunk.toString());
       });
-      childProcess.on("close", (exitCode) => {
+      childProcess.on("close", (exitCode, signal) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
         resolve({
           error:
-            exitCode && exitCode !== 0
-              ? `Docker Compose logs command failed with exit code ${exitCode}`
-              : "",
+            signal
+              ? `Docker Compose logs command failed with signal ${signal}`
+              : exitCode !== null && exitCode !== 0
+                ? `Docker Compose logs command failed with exit code ${exitCode}`
+                : "",
           output: "",
         });
       });
@@ -109,8 +134,11 @@ export class DockerComposeService {
     };
   }
 
+  /**
+   * Builds docker CLI arguments in the order expected by `docker compose`.
+   */
   private getDockerComposeCommandArgs(
-    command: string,
+    command: "logs",
     {
       dockerFlags,
       composeFlags,
