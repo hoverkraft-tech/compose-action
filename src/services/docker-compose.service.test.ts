@@ -440,5 +440,85 @@ describe("DockerComposeService", () => {
         output: "",
       });
     });
+
+    it("should return a non-fatal error message when logs command is terminated by a signal", async () => {
+      const logsInputs = {
+        dockerFlags: [] as string[],
+        composeFiles: ["docker-compose.yml"] as string[],
+        services: [] as string[],
+        composeFlags: [] as string[],
+        cwd: "/current/working/dir",
+        serviceLogger: vi.fn(),
+      };
+
+      const childProcess = new EventEmitter() as EventEmitter & {
+        stdout: EventEmitter;
+        stderr: EventEmitter;
+      };
+      childProcess.stdout = new EventEmitter();
+      childProcess.stderr = new EventEmitter();
+      spawnMock.mockReturnValue(childProcess);
+
+      const logsPromise = service.logs(logsInputs);
+
+      childProcess.emit("close", null, "SIGTERM");
+
+      await expect(logsPromise).resolves.toEqual({
+        error: "Docker Compose logs command failed with signal SIGTERM",
+        output: "",
+      });
+    });
+
+    it("should return a non-fatal error message when spawning logs fails", async () => {
+      const logsInputs = {
+        dockerFlags: [] as string[],
+        composeFiles: ["docker-compose.yml"] as string[],
+        services: [] as string[],
+        composeFlags: [] as string[],
+        cwd: "/current/working/dir",
+        serviceLogger: vi.fn(),
+      };
+
+      const childProcess = new EventEmitter() as EventEmitter & {
+        stdout: EventEmitter;
+        stderr: EventEmitter;
+      };
+      childProcess.stdout = new EventEmitter();
+      childProcess.stderr = new EventEmitter();
+      spawnMock.mockReturnValue(childProcess);
+
+      const logsPromise = service.logs(logsInputs);
+
+      childProcess.emit("error", new Error("spawn ENOENT"));
+
+      await expect(logsPromise).resolves.toEqual({
+        error: "Unable to collect docker compose logs: spawn ENOENT",
+        output: "",
+      });
+    });
+
+    it("should return a non-fatal error message when output streams are unavailable", async () => {
+      const logsInputs = {
+        dockerFlags: [] as string[],
+        composeFiles: ["docker-compose.yml"] as string[],
+        services: [] as string[],
+        composeFlags: [] as string[],
+        cwd: "/current/working/dir",
+        serviceLogger: vi.fn(),
+      };
+
+      const childProcess = new EventEmitter() as EventEmitter & {
+        stdout: EventEmitter | null;
+        stderr: EventEmitter | null;
+      };
+      childProcess.stdout = null;
+      childProcess.stderr = null;
+      spawnMock.mockReturnValue(childProcess);
+
+      await expect(service.logs(logsInputs)).resolves.toEqual({
+        error: "Unable to collect docker compose logs: stdout/stderr unavailable",
+        output: "",
+      });
+    });
   });
 });

@@ -27146,20 +27146,42 @@ var DockerComposeService = class {
       composeFiles: optionsInputs.composeFiles,
       commandArgs: services
     });
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
+      let settled = false;
       const childProcess = spawn("docker", commandArgs, {
         cwd: optionsInputs.cwd
       });
-      childProcess.on("error", reject);
+      childProcess.on("error", (error2) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        resolve({
+          error: `Unable to collect docker compose logs: ${error2.message}`,
+          output: ""
+        });
+      });
+      if (!childProcess.stdout || !childProcess.stderr) {
+        settled = true;
+        resolve({
+          error: "Unable to collect docker compose logs: stdout/stderr unavailable",
+          output: ""
+        });
+        return;
+      }
       childProcess.stdout.on("data", (chunk) => {
         optionsInputs.serviceLogger(chunk.toString());
       });
       childProcess.stderr.on("data", (chunk) => {
         optionsInputs.serviceLogger(chunk.toString());
       });
-      childProcess.on("close", (exitCode) => {
+      childProcess.on("close", (exitCode, signal) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
         resolve({
-          error: exitCode && exitCode !== 0 ? `Docker Compose logs command failed with exit code ${exitCode}` : "",
+          error: signal ? `Docker Compose logs command failed with signal ${signal}` : exitCode !== null && exitCode !== 0 ? `Docker Compose logs command failed with exit code ${exitCode}` : "",
           output: ""
         });
       });
@@ -27183,6 +27205,9 @@ var DockerComposeService = class {
       }
     };
   }
+  /**
+   * Builds docker CLI arguments in the order expected by `docker compose`.
+   */
   getDockerComposeCommandArgs(command, {
     dockerFlags,
     composeFlags,
