@@ -1,9 +1,8 @@
+import { spawn } from "node:child_process";
 import {
   down,
-  type IDockerComposeLogOptions,
   type IDockerComposeOptions,
   type IDockerComposeResult,
-  logs,
   upAll,
   upMany,
 } from "docker-compose";
@@ -60,17 +59,35 @@ export class DockerComposeService {
     error: string;
     output: string;
   }> {
-    const options: IDockerComposeLogOptions = {
-      ...this.getCommonOptions(optionsInputs),
-      follow: false,
-    };
+    const commandArgs = this.getDockerComposeCommandArgs("logs", {
+      dockerFlags: optionsInputs.dockerFlags,
+      composeFlags: optionsInputs.composeFlags,
+      composeFiles: optionsInputs.composeFiles,
+      commandArgs: services,
+    });
 
-    const { err, out } = await logs(services, options);
+    return await new Promise((resolve, reject) => {
+      const childProcess = spawn("docker", commandArgs, {
+        cwd: optionsInputs.cwd,
+      });
 
-    return {
-      error: err,
-      output: out,
-    };
+      childProcess.on("error", reject);
+      childProcess.stdout.on("data", (chunk: Buffer) => {
+        optionsInputs.serviceLogger(chunk.toString());
+      });
+      childProcess.stderr.on("data", (chunk: Buffer) => {
+        optionsInputs.serviceLogger(chunk.toString());
+      });
+      childProcess.on("close", (exitCode) => {
+        resolve({
+          error:
+            exitCode && exitCode !== 0
+              ? `Docker Compose logs command failed with exit code ${exitCode}`
+              : "",
+          output: "",
+        });
+      });
+    });
   }
 
   private getCommonOptions({
@@ -90,6 +107,30 @@ export class DockerComposeService {
         options: dockerFlags,
       },
     };
+  }
+
+  private getDockerComposeCommandArgs(
+    command: string,
+    {
+      dockerFlags,
+      composeFlags,
+      composeFiles,
+      commandArgs,
+    }: {
+      dockerFlags: string[];
+      composeFlags: string[];
+      composeFiles: string[];
+      commandArgs: string[];
+    },
+  ): string[] {
+    return [
+      ...dockerFlags,
+      "compose",
+      ...composeFlags,
+      ...composeFiles.flatMap((composeFile) => ["-f", composeFile]),
+      command,
+      ...commandArgs,
+    ];
   }
 
   /**

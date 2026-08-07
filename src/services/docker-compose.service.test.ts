@@ -1,8 +1,8 @@
 import type {
-  IDockerComposeLogOptions,
   IDockerComposeOptions,
   IDockerComposeResult,
 } from "docker-compose";
+import { EventEmitter } from "node:events";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock docker-compose before importing the module under test
@@ -17,19 +17,16 @@ const upManyMock =
   >();
 const downMock =
   vi.fn<(options: IDockerComposeOptions) => Promise<IDockerComposeResult>>();
-const logsMock =
-  vi.fn<
-    (
-      services: string[],
-      options: IDockerComposeLogOptions,
-    ) => Promise<IDockerComposeResult>
-  >();
+const spawnMock = vi.fn();
 
 vi.doMock("docker-compose", () => ({
   upAll: upAllMock,
   upMany: upManyMock,
   down: downMock,
-  logs: logsMock,
+}));
+
+vi.doMock("node:child_process", () => ({
+  spawn: spawnMock,
 }));
 
 // Dynamic import after mock setup
@@ -360,7 +357,7 @@ describe("DockerComposeService", () => {
   });
 
   describe("logs", () => {
-    it("should call logs with correct options", async () => {
+    it("should stream logs with correct command arguments", async () => {
       const debugMock = vi.fn();
       const logsInputs = {
         dockerFlags: [] as string[],
@@ -371,20 +368,76 @@ describe("DockerComposeService", () => {
         serviceLogger: debugMock,
       };
 
-      logsMock.mockResolvedValue({ exitCode: 0, err: "", out: "logs" });
+      const stdout = new EventEmitter();
+      const stderr = new EventEmitter();
+      const childProcess = new EventEmitter() as EventEmitter & {
+        stdout: EventEmitter;
+        stderr: EventEmitter;
+      };
+      childProcess.stdout = stdout;
+      childProcess.stderr = stderr;
+      spawnMock.mockReturnValue(childProcess);
 
-      await service.logs(logsInputs);
+      const logsPromise = service.logs(logsInputs);
 
-      expect(logsMock).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
-        composeOptions: [],
-        config: ["docker-compose.yml"],
+      expect(spawnMock).toHaveBeenCalledWith("docker", [
+        "compose",
+        "-f",
+        "docker-compose.yml",
+        "logs",
+        "helloworld2",
+        "helloworld3",
+      ], {
         cwd: "/current/working/dir",
-        executable: {
-          executablePath: "docker",
-          options: [],
-        },
-        follow: false,
-        callback: expect.any(Function),
+      });
+
+      stdout.emit("data", Buffer.from("logs"));
+      stderr.emit("data", Buffer.from("error logs"));
+      childProcess.emit("close", 0);
+
+      await expect(logsPromise).resolves.toEqual({ error: "", output: "" });
+      expect(debugMock).toHaveBeenNthCalledWith(1, "logs");
+      expect(debugMock).toHaveBeenNthCalledWith(2, "error logs");
+    });
+
+    it("should return a non-fatal error message when logs command fails", async () => {
+      const logsInputs = {
+        dockerFlags: ["--context", "dev"] as string[],
+        composeFiles: ["docker-compose.yml"] as string[],
+        services: [] as string[],
+        composeFlags: ["--profile", "ci"] as string[],
+        cwd: "/current/working/dir",
+        serviceLogger: vi.fn(),
+      };
+
+      const childProcess = new EventEmitter() as EventEmitter & {
+        stdout: EventEmitter;
+        stderr: EventEmitter;
+      };
+      childProcess.stdout = new EventEmitter();
+      childProcess.stderr = new EventEmitter();
+      spawnMock.mockReturnValue(childProcess);
+
+      const logsPromise = service.logs(logsInputs);
+
+      expect(spawnMock).toHaveBeenCalledWith("docker", [
+        "--context",
+        "dev",
+        "compose",
+        "--profile",
+        "ci",
+        "-f",
+        "docker-compose.yml",
+        "logs",
+      ], {
+        cwd: "/current/working/dir",
+      });
+
+      childProcess.emit("close", 1);
+
+      await expect(logsPromise).resolves.toEqual({
+        error: "Docker Compose logs command failed with exit code 1",
+        output: "",
       });
     });
   });

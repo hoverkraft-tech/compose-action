@@ -26549,7 +26549,7 @@ var require_dist2 = __commonJS({
       return (0, exports.restartMany)([service], options);
     };
     exports.restartOne = restartOne;
-    var logs2 = function(services, options = {}) {
+    var logs = function(services, options = {}) {
       const args = Array.isArray(services) ? services : [services];
       if (options.follow) {
         args.unshift("--follow");
@@ -26559,7 +26559,7 @@ var require_dist2 = __commonJS({
       }
       return (0, exports.execCompose)("logs", args, options);
     };
-    exports.logs = logs2;
+    exports.logs = logs;
     var port = async function(service, containerPort, options) {
       const args = [service, containerPort];
       try {
@@ -31374,6 +31374,7 @@ function info(message) {
 
 // src/services/docker-compose.service.ts
 var import_docker_compose = __toESM(require_dist2(), 1);
+import { spawn as spawn2 } from "node:child_process";
 var DockerComposeService = class {
   async up({ upFlags, services, ...optionsInputs }) {
     const options = {
@@ -31402,15 +31403,30 @@ var DockerComposeService = class {
     }
   }
   async logs({ services, ...optionsInputs }) {
-    const options = {
-      ...this.getCommonOptions(optionsInputs),
-      follow: false
-    };
-    const { err, out } = await (0, import_docker_compose.logs)(services, options);
-    return {
-      error: err,
-      output: out
-    };
+    const commandArgs = this.getDockerComposeCommandArgs("logs", {
+      dockerFlags: optionsInputs.dockerFlags,
+      composeFlags: optionsInputs.composeFlags,
+      composeFiles: optionsInputs.composeFiles,
+      commandArgs: services
+    });
+    return await new Promise((resolve2, reject) => {
+      const childProcess = spawn2("docker", commandArgs, {
+        cwd: optionsInputs.cwd
+      });
+      childProcess.on("error", reject);
+      childProcess.stdout.on("data", (chunk) => {
+        optionsInputs.serviceLogger(chunk.toString());
+      });
+      childProcess.stderr.on("data", (chunk) => {
+        optionsInputs.serviceLogger(chunk.toString());
+      });
+      childProcess.on("close", (exitCode) => {
+        resolve2({
+          error: exitCode && exitCode !== 0 ? `Docker Compose logs command failed with exit code ${exitCode}` : "",
+          output: ""
+        });
+      });
+    });
   }
   getCommonOptions({
     dockerFlags,
@@ -31429,6 +31445,21 @@ var DockerComposeService = class {
         options: dockerFlags
       }
     };
+  }
+  getDockerComposeCommandArgs(command, {
+    dockerFlags,
+    composeFlags,
+    composeFiles,
+    commandArgs
+  }) {
+    return [
+      ...dockerFlags,
+      "compose",
+      ...composeFlags,
+      ...composeFiles.flatMap((composeFile) => ["-f", composeFile]),
+      command,
+      ...commandArgs
+    ];
   }
   /**
    * Formats docker-compose errors into proper Error objects with readable messages

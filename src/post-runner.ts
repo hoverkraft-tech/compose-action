@@ -15,20 +15,24 @@ export async function run(): Promise<void> {
 
     const inputs = inputService.getInputs();
 
-    const { error, output } = await dockerComposeService.logs({
-      dockerFlags: inputs.dockerFlags,
-      composeFiles: inputs.composeFiles,
-      composeFlags: inputs.composeFlags,
-      cwd: inputs.cwd,
-      services: inputs.services,
-      serviceLogger: loggerService.getServiceLogger(inputs.serviceLogLevel),
-    });
+    try {
+      const { error } = await dockerComposeService.logs({
+        dockerFlags: inputs.dockerFlags,
+        composeFiles: inputs.composeFiles,
+        composeFlags: inputs.composeFlags,
+        cwd: inputs.cwd,
+        services: inputs.services,
+        serviceLogger: loggerService.getServiceLogger(inputs.serviceLogLevel),
+      });
 
-    if (error) {
-      loggerService.debug(`docker compose error:\n${error}`);
+      if (error) {
+        loggerService.debug(`docker compose error:\n${error}`);
+      }
+    } catch (error) {
+      loggerService.warn(
+        `Unable to collect docker compose logs before cleanup: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
+      );
     }
-
-    loggerService.debug(`docker compose logs:\n${output}`);
 
     await dockerComposeService.down({
       dockerFlags: inputs.dockerFlags,

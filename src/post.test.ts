@@ -73,7 +73,7 @@ describe("post", () => {
       serviceLogLevel: LogLevel.Debug,
     }));
 
-    serviceLogsMock.mockResolvedValue({ error: "", output: "test logs" });
+    serviceLogsMock.mockResolvedValue({ error: "", output: "" });
     serviceDownMock.mockResolvedValueOnce();
 
     await import("./post.js");
@@ -97,10 +97,6 @@ describe("post", () => {
       serviceLogger: debugMock,
     });
 
-    expect(debugMock).toHaveBeenNthCalledWith(
-      1,
-      "docker compose logs:\ntest logs",
-    );
     expect(infoMock).toHaveBeenNthCalledWith(1, "docker compose is down");
 
     expect(setFailedMock).not.toHaveBeenCalled();
