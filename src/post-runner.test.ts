@@ -134,6 +134,7 @@ describe("run", () => {
     await run();
 
     // Assert
+    expect(debugMock).toHaveBeenCalledWith("docker compose logs:");
     expect(debugMock).toHaveBeenCalledWith(
       "docker compose error:\ntest logs error",
     );

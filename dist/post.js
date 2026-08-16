@@ -27140,16 +27140,12 @@ var DockerComposeService = class {
     }
   }
   async logs({ services, ...optionsInputs }) {
-    const commandArgs = this.getDockerComposeCommandArgs("logs", {
-      dockerFlags: optionsInputs.dockerFlags,
-      composeFlags: optionsInputs.composeFlags,
-      composeFiles: optionsInputs.composeFiles,
-      commandArgs: services
-    });
+    const options = this.getCommonOptions(optionsInputs);
+    const { executablePath, executableArgs } = this.getDockerComposeCommandExecution("logs", services, options);
     return new Promise((resolve) => {
       let settled = false;
-      const childProcess = spawn("docker", commandArgs, {
-        cwd: optionsInputs.cwd
+      const childProcess = spawn(executablePath, executableArgs, {
+        cwd: options.cwd
       });
       childProcess.on("error", (error2) => {
         if (settled) {
@@ -27170,10 +27166,10 @@ var DockerComposeService = class {
         return;
       }
       childProcess.stdout.on("data", (chunk) => {
-        optionsInputs.serviceLogger(chunk.toString());
+        options.callback?.(Buffer.from(chunk), "stdout");
       });
       childProcess.stderr.on("data", (chunk) => {
-        optionsInputs.serviceLogger(chunk.toString());
+        options.callback?.(Buffer.from(chunk), "stderr");
       });
       childProcess.on("close", (exitCode, signal) => {
         if (settled) {
@@ -27206,29 +27202,54 @@ var DockerComposeService = class {
     };
   }
   /**
-   * Builds docker CLI arguments in the order expected by `docker compose`.
-   */
-  getDockerComposeCommandArgs(command, {
-    dockerFlags,
-    composeFlags,
-    composeFiles,
-    commandArgs
-  }) {
-    return [
-      ...dockerFlags,
-      "compose",
-      ...composeFlags,
-      ...composeFiles.flatMap((composeFile) => ["-f", composeFile]),
-      command,
-      ...commandArgs
-    ];
-  }
-  /**
    * Formats docker-compose errors into proper Error objects with readable messages
    */
   formatDockerComposeError(error2) {
+    return new Error(this.getDockerComposeErrorMessage(error2));
+  }
+  getDockerComposeCommandExecution(command, commandArgs, options) {
+    const composeArgs = [
+      ...this.getComposeOptionArgs(options.composeOptions),
+      ...this.getConfigArgs(options.config),
+      command,
+      ...this.getComposeOptionArgs(options.commandOptions),
+      ...commandArgs
+    ];
+    if (options.executable?.standalone) {
+      return {
+        executablePath: options.executable.executablePath ?? "docker-compose",
+        executableArgs: composeArgs
+      };
+    }
+    return {
+      executablePath: options.executable?.executablePath ?? "docker",
+      executableArgs: [
+        ...this.getComposeOptionArgs(options.executable?.options),
+        "compose",
+        ...composeArgs
+      ]
+    };
+  }
+  getConfigArgs(config) {
+    if (typeof config === "undefined") {
+      return [];
+    }
+    if (typeof config === "string") {
+      return ["-f", config];
+    }
+    return config.flatMap((item) => ["-f", item]);
+  }
+  getComposeOptionArgs(composeOptions) {
+    if (!composeOptions) {
+      return [];
+    }
+    return composeOptions.flatMap(
+      (option) => Array.isArray(option) ? option : [option]
+    );
+  }
+  getDockerComposeErrorMessage(error2) {
     if (error2 instanceof Error) {
-      return error2;
+      return error2.message;
     }
     if (this.isDockerComposeResult(error2)) {
       const parts = [];
@@ -27247,12 +27268,12 @@ var DockerComposeService = class {
         parts.push("\nStandard output:");
         parts.push(error2.out.trim());
       }
-      return new Error(parts.join("\n"));
+      return parts.join("\n");
     }
     if (typeof error2 === "string") {
-      return new Error(error2);
+      return error2;
     }
-    return new Error(JSON.stringify(error2));
+    return JSON.stringify(error2);
   }
   /**
    * Type guard to check if an object is a docker-compose result
@@ -27392,6 +27413,7 @@ async function run() {
     const dockerComposeService = new DockerComposeService();
     const inputs = inputService.getInputs();
     try {
+      loggerService.debug("docker compose logs:");
       const { error: error2 } = await dockerComposeService.logs({
         dockerFlags: inputs.dockerFlags,
         composeFiles: inputs.composeFiles,

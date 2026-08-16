@@ -16,6 +16,8 @@ export async function run(): Promise<void> {
     const inputs = inputService.getInputs();
 
     try {
+      loggerService.debug("docker compose logs:");
+
       const { error } = await dockerComposeService.logs({
         dockerFlags: inputs.dockerFlags,
         composeFiles: inputs.composeFiles,
