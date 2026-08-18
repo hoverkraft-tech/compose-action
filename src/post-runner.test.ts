@@ -42,6 +42,7 @@ const { DockerComposeService } = await import(
 describe("run", () => {
   let infoMock: ReturnType<typeof vi.spyOn>;
   let debugMock: ReturnType<typeof vi.spyOn>;
+  let warnMock: ReturnType<typeof vi.spyOn>;
   let getInputsMock: ReturnType<typeof vi.spyOn>;
   let serviceDownMock: ReturnType<typeof vi.spyOn>;
   let serviceLogsMock: ReturnType<typeof vi.spyOn>;
@@ -55,12 +56,15 @@ describe("run", () => {
     debugMock = vi
       .spyOn(LoggerService.prototype, "debug")
       .mockImplementation(() => {});
+    warnMock = vi
+      .spyOn(LoggerService.prototype, "warn")
+      .mockImplementation(() => {});
     getInputsMock = vi.spyOn(InputService.prototype, "getInputs");
     serviceDownMock = vi.spyOn(DockerComposeService.prototype, "down");
     serviceLogsMock = vi.spyOn(DockerComposeService.prototype, "logs");
   });
 
-  it("should bring down docker compose service(s) and log output", async () => {
+  it("should bring down docker compose service(s)", async () => {
     // Arrange
     getInputsMock.mockImplementation(() => ({
       dockerFlags: [],
@@ -75,7 +79,7 @@ describe("run", () => {
       serviceLogLevel: LogLevel.Debug,
     }));
 
-    serviceLogsMock.mockResolvedValue({ error: "", output: "test logs" });
+    serviceLogsMock.mockResolvedValue({ error: "", output: "" });
     serviceDownMock.mockResolvedValue();
 
     // Act
@@ -100,12 +104,11 @@ describe("run", () => {
       serviceLogger: debugMock,
     });
 
-    expect(debugMock).toHaveBeenCalledWith("docker compose logs:\ntest logs");
     expect(infoMock).toHaveBeenCalledWith("docker compose is down");
     expect(setFailedMock).not.toHaveBeenCalled();
   });
 
-  it("should log docker composer errors if any", async () => {
+  it("should log docker compose command errors if any", async () => {
     // Arrange
     getInputsMock.mockImplementation(() => ({
       dockerFlags: [],
@@ -131,13 +134,38 @@ describe("run", () => {
     await run();
 
     // Assert
+    expect(debugMock).toHaveBeenCalledWith("docker compose logs:");
     expect(debugMock).toHaveBeenCalledWith(
       "docker compose error:\ntest logs error",
     );
-    expect(debugMock).toHaveBeenCalledWith(
-      "docker compose logs:\ntest logs output",
-    );
     expect(infoMock).toHaveBeenCalledWith("docker compose is down");
+  });
+
+  it("should continue cleanup when collecting logs fails", async () => {
+    getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
+      composeFiles: ["docker-compose.yml"],
+      services: [],
+      composeFlags: [],
+      upFlags: [],
+      downFlags: [],
+      cwd: "/current/working/dir",
+      composeVersion: null,
+      githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
+    }));
+
+    serviceLogsMock.mockRejectedValue(new Error("Test logs error"));
+    serviceDownMock.mockResolvedValue();
+
+    await run();
+
+    expect(warnMock).toHaveBeenCalledWith(
+      "Unable to collect docker compose logs before cleanup: Test logs error",
+    );
+    expect(serviceDownMock).toHaveBeenCalled();
+    expect(infoMock).toHaveBeenCalledWith("docker compose is down");
+    expect(setFailedMock).not.toHaveBeenCalled();
   });
 
   it("should set failed when an error occurs", async () => {

@@ -26549,7 +26549,7 @@ var require_dist2 = __commonJS({
       return (0, exports.restartMany)([service], options);
     };
     exports.restartOne = restartOne;
-    var logs2 = function(services, options = {}) {
+    var logs = function(services, options = {}) {
       const args = Array.isArray(services) ? services : [services];
       if (options.follow) {
         args.unshift("--follow");
@@ -26559,7 +26559,7 @@ var require_dist2 = __commonJS({
       }
       return (0, exports.execCompose)("logs", args, options);
     };
-    exports.logs = logs2;
+    exports.logs = logs;
     var port = async function(service, containerPort, options) {
       const args = [service, containerPort];
       try {
@@ -27111,6 +27111,7 @@ function info(message) {
 
 // src/services/docker-compose.service.ts
 var import_docker_compose = __toESM(require_dist2(), 1);
+import { spawn } from "node:child_process";
 var DockerComposeService = class {
   async up({ upFlags, services, ...optionsInputs }) {
     const options = {
@@ -27139,15 +27140,48 @@ var DockerComposeService = class {
     }
   }
   async logs({ services, ...optionsInputs }) {
-    const options = {
-      ...this.getCommonOptions(optionsInputs),
-      follow: false
-    };
-    const { err, out } = await (0, import_docker_compose.logs)(services, options);
-    return {
-      error: err,
-      output: out
-    };
+    const options = this.getCommonOptions(optionsInputs);
+    const { executablePath, executableArgs } = this.getDockerComposeCommandExecution("logs", services, options);
+    return new Promise((resolve) => {
+      let settled = false;
+      const childProcess = spawn(executablePath, executableArgs, {
+        cwd: options.cwd
+      });
+      childProcess.on("error", (error2) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        resolve({
+          error: `Unable to collect docker compose logs: ${error2.message}`,
+          output: ""
+        });
+      });
+      if (!childProcess.stdout || !childProcess.stderr) {
+        settled = true;
+        resolve({
+          error: "Unable to collect docker compose logs: stdout/stderr unavailable",
+          output: ""
+        });
+        return;
+      }
+      childProcess.stdout.on("data", (chunk) => {
+        options.callback?.(Buffer.from(chunk), "stdout");
+      });
+      childProcess.stderr.on("data", (chunk) => {
+        options.callback?.(Buffer.from(chunk), "stderr");
+      });
+      childProcess.on("close", (exitCode, signal) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        resolve({
+          error: signal ? `Docker Compose logs command failed with signal ${signal}` : exitCode !== null && exitCode !== 0 ? `Docker Compose logs command failed with exit code ${exitCode}` : "",
+          output: ""
+        });
+      });
+    });
   }
   getCommonOptions({
     dockerFlags,
@@ -27171,8 +27205,51 @@ var DockerComposeService = class {
    * Formats docker-compose errors into proper Error objects with readable messages
    */
   formatDockerComposeError(error2) {
+    return new Error(this.getDockerComposeErrorMessage(error2));
+  }
+  getDockerComposeCommandExecution(command, commandArgs, options) {
+    const composeArgs = [
+      ...this.getComposeOptionArgs(options.composeOptions),
+      ...this.getConfigArgs(options.config),
+      command,
+      ...this.getComposeOptionArgs(options.commandOptions),
+      ...commandArgs
+    ];
+    if (options.executable?.standalone) {
+      return {
+        executablePath: options.executable.executablePath ?? "docker-compose",
+        executableArgs: composeArgs
+      };
+    }
+    return {
+      executablePath: options.executable?.executablePath ?? "docker",
+      executableArgs: [
+        ...this.getComposeOptionArgs(options.executable?.options),
+        "compose",
+        ...composeArgs
+      ]
+    };
+  }
+  getConfigArgs(config) {
+    if (typeof config === "undefined") {
+      return [];
+    }
+    if (typeof config === "string") {
+      return ["-f", config];
+    }
+    return config.flatMap((item) => ["-f", item]);
+  }
+  getComposeOptionArgs(composeOptions) {
+    if (!composeOptions) {
+      return [];
+    }
+    return composeOptions.flatMap(
+      (option) => Array.isArray(option) ? option : [option]
+    );
+  }
+  getDockerComposeErrorMessage(error2) {
     if (error2 instanceof Error) {
-      return error2;
+      return error2.message;
     }
     if (this.isDockerComposeResult(error2)) {
       const parts = [];
@@ -27191,12 +27268,12 @@ var DockerComposeService = class {
         parts.push("\nStandard output:");
         parts.push(error2.out.trim());
       }
-      return new Error(parts.join("\n"));
+      return parts.join("\n");
     }
     if (typeof error2 === "string") {
-      return new Error(error2);
+      return error2;
     }
-    return new Error(JSON.stringify(error2));
+    return JSON.stringify(error2);
   }
   /**
    * Type guard to check if an object is a docker-compose result
@@ -27335,20 +27412,25 @@ async function run() {
     const inputService = new InputService();
     const dockerComposeService = new DockerComposeService();
     const inputs = inputService.getInputs();
-    const { error: error2, output } = await dockerComposeService.logs({
-      dockerFlags: inputs.dockerFlags,
-      composeFiles: inputs.composeFiles,
-      composeFlags: inputs.composeFlags,
-      cwd: inputs.cwd,
-      services: inputs.services,
-      serviceLogger: loggerService.getServiceLogger(inputs.serviceLogLevel)
-    });
-    if (error2) {
-      loggerService.debug(`docker compose error:
+    try {
+      loggerService.debug("docker compose logs:");
+      const { error: error2 } = await dockerComposeService.logs({
+        dockerFlags: inputs.dockerFlags,
+        composeFiles: inputs.composeFiles,
+        composeFlags: inputs.composeFlags,
+        cwd: inputs.cwd,
+        services: inputs.services,
+        serviceLogger: loggerService.getServiceLogger(inputs.serviceLogLevel)
+      });
+      if (error2) {
+        loggerService.debug(`docker compose error:
 ${error2}`);
+      }
+    } catch (error2) {
+      loggerService.warn(
+        `Unable to collect docker compose logs before cleanup: ${error2 instanceof Error ? error2.message : JSON.stringify(error2)}`
+      );
     }
-    loggerService.debug(`docker compose logs:
-${output}`);
     await dockerComposeService.down({
       dockerFlags: inputs.dockerFlags,
       composeFiles: inputs.composeFiles,
