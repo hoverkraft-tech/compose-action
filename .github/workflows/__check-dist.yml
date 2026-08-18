@@ -21,7 +21,7 @@ jobs:
 
       - name: Build dist/ Directory
         id: package
-        run: ${{ steps.setup-node.outputs.run-script-command }} package
+        run: npm run package
 
       # This will fail the workflow if the PR wasn't created by Dependabot.
       - name: Compare Directories

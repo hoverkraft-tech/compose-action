@@ -1,0 +1,3 @@
+[codespell]
+# Skip third-party/generated paths and French-locale content files.
+skip = .git,*.svg,**/package-lock.json,**/dist/**,**/node_modules/**,**/coverage/**,**/junit.xml
