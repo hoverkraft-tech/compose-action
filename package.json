@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@ts-dev-tools/core": "^1.13.1",
-    "esbuild": "^0.28.1"
+    "esbuild": "^0.28.2"
   },
   "scripts": {
     "prepackage": "rm -rf dist",
