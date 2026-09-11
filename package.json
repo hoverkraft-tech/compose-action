@@ -32,7 +32,7 @@
     "docker-compose": "^1.4.2"
   },
   "devDependencies": {
-    "@ts-dev-tools/core": "^1.13.1",
+    "@ts-dev-tools/core": "^1.13.2",
     "esbuild": "^0.28.2"
   },
   "scripts": {
