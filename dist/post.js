@@ -26176,9 +26176,54 @@ var require_dist2 = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.stats = exports.version = exports.port = exports.logs = exports.restartOne = exports.restartMany = exports.restartAll = exports.push = exports.images = exports.ps = exports.configVolumes = exports.configServices = exports.config = exports.pullOne = exports.pullMany = exports.pullAll = exports.createOne = exports.createMany = exports.createAll = exports.buildOne = exports.buildMany = exports.buildAll = exports.run = exports.exec = exports.rm = exports.kill = exports.unpauseOne = exports.pauseOne = exports.stopMany = exports.stopOne = exports.stop = exports.downOne = exports.downMany = exports.down = exports.downAll = exports.upOne = exports.upMany = exports.upAll = exports.execCompose = exports.mapImListOutput = exports.mapPsOutput = void 0;
     var child_process_1 = __importDefault(__require("child_process"));
+    var buffer_1 = __require("buffer");
     var yaml_1 = __importDefault(require_dist());
     var map_ports_1 = __importDefault(require_map_ports());
     var nonEmptyString = (v) => v !== "";
+    var MAX_CAPTURED_OUTPUT_LENGTH = buffer_1.constants.MAX_STRING_LENGTH;
+    var createBufferedOutput = () => ({
+      chunks: [],
+      head: 0,
+      length: 0,
+      truncated: false
+    });
+    var appendBufferedOutput = (output, stream, chunk, maxLength) => {
+      if (chunk.length === 0) {
+        return;
+      }
+      if (maxLength === 0 || stream === "out" && output.length >= maxLength) {
+        output.truncated = true;
+        return;
+      }
+      const chunkString = chunk.toString();
+      const remainingLength = maxLength - output.length;
+      if (chunkString.length > remainingLength) {
+        output.truncated = true;
+      }
+      const retainedChunk = stream === "err" ? chunkString.slice(-maxLength) : chunkString.slice(0, remainingLength);
+      output.chunks.push(retainedChunk);
+      output.length += retainedChunk.length;
+      while (output.length > maxLength) {
+        const first = output.chunks[output.head];
+        const excessLength = output.length - maxLength;
+        if (first.length <= excessLength) {
+          output.length -= first.length;
+          output.chunks[output.head++] = "";
+        } else {
+          output.chunks[output.head] = first.slice(excessLength);
+          output.length -= excessLength;
+        }
+      }
+      if (output.head > 0 && output.head * 2 >= output.chunks.length) {
+        output.chunks = output.chunks.slice(output.head);
+        output.head = 0;
+      }
+    };
+    var assertCompleteOutput = (result, command) => {
+      if (result.truncated.out) {
+        throw new Error(`Cannot parse docker compose ${command} output because stdout was truncated by maxOutputLength. Increase maxOutputLength or omit it.`);
+      }
+    };
     var arrayIncludesTuple = (arr, tuple) => {
       return arr.some((subArray) => Array.isArray(subArray) && subArray.length === tuple.length && subArray.every((value, index) => value === tuple[index]));
     };
@@ -26297,6 +26342,8 @@ var require_dist2 = __commonJS({
       const cwd = options.cwd;
       const env = options.env || void 0;
       const executable = options.executable;
+      const requestedMaxOutputLength = options.maxOutputLength ?? MAX_CAPTURED_OUTPUT_LENGTH;
+      const maxOutputLength = Number.isFinite(requestedMaxOutputLength) ? Math.max(0, Math.min(Math.floor(requestedMaxOutputLength), MAX_CAPTURED_OUTPUT_LENGTH)) : MAX_CAPTURED_OUTPUT_LENGTH;
       let executablePath;
       let executableArgs = [];
       if (executable?.standalone) {
@@ -26313,22 +26360,24 @@ var require_dist2 = __commonJS({
       childProc.on("error", (err) => {
         reject(err);
       });
-      const result = {
-        exitCode: null,
-        err: "",
-        out: ""
-      };
+      const stdout = createBufferedOutput();
+      const stderr = createBufferedOutput();
       childProc.stdout.on("data", (chunk) => {
-        result.out += chunk.toString();
+        appendBufferedOutput(stdout, "out", chunk, maxOutputLength);
         options.callback?.(chunk, "stdout");
       });
       childProc.stderr.on("data", (chunk) => {
-        result.err += chunk.toString();
+        appendBufferedOutput(stderr, "err", chunk, maxOutputLength);
         options.callback?.(chunk, "stderr");
       });
       childProc.on("exit", (exitCode) => {
-        result.exitCode = exitCode;
         setTimeout(() => {
+          const result = {
+            exitCode,
+            out: stdout.chunks.join(""),
+            err: stderr.chunks.join(""),
+            truncated: { out: stdout.truncated, err: stderr.truncated }
+          };
           if (exitCode === 0) {
             resolve(result);
           } else {
@@ -26467,6 +26516,7 @@ var require_dist2 = __commonJS({
     var config = async function(options) {
       try {
         const result = await (0, exports.execCompose)("config", [], options);
+        assertCompleteOutput(result, "config");
         const config2 = yaml_1.default.parse(result.out);
         return {
           ...result,
@@ -26480,6 +26530,7 @@ var require_dist2 = __commonJS({
     var configServices = async function(options) {
       try {
         const result = await (0, exports.execCompose)("config", ["--services"], options);
+        assertCompleteOutput(result, "config --services");
         const services = result.out.split("\n").filter(nonEmptyString);
         return {
           ...result,
@@ -26493,6 +26544,7 @@ var require_dist2 = __commonJS({
     var configVolumes = async function(options) {
       try {
         const result = await (0, exports.execCompose)("config", ["--volumes"], options);
+        assertCompleteOutput(result, "config --volumes");
         const volumes = result.out.split("\n").filter(nonEmptyString);
         return {
           ...result,
@@ -26506,6 +26558,7 @@ var require_dist2 = __commonJS({
     var ps = async function(options) {
       try {
         const result = await (0, exports.execCompose)("ps", [], options);
+        assertCompleteOutput(result, "ps");
         const data = (0, exports.mapPsOutput)(result.out, options);
         return {
           ...result,
@@ -26523,6 +26576,7 @@ var require_dist2 = __commonJS({
           commandOptions: [...options?.commandOptions || [], ["--format", "json"]]
         };
         const result = await (0, exports.execCompose)("images", [], jsonOptions);
+        assertCompleteOutput(result, "images");
         const data = (0, exports.mapImListOutput)(result.out, jsonOptions);
         return {
           ...result,
@@ -26549,7 +26603,7 @@ var require_dist2 = __commonJS({
       return (0, exports.restartMany)([service], options);
     };
     exports.restartOne = restartOne;
-    var logs = function(services, options = {}) {
+    var logs2 = function(services, options = {}) {
       const args = Array.isArray(services) ? services : [services];
       if (options.follow) {
         args.unshift("--follow");
@@ -26559,11 +26613,12 @@ var require_dist2 = __commonJS({
       }
       return (0, exports.execCompose)("logs", args, options);
     };
-    exports.logs = logs;
+    exports.logs = logs2;
     var port = async function(service, containerPort, options) {
       const args = [service, containerPort];
       try {
         const result = await (0, exports.execCompose)("port", args, options);
+        assertCompleteOutput(result, "port");
         const [address, port2] = result.out.split(":");
         return {
           ...result,
@@ -26580,6 +26635,7 @@ var require_dist2 = __commonJS({
     var version = async function(options) {
       try {
         const result = await (0, exports.execCompose)("version", ["--short"], options);
+        assertCompleteOutput(result, "version");
         const version2 = result.out.replace("\n", "").trim();
         return {
           ...result,
@@ -26594,6 +26650,7 @@ var require_dist2 = __commonJS({
       const args = ["--no-stream", "--format", '"{{ json . }}"', service];
       try {
         const result = await (0, exports.execCompose)("stats", args, options);
+        assertCompleteOutput(result, "stats");
         const output = result.out.replace("\n", "").trim().slice(1, -1);
         return JSON.parse(output);
       } catch (error2) {
@@ -27111,7 +27168,6 @@ function info(message) {
 
 // src/services/docker-compose.service.ts
 var import_docker_compose = __toESM(require_dist2(), 1);
-import { spawn } from "node:child_process";
 var DockerComposeService = class {
   async up({ upFlags, services, ...optionsInputs }) {
     const options = {
@@ -27140,48 +27196,23 @@ var DockerComposeService = class {
     }
   }
   async logs({ services, ...optionsInputs }) {
-    const options = this.getCommonOptions(optionsInputs);
-    const { executablePath, executableArgs } = this.getDockerComposeCommandExecution("logs", services, options);
-    return new Promise((resolve) => {
-      let settled = false;
-      const childProcess = spawn(executablePath, executableArgs, {
-        cwd: options.cwd
-      });
-      childProcess.on("error", (error2) => {
-        if (settled) {
-          return;
-        }
-        settled = true;
-        resolve({
-          error: `Unable to collect docker compose logs: ${error2.message}`,
-          output: ""
-        });
-      });
-      if (!childProcess.stdout || !childProcess.stderr) {
-        settled = true;
-        resolve({
-          error: "Unable to collect docker compose logs: stdout/stderr unavailable",
-          output: ""
-        });
-        return;
-      }
-      childProcess.stdout.on("data", (chunk) => {
-        options.callback?.(Buffer.from(chunk), "stdout");
-      });
-      childProcess.stderr.on("data", (chunk) => {
-        options.callback?.(Buffer.from(chunk), "stderr");
-      });
-      childProcess.on("close", (exitCode, signal) => {
-        if (settled) {
-          return;
-        }
-        settled = true;
-        resolve({
-          error: signal ? `Docker Compose logs command failed with signal ${signal}` : exitCode !== null && exitCode !== 0 ? `Docker Compose logs command failed with exit code ${exitCode}` : "",
-          output: ""
-        });
-      });
-    });
+    const options = {
+      ...this.getCommonOptions(optionsInputs),
+      follow: false,
+      maxOutputLength: 0
+    };
+    try {
+      const { err, out } = await (0, import_docker_compose.logs)(services, options);
+      return {
+        error: err,
+        output: out
+      };
+    } catch (error2) {
+      return {
+        error: this.getDockerComposeErrorMessage(error2),
+        output: ""
+      };
+    }
   }
   getCommonOptions({
     dockerFlags,
@@ -27206,46 +27237,6 @@ var DockerComposeService = class {
    */
   formatDockerComposeError(error2) {
     return new Error(this.getDockerComposeErrorMessage(error2));
-  }
-  getDockerComposeCommandExecution(command, commandArgs, options) {
-    const composeArgs = [
-      ...this.getComposeOptionArgs(options.composeOptions),
-      ...this.getConfigArgs(options.config),
-      command,
-      ...this.getComposeOptionArgs(options.commandOptions),
-      ...commandArgs
-    ];
-    if (options.executable?.standalone) {
-      return {
-        executablePath: options.executable.executablePath ?? "docker-compose",
-        executableArgs: composeArgs
-      };
-    }
-    return {
-      executablePath: options.executable?.executablePath ?? "docker",
-      executableArgs: [
-        ...this.getComposeOptionArgs(options.executable?.options),
-        "compose",
-        ...composeArgs
-      ]
-    };
-  }
-  getConfigArgs(config) {
-    if (typeof config === "undefined") {
-      return [];
-    }
-    if (typeof config === "string") {
-      return ["-f", config];
-    }
-    return config.flatMap((item) => ["-f", item]);
-  }
-  getComposeOptionArgs(composeOptions) {
-    if (!composeOptions) {
-      return [];
-    }
-    return composeOptions.flatMap(
-      (option) => Array.isArray(option) ? option : [option]
-    );
   }
   getDockerComposeErrorMessage(error2) {
     if (error2 instanceof Error) {

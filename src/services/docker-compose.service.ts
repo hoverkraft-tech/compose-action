@@ -1,8 +1,9 @@
-import { spawn } from "node:child_process";
 import {
   down,
+  type IDockerComposeLogOptions,
   type IDockerComposeOptions,
   type IDockerComposeResult,
+  logs,
   upAll,
   upMany,
 } from "docker-compose";
@@ -59,62 +60,25 @@ export class DockerComposeService {
     error: string;
     output: string;
   }> {
-    const options = this.getCommonOptions(optionsInputs);
-    const { executablePath, executableArgs } =
-      this.getDockerComposeCommandExecution("logs", services, options);
+    const options: IDockerComposeLogOptions = {
+      ...this.getCommonOptions(optionsInputs),
+      follow: false,
+      maxOutputLength: 0,
+    };
 
-    return new Promise((resolve) => {
-      let settled = false;
-      const childProcess = spawn(executablePath, executableArgs, {
-        cwd: options.cwd,
-      });
+    try {
+      const { err, out } = await logs(services, options);
 
-      childProcess.on("error", (error) => {
-        if (settled) {
-          return;
-        }
-
-        settled = true;
-        resolve({
-          error: `Unable to collect docker compose logs: ${error.message}`,
-          output: "",
-        });
-      });
-
-      if (!childProcess.stdout || !childProcess.stderr) {
-        settled = true;
-        resolve({
-          error:
-            "Unable to collect docker compose logs: stdout/stderr unavailable",
-          output: "",
-        });
-        return;
-      }
-
-      childProcess.stdout.on("data", (chunk: Buffer | string) => {
-        options.callback?.(Buffer.from(chunk), "stdout");
-      });
-
-      childProcess.stderr.on("data", (chunk: Buffer | string) => {
-        options.callback?.(Buffer.from(chunk), "stderr");
-      });
-
-      childProcess.on("close", (exitCode, signal) => {
-        if (settled) {
-          return;
-        }
-
-        settled = true;
-        resolve({
-          error: signal
-            ? `Docker Compose logs command failed with signal ${signal}`
-            : exitCode !== null && exitCode !== 0
-              ? `Docker Compose logs command failed with exit code ${exitCode}`
-              : "",
-          output: "",
-        });
-      });
-    });
+      return {
+        error: err,
+        output: out,
+      };
+    } catch (error) {
+      return {
+        error: this.getDockerComposeErrorMessage(error),
+        output: "",
+      };
+    }
   }
 
   private getCommonOptions({
@@ -141,66 +105,6 @@ export class DockerComposeService {
    */
   private formatDockerComposeError(error: unknown): Error {
     return new Error(this.getDockerComposeErrorMessage(error));
-  }
-
-  private getDockerComposeCommandExecution(
-    command: string,
-    commandArgs: string[],
-    options: IDockerComposeOptions,
-  ): {
-    executablePath: string;
-    executableArgs: string[];
-  } {
-    const composeArgs = [
-      ...this.getComposeOptionArgs(options.composeOptions),
-      ...this.getConfigArgs(options.config),
-      command,
-      ...this.getComposeOptionArgs(options.commandOptions),
-      ...commandArgs,
-    ];
-
-    if (options.executable?.standalone) {
-      return {
-        executablePath: options.executable.executablePath ?? "docker-compose",
-        executableArgs: composeArgs,
-      };
-    }
-
-    return {
-      executablePath: options.executable?.executablePath ?? "docker",
-      executableArgs: [
-        ...this.getComposeOptionArgs(options.executable?.options),
-        "compose",
-        ...composeArgs,
-      ],
-    };
-  }
-
-  private getConfigArgs(config: IDockerComposeOptions["config"]): string[] {
-    if (typeof config === "undefined") {
-      return [];
-    }
-
-    if (typeof config === "string") {
-      return ["-f", config];
-    }
-
-    return config.flatMap((item) => ["-f", item]);
-  }
-
-  private getComposeOptionArgs(
-    composeOptions:
-      | IDockerComposeOptions["composeOptions"]
-      | IDockerComposeOptions["commandOptions"]
-      | NonNullable<IDockerComposeOptions["executable"]>["options"],
-  ): string[] {
-    if (!composeOptions) {
-      return [];
-    }
-
-    return composeOptions.flatMap((option) =>
-      Array.isArray(option) ? option : [option],
-    );
   }
 
   private getDockerComposeErrorMessage(error: unknown): string {
