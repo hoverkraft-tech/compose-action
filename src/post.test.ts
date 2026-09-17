@@ -73,7 +73,7 @@ describe("post", () => {
       serviceLogLevel: LogLevel.Debug,
     }));
 
-    serviceLogsMock.mockResolvedValue({ error: "", output: "" });
+    serviceLogsMock.mockResolvedValue({ error: "" });
     serviceDownMock.mockResolvedValueOnce();
 
     await import("./post.js");

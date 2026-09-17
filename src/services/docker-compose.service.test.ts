@@ -373,10 +373,7 @@ describe("DockerComposeService", () => {
 
       logsMock.mockResolvedValue({ exitCode: 0, err: "", out: "" });
 
-      await expect(service.logs(logsInputs)).resolves.toEqual({
-        error: "",
-        output: "",
-      });
+      await expect(service.logs(logsInputs)).resolves.toEqual({ error: "" });
 
       expect(logsMock).toHaveBeenCalledWith(["helloworld2", "helloworld3"], {
         composeOptions: ["--profile", "ci"],
@@ -417,7 +414,6 @@ describe("DockerComposeService", () => {
       await expect(service.logs(logsInputs)).resolves.toEqual({
         error:
           "Docker Compose command failed with exit code 1\n\nError output:\nError output",
-        output: "",
       });
     });
 
@@ -435,7 +431,6 @@ describe("DockerComposeService", () => {
 
       await expect(service.logs(logsInputs)).resolves.toEqual({
         error: "spawn ENOENT",
-        output: "",
       });
     });
   });

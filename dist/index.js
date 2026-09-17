@@ -31465,15 +31465,13 @@ var DockerComposeService = class {
       maxOutputLength: 0
     };
     try {
-      const { err, out } = await (0, import_docker_compose.logs)(services, options);
+      const { err } = await (0, import_docker_compose.logs)(services, options);
       return {
-        error: err,
-        output: out
+        error: err
       };
     } catch (error2) {
       return {
-        error: this.getDockerComposeErrorMessage(error2),
-        output: ""
+        error: this.getDockerComposeErrorMessage(error2)
       };
     }
   }
