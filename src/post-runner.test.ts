@@ -167,6 +167,33 @@ describe("run", () => {
     expect(setFailedMock).not.toHaveBeenCalled();
   });
 
+  it("should stringify unknown log collection failures and continue cleanup", async () => {
+    getInputsMock.mockImplementation(() => ({
+      dockerFlags: [],
+      composeFiles: ["docker-compose.yml"],
+      services: [],
+      composeFlags: [],
+      upFlags: [],
+      downFlags: [],
+      cwd: "/current/working/dir",
+      composeVersion: null,
+      githubToken: null,
+      serviceLogLevel: LogLevel.Debug,
+    }));
+
+    serviceLogsMock.mockRejectedValue("Test logs error");
+    serviceDownMock.mockResolvedValue();
+
+    await run();
+
+    expect(warnMock).toHaveBeenCalledWith(
+      'Unable to collect docker compose logs before cleanup: "Test logs error"',
+    );
+    expect(serviceDownMock).toHaveBeenCalled();
+    expect(infoMock).toHaveBeenCalledWith("docker compose is down");
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+
   it("should set failed when an error occurs", async () => {
     // Arrange
     getInputsMock.mockImplementation(() => {
