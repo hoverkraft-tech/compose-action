@@ -79,7 +79,7 @@ describe("run", () => {
       serviceLogLevel: LogLevel.Debug,
     }));
 
-    serviceLogsMock.mockResolvedValue({ error: "", output: "" });
+    serviceLogsMock.mockResolvedValue({ error: "" });
     serviceDownMock.mockResolvedValue();
 
     // Act
@@ -125,7 +125,6 @@ describe("run", () => {
 
     serviceLogsMock.mockResolvedValue({
       error: "test logs error",
-      output: "test logs output",
     });
 
     serviceDownMock.mockResolvedValue();

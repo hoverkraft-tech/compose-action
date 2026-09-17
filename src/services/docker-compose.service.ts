@@ -58,7 +58,6 @@ export class DockerComposeService {
 
   async logs({ services, ...optionsInputs }: LogsInputs): Promise<{
     error: string;
-    output: string;
   }> {
     const options: IDockerComposeLogOptions = {
       ...this.getCommonOptions(optionsInputs),
@@ -67,16 +66,14 @@ export class DockerComposeService {
     };
 
     try {
-      const { err, out } = await logs(services, options);
+      const { err } = await logs(services, options);
 
       return {
         error: err,
-        output: out,
       };
     } catch (error) {
       return {
         error: this.getDockerComposeErrorMessage(error),
-        output: "",
       };
     }
   }
