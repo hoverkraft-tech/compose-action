@@ -173,10 +173,14 @@ jobs:
           - name: Given OCI compose artifact when running action
             assertion-name: "Then the OCI compose application runs"
             compose-file: oci://localhost:5000/compose-action-test:latest
+            # Older runner versions lose the registry option when reloading OCI artifacts.
+            # https://github.com/docker/compose/pull/13825
+            compose-version: latest
+            compose-flags: "--insecure-registry localhost:5000"
             publish-oci-artifact: true
             source-compose-file: ./test/docker-compose.yml
             assertion: |
-              docker compose -f "$OCI_COMPOSE_FILE" ps service-a | grep service-a | grep "Up" || (echo "Service service-a is not running from the OCI artifact" && exit 1)
+              docker compose --insecure-registry localhost:5000 -f "$OCI_COMPOSE_FILE" ps service-a | grep service-a | grep "Up" || (echo "Service service-a is not running from the OCI artifact" && exit 1)
 
     env:
       DOCKER_COMPOSE_VERSION: ${{ matrix.expected-compose-version || '' }}
@@ -218,7 +222,7 @@ jobs:
           OCI_REGISTRY_RETRY_DELAY_SECONDS=1
 
           # Keep the registry on port 5000 so it matches the OCI reference configured in the test matrix.
-          OCI_REGISTRY_CONTAINER_ID=$(docker run -d -p 5000:5000 "$OCI_REGISTRY_IMAGE")
+          OCI_REGISTRY_CONTAINER_ID=$(docker run -d -p 127.0.0.1:5000:5000 "$OCI_REGISTRY_IMAGE")
           echo "OCI_REGISTRY_CONTAINER_ID=$OCI_REGISTRY_CONTAINER_ID" >> "$GITHUB_ENV"
 
           retry_count=0
@@ -239,7 +243,7 @@ jobs:
         run: |
           OCI_REPOSITORY="${{ matrix.compose-file }}"
           OCI_PUBLISH_TARGET="${OCI_REPOSITORY#oci://}"
-          docker compose -f "${{ matrix.source-compose-file }}" publish "$OCI_PUBLISH_TARGET"
+          docker compose -f "${{ matrix.source-compose-file }}" publish --insecure-registry "$OCI_PUBLISH_TARGET"
 
       - name: "Arrange: ensure original docker compose version is not the expected one"
         if: ${{ matrix.ensure-version-mismatch }}
@@ -253,7 +257,7 @@ jobs:
           fi
 
       - name: Act
-        uses: ./
+        uses: $/
         with:
           compose-file: ${{ matrix.use-absolute-path && steps.compose-path.outputs.absolute || matrix.compose-file }}
           services: ${{ matrix.services || '' }}
