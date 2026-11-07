@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   ci:
-    uses: ./.github/workflows/__shared-ci.yml
+    uses: $/.github/workflows/__shared-ci.yml
     permissions:
       actions: read
       contents: read
