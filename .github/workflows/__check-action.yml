@@ -191,7 +191,7 @@ jobs:
 
       - name: Set up Docker context
         if: ${{ matrix.docker-context }}
-        uses: docker/setup-docker-action@2bf61fb9464cc67f0cbdeabed6aa0380accd1c70 # v5.5.0
+        uses: docker/setup-docker-action@3f1ab1ab0e29231562e4db4ca600c1a49653bac6 # v5.7.0
         with:
           context: ${{ matrix.docker-context }}
 
