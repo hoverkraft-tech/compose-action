@@ -6,7 +6,7 @@ WORKDIR /app
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
-HEALTHCHECK CMD grep -qa "entrypoint.sh" /proc/1/cmdline || exit 1
+HEALTHCHECK CMD ["grep", "-qa", "entrypoint.sh", "/proc/1/cmdline"]
 
 CMD ["/bin/sh", "entrypoint.sh"]
 
