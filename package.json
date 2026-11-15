@@ -39,6 +39,7 @@
     "prepackage": "rm -rf dist",
     "package": "esbuild src/index.ts src/post.ts --bundle --format=esm --platform=node --target=node24 --outdir=dist --entry-names=[name] --banner:js='import { createRequire } from \"node:module\";const require = createRequire(import.meta.url);'",
     "package:watch": "npm run package -- --watch",
+    "check:dist": "npm run package && git diff --exit-code -- dist && test -z \"$(git ls-files --others --exclude-standard -- dist)\"",
     "lint": "biome lint --error-on-warnings .",
     "lint:ci": "biome lint --error-on-warnings . --reporter=sarif | tee biome-report.sarif",
     "all": "npm run format && npm run lint:ci && npm run test:ci && npm run package",
