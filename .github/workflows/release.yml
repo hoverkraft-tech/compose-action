@@ -1,0 +1,84 @@
+# Validate the selected commit before publication. The release event updates
+# the major alias through release-new-action-version.yml.
+name: Release
+
+on:
+  workflow_dispatch:
+    # checkov:skip=CKV_GHA_7: force only bypasses change detection; the source and validation stay fixed.
+    inputs:
+      force:
+        description: Release even when no relevant changes are detected
+        type: boolean
+        default: false
+  schedule:
+    - cron: "25 8 * * 1"
+
+permissions: {}
+
+env:
+  RELEASE_CONFIG_OVERRIDES: |
+    tag-prefix: v
+    tag-template: "v$RESOLVED_VERSION"
+
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    if: github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      should-release: ${{ steps.plan.outputs.should-release }}
+      tag: ${{ steps.plan.outputs.tag }}
+    steps:
+      - id: plan
+        uses: hoverkraft-tech/ci-github-publish/actions/release/plan@c3cd9bbbc4909bb341bd2aafe50a8673afc58fd0 # 3.0.6
+        with:
+          target-ref: ${{ github.sha }}
+          config-overrides: ${{ env.RELEASE_CONFIG_OVERRIDES }}
+          force: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
+
+  validate:
+    needs: plan
+    if: needs.plan.outputs.should-release == 'true'
+    uses: $/.github/workflows/__shared-ci.yml
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      issues: write
+      packages: read
+      pull-requests: write
+      security-events: write
+      statuses: write
+
+  release:
+    needs: [plan, validate]
+    runs-on: ubuntu-latest
+    environment: releaseNewActionVersion
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - id: generate-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.CI_BOT_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env] release identity triggers tag documentation
+          permission-contents: write
+          permission-pull-requests: read
+
+      - name: Publish release and AI summary
+        uses: hoverkraft-tech/ci-github-publish/actions/release/create@c3cd9bbbc4909bb341bd2aafe50a8673afc58fd0 # 3.0.6
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # zizmor: ignore[secrets-outside-env] summary credential stays scoped to publication
+        with:
+          tag: ${{ needs.plan.outputs.tag }}
+          target-ref: ${{ github.sha }}
+          config-overrides: ${{ env.RELEASE_CONFIG_OVERRIDES }}
+          changelog-summary: ${{ format('{{"llmAuth":{0},"llmProvider":"openai"}}', toJSON(env.OPENAI_API_KEY)) }}
+          github-token: ${{ steps.generate-token.outputs.token }}

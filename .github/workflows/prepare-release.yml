@@ -3,7 +3,7 @@ name: "Prepare release"
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [opened, reopened, synchronize, edited]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,7 +13,7 @@ permissions: {}
 
 jobs:
   release:
-    uses: hoverkraft-tech/ci-github-publish/.github/workflows/prepare-release.yml@78a540b1bf0b18dd2f160c98943f61eefb03e8b9 # 3.0.4
+    uses: hoverkraft-tech/ci-github-publish/.github/workflows/prepare-release.yml@c3cd9bbbc4909bb341bd2aafe50a8673afc58fd0 # 3.0.6
     permissions:
       contents: read
       pull-requests: write
