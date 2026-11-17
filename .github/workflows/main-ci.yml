@@ -73,6 +73,8 @@ jobs:
         with:
           github-token: ${{ steps.generate-token.outputs.token }}
           branch: docs/actions-workflows-documentation-update
+          # GitHub cannot sign rebase merges for the protected main branch.
+          merge-method: squash
           title: "docs: update actions and workflows documentation"
           body: Update actions and workflows documentation
           commit-message: |
