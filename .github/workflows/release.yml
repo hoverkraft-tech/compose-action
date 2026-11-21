@@ -74,11 +74,9 @@ jobs:
 
       - name: Publish release and AI summary
         uses: hoverkraft-tech/ci-github-publish/actions/release/create@d034b96d52f6f32c58a93bcd87a06932f50d8b26 # 3.1.0
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # zizmor: ignore[secrets-outside-env] summary credential stays scoped to publication
         with:
           tag: ${{ needs.plan.outputs.tag }}
           target-ref: ${{ github.sha }}
           config-overrides: ${{ env.RELEASE_CONFIG_OVERRIDES }}
-          changelog-summary: ${{ format('{{"llmAuth":{0},"llmProvider":"openai"}}', toJSON(env.OPENAI_API_KEY)) }}
+          changelog-summary: ${{ secrets.CHANGELOG_SUMMARY }}
           github-token: ${{ steps.generate-token.outputs.token }}
