@@ -36,7 +36,7 @@ jobs:
       tag: ${{ steps.plan.outputs.tag }}
     steps:
       - id: plan
-        uses: hoverkraft-tech/ci-github-publish/actions/release/plan@d034b96d52f6f32c58a93bcd87a06932f50d8b26 # 3.1.0
+        uses: hoverkraft-tech/ci-github-publish/actions/release/plan@79515002f850e714d4c76f07983e6eb1ba97bea5 # 3.1.1
         with:
           target-ref: ${{ github.sha }}
           config-overrides: ${{ env.RELEASE_CONFIG_OVERRIDES }}
@@ -73,7 +73,7 @@ jobs:
           permission-pull-requests: read
 
       - name: Publish release and AI summary
-        uses: hoverkraft-tech/ci-github-publish/actions/release/create@d034b96d52f6f32c58a93bcd87a06932f50d8b26 # 3.1.0
+        uses: hoverkraft-tech/ci-github-publish/actions/release/create@79515002f850e714d4c76f07983e6eb1ba97bea5 # 3.1.1
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # zizmor: ignore[secrets-outside-env] summary credential stays scoped to publication
         with:
