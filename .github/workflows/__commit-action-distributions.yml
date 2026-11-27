@@ -9,7 +9,7 @@ permissions: {}
 
 jobs:
   distributions:
-    uses: hoverkraft-tech/ci-github-common/.github/workflows/action-distributions.yml@d606f77fad305ef07dfde3db5270f5e324019c97 # 4.2.4
+    uses: hoverkraft-tech/ci-github-common/.github/workflows/action-distributions.yml@f165c0ca3e88604611481e1408ace1e0e3a5ee47 # 4.3.1
     permissions:
       actions: read
       contents: read
